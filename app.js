@@ -2,7 +2,13 @@ const	createError = require('http-errors'),
 		express = require('express'),
 		path = require('path'),
 		cookieParser = require('cookie-parser'),
-		logger = require('morgan');
+		logger = require('morgan'),
+		expressSession	= require('express-session'),
+		mongoose = require('mongoose'),
+		User = require('./models/user'),
+		passport = require('passport'),
+		localStrategy = require('passport-local'),
+		passportLocalMongoose = require('passport-local-mongoose');
 
 const	indexRouter = require('./routes/index'),
 		usersRouter = require('./routes/users');
@@ -19,23 +25,41 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// ==============
+// Authentication
+// ==============
+mongoose.connect(process.env.DB_HOST);
+
+app.use(expressSession({
+	secret: process.env.APP_SECRET,
+	saveUninitialized: false,
+	resave: false
+}))
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
+
+
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
-  next(createError(404));
+	next(createError(404));
 });
 
 // error handler
 app.use((err, req, res, next) => {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+	// set locals, only providing error in development
+	res.locals.message = err.message;
+	res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+	// render the error page
+	res.status(err.status || 500);
+	res.render('error');
 });
 
 module.exports = app;
