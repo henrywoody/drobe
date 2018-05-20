@@ -11,7 +11,8 @@ const	createError = require('http-errors'),
 		passportLocalMongoose = require('passport-local-mongoose');
 
 const	indexRouter = require('./routes/index'),
-		usersRouter = require('./routes/users');
+		usersRouter = require('./routes/users'),
+		apiRouter = require('./routes/api');
 
 const app = express();
 
@@ -45,6 +46,7 @@ passport.deserializeUser(User.deserializeUser());
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/api', apiRouter);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
