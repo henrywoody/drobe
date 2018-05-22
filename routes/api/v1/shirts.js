@@ -25,11 +25,11 @@ router.get('/:id', async (req, res) => {
 		}
 		res.json(shirt);
 	} catch (err) {
-		console.log(err);
 		if (err.name === 'CastError' || err.name === 'NotFound') {
 			res.status(404).send(`Could not find shirt with id: ${id}.`);
 			return;
 		}
+		console.log(err);
 		res.status(500).send('There was a problem with the server.');
 	}
 })
@@ -61,11 +61,11 @@ router.put('/:id', async (req, res) => {
 		}
 		res.json(updatedShirt);
 	} catch (err) {
-		console.log(err);
 		if (err.name === 'CastError' || err.name === 'NotFound') {
 			res.status(404).send(`Could not find shirt with id: ${id}.`);
 			return;
 		}
+		console.log(err);
 		res.status(500).send('There was a problem with the server.');
 	}
 })
@@ -82,11 +82,11 @@ router.delete('/:id', async (req, res) => {
 		}
 		res.send('Successfully deleted.')
 	} catch (err) {
-		console.log(err);
 		if (err.name === 'CastError' || err.name === 'NotFound') {
 			res.status(404).send(`Could not find shirt with id: ${id}.`);
 			return;
 		}
+		console.log(err);
 		res.status(500).send('There was a problem with the server.');
 	}
 })
