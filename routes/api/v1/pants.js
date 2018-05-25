@@ -38,8 +38,7 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
 	try {
 		const { pair } = req.body;
-		const pairData = JSON.parse(pair);
-		const newPair = await Pants.create(pairData);
+		const newPair = await Pants.create(pair);
 		res.json(newPair);
 	} catch (err) {
 		console.log(err);
@@ -52,8 +51,7 @@ router.put('/:id', async (req, res) => {
 	const { id } = req.params;
 	try {
 		const { pair } = req.body;
-		const pairData = JSON.parse(pair);
-		const updatedPair = await Pants.findByIdAndUpdate(id, pairData, {new: true});
+		const updatedPair = await Pants.findByIdAndUpdate(id, pair, {new: true});
 		if (!updatedPair) {
 			const err = new Error('Pants Not Found.');
 			err.name = 'NotFound';

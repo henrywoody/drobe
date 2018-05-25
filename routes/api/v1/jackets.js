@@ -38,8 +38,7 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
 	try {
 		const { jacket } = req.body;
-		const jacketData = JSON.parse(jacket);
-		const newJacket = await Jacket.create(jacketData);
+		const newJacket = await Jacket.create(jacket);
 		res.json(newJacket);
 	} catch (err) {
 		console.log(err);
@@ -52,8 +51,7 @@ router.put('/:id', async (req, res) => {
 	const { id } = req.params;
 	try {
 		const { jacket } = req.body;
-		const jacketData = JSON.parse(jacket);
-		const updatedJacket = await Jacket.findByIdAndUpdate(id, jacketData, {new: true});
+		const updatedJacket = await Jacket.findByIdAndUpdate(id, jacket, {new: true});
 		if (!updatedJacket) {
 			const err = new Error('Jacket Not Found.');
 			err.name = 'NotFound';

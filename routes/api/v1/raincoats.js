@@ -38,8 +38,7 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
 	try {
 		const { raincoat } = req.body;
-		const raincoatData = JSON.parse(raincoat);
-		const newRaincoat = await Raincoat.create(raincoatData);
+		const newRaincoat = await Raincoat.create(raincoat);
 		res.json(newRaincoat);
 	} catch (err) {
 		console.log(err);
@@ -52,8 +51,7 @@ router.put('/:id', async (req, res) => {
 	const { id } = req.params;
 	try {
 		const { raincoat } = req.body;
-		const raincoatData = JSON.parse(raincoat);
-		const updatedRaincoat = await Raincoat.findByIdAndUpdate(id, raincoatData, {new: true});
+		const updatedRaincoat = await Raincoat.findByIdAndUpdate(id, raincoat, {new: true});
 		if (!updatedRaincoat) {
 			const err = new Error('Raincoat Not Found.');
 			err.name = 'NotFound';
