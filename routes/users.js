@@ -4,9 +4,6 @@ const	express = require('express'),
 		User = require('../models/user'),
 		passport = require('passport');
 
-
-mongoose.connect(process.env.DB_HOST);
-
 /* GET users listing. */
 router.get('/', (req, res, next) => {
   res.send('respond with a resource');

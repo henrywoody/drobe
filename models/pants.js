@@ -1,8 +1,6 @@
 const	mongoose = require('mongoose'),
 		Article = require('./article');
 
-mongoose.connect(process.env.DB_HOST);
-
 pantsSchema = new mongoose.Schema({
 	shirts: [
 		{

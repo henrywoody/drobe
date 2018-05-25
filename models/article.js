@@ -5,8 +5,6 @@ only to be used for inheritance.
 
 const	mongoose = require('mongoose');
 
-mongoose.connect(process.env.DB_HOST);
-
 articleSchema = new mongoose.Schema({
 	name: String,
 	description: String,
