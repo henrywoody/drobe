@@ -3,10 +3,12 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "nodemon ./bin/www",
+    "test-api": "NODE_ENV=test mocha test/api/v1"
   },
   "dependencies": {
     "cookie-parser": "~1.4.3",
+    "cors": "^2.8.4",
     "debug": "~2.6.9",
     "express": "~4.16.0",
     "express-session": "^1.15.6",
@@ -18,5 +20,26 @@
     "passport-local": "^1.0.0",
     "passport-local-mongoose": "^5.0.0",
     "pug": "^2.0.3"
-  }
+  },
+  "description": "Automated outfit picking.",
+  "main": "app.js",
+  "directories": {
+    "test": "test"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "chai-http": "^4.0.0",
+    "mocha": "^5.2.0",
+    "nodemon": "^1.17.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/henrywoody/drobe.git"
+  },
+  "author": "Henry Woody",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/henrywoody/drobe/issues"
+  },
+  "homepage": "https://github.com/henrywoody/drobe#readme"
 }
