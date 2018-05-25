@@ -4,8 +4,9 @@ const	express = require('express'),
 
 // Index
 router.get('/', async (req, res) => {
+	const { user } = req;
 	try {
-		const raincoats = await Raincoat.find({});
+		const raincoats = await Raincoat.find({owner: user._id});
 		res.json(raincoats);
 	} catch (err) {
 		console.log(err);
@@ -15,6 +16,7 @@ router.get('/', async (req, res) => {
 
 // Detail
 router.get('/:id', async (req, res) => {
+	const { user } = req;
 	const { id } = req.params;
 	try {
 		const raincoat = await Raincoat.findById(id);
@@ -23,6 +25,9 @@ router.get('/:id', async (req, res) => {
 			err.name = 'NotFound';
 			throw err;
 		}
+		if (!raincoat.owner.equals(user._id))
+			return res.sendStatus(403);
+
 		res.json(raincoat);
 	} catch (err) {
 		if (err.name === 'CastError' || err.name === 'NotFound') {
@@ -36,9 +41,11 @@ router.get('/:id', async (req, res) => {
 
 // Create
 router.post('/', async (req, res) => {
+	const { user } = req;
 	try {
-		const { raincoat } = req.body;
-		const newRaincoat = await Raincoat.create(raincoat);
+		const { raincoat: raincoatData } = req.body;
+		raincoatData.owner = user._id;
+		const newRaincoat = await Raincoat.create(raincoatData);
 		res.json(newRaincoat);
 	} catch (err) {
 		console.log(err);
@@ -48,15 +55,21 @@ router.post('/', async (req, res) => {
 
 // Update
 router.put('/:id', async (req, res) => {
+	const { user } = req;
 	const { id } = req.params;
 	try {
-		const { raincoat } = req.body;
-		const updatedRaincoat = await Raincoat.findByIdAndUpdate(id, raincoat, {new: true});
-		if (!updatedRaincoat) {
+		const { raincoat: raincoatData } = req.body;
+		const raincoat = await Raincoat.findById(id);
+
+		if (!raincoat) {
 			const err = new Error('Raincoat Not Found.');
 			err.name = 'NotFound';
 			throw err;
 		}
+		if (!raincoat.owner.equals(user._id))
+			return res.sendStatus(403);
+
+		const updatedRaincoat = await Raincoat.findByIdAndUpdate(id, raincoatData, {new: true});
 		res.json(updatedRaincoat);
 	} catch (err) {
 		if (err.name === 'CastError' || err.name === 'NotFound') {
@@ -70,14 +83,20 @@ router.put('/:id', async (req, res) => {
 
 // Delete
 router.delete('/:id', async (req, res) => {
+	const { user } = req;
 	const { id } = req.params;
 	try {
-		const deletedRaincoat = await Raincoat.findByIdAndRemove(id);
-		if (!deletedRaincoat) {
+		const raincoat = await Raincoat.findById(id);
+
+		if (!raincoat) {
 			const err = new Error('Raincoat Not Found');
 			err.name = 'NotFound';
 			throw err;
 		}
+		if (!raincoat.owner.equals(user._id))
+			return res.sendStatus(403);
+
+		await Raincoat.findByIdAndRemove(id);
 		res.send('Successfully deleted.')
 	} catch (err) {
 		if (err.name === 'CastError' || err.name === 'NotFound') {
