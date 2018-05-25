@@ -2,7 +2,8 @@ const	express = require('express'),
 		router = express.Router(),
 		mongoose = require('mongoose'),
 		User = require('../models/user'),
-		passport = require('passport');
+		passport = require('passport'),
+		jwt = require('jsonwebtoken');
 
 /* GET users listing. */
 router.get('/', (req, res, next) => {
@@ -45,9 +46,21 @@ router.get('/login', (req, res, next) => {
 })
 
 router.post('/login', passport.authenticate('local', {
-	successRedirect: 'secret',
 	failureRedirect: 'login'
-}), (req, res) => {
+}), async (req, res) => {
+	const { user } = req;
+
+	const payload = {
+		sub: user._id
+	}
+
+	try {
+		const token = await jwt.sign(payload, global.config.appSecret);
+		res.json({ token });
+	} catch (err) {
+		console.log(err);
+		res.status(500).send('There was a problem with the server.')
+	}
 })
 
 router.get('/logout', (req, res) => {
