@@ -10,6 +10,8 @@ const	createError = require('http-errors'),
 		localStrategy = require('passport-local'),
 		passportLocalMongoose = require('passport-local-mongoose');
 
+const config = require('./config')[process.env.NODE_ENV];
+
 const	indexRouter = require('./routes/index'),
 		usersRouter = require('./routes/users'),
 		apiRouter = require('./routes/api');
@@ -29,10 +31,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 // ==============
 // Authentication
 // ==============
-mongoose.connect(process.env.DB_HOST);
+mongoose.connect(config.dbHost);
 
 app.use(expressSession({
-	secret: process.env.APP_SECRET,
+	secret: config.appSecret,
 	saveUninitialized: false,
 	resave: false
 }))
