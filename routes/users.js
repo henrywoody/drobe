@@ -33,6 +33,28 @@ router.post('/register', async (req, res, next) => {
 	}
 })
 
+router.get('/login', (req, res, next) => {
+	res.send(`
+		<h1>Login</h1>
+		<form method="POST" action="/users/login">
+			<input type="text" placeholder="username" name="username">
+			<input type="password" placeholder="password" name="password">
+			<input type="submit">
+		</form>
+	`)
+})
+
+router.post('/login', passport.authenticate('local', {
+	successRedirect: 'secret',
+	failureRedirect: 'login'
+}), (req, res) => {
+})
+
+router.get('/logout', (req, res) => {
+	req.logout();
+	res.redirect('/');
+})
+
 router.get('/secret', (req, res, next) => {
 	res.send('nice secret');
 })

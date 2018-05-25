@@ -1,20 +1,21 @@
-const	createError = require('http-errors'),
-		express = require('express'),
-		path = require('path'),
-		cookieParser = require('cookie-parser'),
-		logger = require('morgan'),
+const	createError		= require('http-errors'),
+		express			= require('express'),
+		path			= require('path'),
+		cookieParser	= require('cookie-parser'),
+		logger			= require('morgan'),
 		expressSession	= require('express-session'),
-		mongoose = require('mongoose'),
-		User = require('./models/user'),
-		passport = require('passport'),
-		localStrategy = require('passport-local'),
-		passportLocalMongoose = require('passport-local-mongoose');
+		mongoose		= require('mongoose'),
+		User			= require('./models/user'),
+		passport		= require('passport'),
+		localStrategy	= require('passport-local'),
+		passportLocalMongoose = require('passport-local-mongoose'),
+		cors			= require('cors');
 
 const config = require('./config')[process.env.NODE_ENV];
 
-const	indexRouter = require('./routes/index'),
-		usersRouter = require('./routes/users'),
-		apiRouter = require('./routes/api');
+const	indexRouter	= require('./routes/index'),
+		usersRouter	= require('./routes/users'),
+		apiRouter	= require('./routes/api');
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(cors());
 
 // ==============
 // Authentication
@@ -38,9 +40,11 @@ app.use(expressSession({
 	saveUninitialized: false,
 	resave: false
 }))
+
 app.use(passport.initialize());
 app.use(passport.session());
 
+passport.use(new localStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
