@@ -11,7 +11,7 @@ const	createError		= require('http-errors'),
 		passportLocalMongoose = require('passport-local-mongoose'),
 		cors			= require('cors');
 
-const config = require('./config')[process.env.NODE_ENV];
+global.config = require('./config')[process.env.NODE_ENV];
 
 const	indexRouter	= require('./routes/index'),
 		usersRouter	= require('./routes/users'),
@@ -33,10 +33,10 @@ app.use(cors());
 // ==============
 // Authentication
 // ==============
-mongoose.connect(config.dbHost);
+mongoose.connect(global.config.dbHost);
 
 app.use(expressSession({
-	secret: config.appSecret,
+	secret: global.config.appSecret,
 	saveUninitialized: false,
 	resave: false
 }))
