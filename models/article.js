@@ -6,7 +6,7 @@ only to be used for inheritance.
 const	mongoose = require('mongoose');
 
 articleSchema = new mongoose.Schema({
-	name: String,
+	name: { type: String, required: true },
 	description: String,
 	color: String,
 	maxTemp: Number,
@@ -17,7 +17,8 @@ articleSchema = new mongoose.Schema({
 	wearDates: [Date],
 	owner: {
 		type: mongoose.Schema.Types.ObjectId,
-		ref: 'User'
+		ref: 'User',
+		required: true,
 	}
 }, {
 	discriminatorKey: 'kind'
