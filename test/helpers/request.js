@@ -7,17 +7,18 @@ chai.use(chaiHTTP);
 
 module.exports = {
 	get: (endpoint, arg, { headers={} }={}) => {
-		const url = arg ? endpoint + arg : endpoint;
-		return chai.request(app).get(url);
+		const url = arg ? `${endpoint}/${arg}` : endpoint;
+		return chai.request(app).get(url).set(headers);
 	},
-	post: (endpoint, payload,  { headers={} }={}) => {
-		return chai.request(app).post(endpoint).send(payload);
+	post: (endpoint, payload, { headers={} }={}) => {
+		return chai.request(app).post(endpoint).set(headers).send(payload);
 	},
-	put: (endpoint, payload,  { headers={} }={}) => {
-		return chai.request(app).put(endpoint).send(payload);
+	put: (endpoint, arg, payload, { headers={} }={}) => {
+		const url = arg ? `${endpoint}/${arg}` : endpoint;
+		return chai.request(app).put(url).set(headers).send(payload);
 	},
-	delete: (endpoint, arg,  { headers={} }={}) => {
-		const url = arg ? endpoint + arg : endpoint;
-		return chai.request()
+	delete: (endpoint, arg, { headers={} }={}) => {
+		const url = arg ? `${endpoint}/${arg}` : endpoint;
+		return chai.request(app).delete(url).set(headers);
 	}
 }
