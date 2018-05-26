@@ -1,6 +1,7 @@
 const	express = require('express'),
 		router = express.Router(),
-		Pants = require('../../../models/pants');
+		Pants = require('../../../models/pants'),
+		handleErrors = require('../../../modules/handle-db-errors');
 
 // Index
 router.get('/', async (req, res) => {
@@ -9,8 +10,7 @@ router.get('/', async (req, res) => {
 		const pants = await Pants.find({owner: user._id});
 		res.json(pants);
 	} catch (err) {
-		console.log(err);
-		res.status(500).send('There was a problem with the server.')
+		handleErrors(err, res);
 	}
 })
 
@@ -30,12 +30,7 @@ router.get('/:id', async (req, res) => {
 
 		res.json(pair);
 	} catch (err) {
-		if (err.name === 'CastError' || err.name === 'NotFound') {
-			res.status(404).send(`Could not find pants with id: ${id}.`);
-			return;
-		}
-		console.log(err);
-		res.status(500).send('There was a problem with the server.');
+		handleErrors(err, res);
 	}
 })
 
@@ -48,8 +43,7 @@ router.post('/', async (req, res) => {
 		const newPair = await Pants.create(pairData);
 		res.json(newPair);
 	} catch (err) {
-		console.log(err);
-		res.status(500).send('There was a problem with the server.');
+		handleErrors(err, res);
 	}
 })
 
@@ -72,12 +66,7 @@ router.put('/:id', async (req, res) => {
 		const updatedPair = await Pants.findByIdAndUpdate(id, pairData, {new: true});
 		res.json(updatedPair);
 	} catch (err) {
-		if (err.name === 'CastError' || err.name === 'NotFound') {
-			res.status(404).send(`Could not find pants with id: ${id}.`);
-			return;
-		}
-		console.log(err);
-		res.status(500).send('There was a problem with the server.');
+		handleErrors(err, res);
 	}
 })
 
@@ -99,12 +88,7 @@ router.delete('/:id', async (req, res) => {
 		await Pants.findByIdAndRemove(id);
 		res.send('Successfully deleted.');
 	} catch (err) {
-		if (err.name === 'CastError' || err.name === 'NotFound') {
-			res.status(404).send(`Could not find pants with id: ${id}.`);
-			return;
-		}
-		console.log(err);
-		res.status(500).send('There was a problem with the server.');
+		handleErrors(err, res);
 	}
 })
 

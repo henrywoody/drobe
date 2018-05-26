@@ -3,7 +3,8 @@ const	express = require('express'),
 		mongoose = require('mongoose'),
 		User = require('../models/user'),
 		passport = require('passport'),
-		jwt = require('jsonwebtoken');
+		jwt = require('jsonwebtoken'),
+		handleErrors = require('../modules/handle-db-errors');
 
 /* GET users listing. */
 router.get('/', (req, res, next) => {
@@ -29,8 +30,7 @@ router.post('/register', async (req, res, next) => {
 			res.redirect('/users/secret')
 		})
 	} catch (err) {
-		console.log(err)
-		return res.redirect('/users/register');
+		handleErrors(err, res);
 	}
 })
 

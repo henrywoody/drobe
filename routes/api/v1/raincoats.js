@@ -1,6 +1,7 @@
 const	express = require('express'),
 		router = express.Router(),
-		Raincoat = require('../../../models/raincoat');
+		Raincoat = require('../../../models/raincoat'),
+		handleErrors = require('../../../modules/handle-db-errors');
 
 // Index
 router.get('/', async (req, res) => {
@@ -9,8 +10,7 @@ router.get('/', async (req, res) => {
 		const raincoats = await Raincoat.find({owner: user._id});
 		res.json(raincoats);
 	} catch (err) {
-		console.log(err);
-		res.status(500).send('There was a problem with the server.');
+		handleErrors(err, res);
 	}
 })
 
@@ -30,12 +30,7 @@ router.get('/:id', async (req, res) => {
 
 		res.json(raincoat);
 	} catch (err) {
-		if (err.name === 'CastError' || err.name === 'NotFound') {
-			res.status(404).send(`Could not find raincoat with id: ${id}`);
-			return;
-		}
-		console.log(err);
-		res.status(500).send('There was a problem with the server.');
+		handleErrors(err, res);
 	}
 })
 
@@ -48,8 +43,7 @@ router.post('/', async (req, res) => {
 		const newRaincoat = await Raincoat.create(raincoatData);
 		res.json(newRaincoat);
 	} catch (err) {
-		console.log(err);
-		res.status(500).send('There was a problem with the server.');
+		handleErrors(err, res);
 	}
 })
 
@@ -72,12 +66,7 @@ router.put('/:id', async (req, res) => {
 		const updatedRaincoat = await Raincoat.findByIdAndUpdate(id, raincoatData, {new: true});
 		res.json(updatedRaincoat);
 	} catch (err) {
-		if (err.name === 'CastError' || err.name === 'NotFound') {
-			res.status(404).send(`Could not find raincoat with id: ${id}`);
-			return;
-		}
-		console.log(err);
-		res.status(500).send('There was a problem with the server.');
+		handleErrors(err, res);
 	}
 })
 
@@ -99,12 +88,7 @@ router.delete('/:id', async (req, res) => {
 		await Raincoat.findByIdAndRemove(id);
 		res.send('Successfully deleted.')
 	} catch (err) {
-		if (err.name === 'CastError' || err.name === 'NotFound') {
-			res.status(404).send(`Could not find raincoat with id: ${id}`);
-			return;
-		}
-		console.log(err);
-		res.status(500).send('There was a problem with the server.');
+		handleErrors(err, res);
 	}
 })
 

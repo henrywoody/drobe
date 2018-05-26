@@ -1,6 +1,7 @@
 const	express = require('express'),
 		router = express.Router(),
-		Shirt = require('../../../models/shirt');
+		Shirt = require('../../../models/shirt'),
+		handleErrors = require('../../../modules/handle-db-errors');
 
 // Index
 router.get('/', async (req, res) => {
@@ -9,8 +10,7 @@ router.get('/', async (req, res) => {
 		const shirts = await Shirt.find({owner: user._id});
 		res.json(shirts);
 	} catch (err) {
-		console.log(err);
-		res.status(500).send('There was a problem with the server.');
+		handleErrors(err, res);
 	}
 })
 
@@ -30,12 +30,7 @@ router.get('/:id', async (req, res) => {
 
 		res.json(shirt);
 	} catch (err) {
-		if (err.name === 'CastError' || err.name === 'NotFound') {
-			res.status(404).send(`Could not find shirt with id: ${id}.`);
-			return;
-		}
-		console.log(err);
-		res.status(500).send('There was a problem with the server.');
+		handleErrors(err, res);
 	}
 })
 
@@ -48,8 +43,7 @@ router.post('/', async (req, res) => {
 		const newShirt = await Shirt.create(shirtData);
 		res.json(newShirt);
 	} catch (err) {
-		console.log(err);
-		res.status(500).send('There was a problem with the server.');
+		handleErrors(err, res);
 	}
 })
 
@@ -72,12 +66,7 @@ router.put('/:id', async (req, res) => {
 		const updatedShirt = await Shirt.findByIdAndUpdate(id, shirtData, {new: true});
 		res.json(updatedShirt);
 	} catch (err) {
-		if (err.name === 'CastError' || err.name === 'NotFound') {
-			res.status(404).send(`Could not find shirt with id: ${id}.`);
-			return;
-		}
-		console.log(err);
-		res.status(500).send('There was a problem with the server.');
+		handleErrors(err, res);
 	}
 })
 
@@ -99,12 +88,7 @@ router.delete('/:id', async (req, res) => {
 		await Shirt.findByIdAndRemove(id);
 		res.send('Successfully deleted.')
 	} catch (err) {
-		if (err.name === 'CastError' || err.name === 'NotFound') {
-			res.status(404).send(`Could not find shirt with id: ${id}.`);
-			return;
-		}
-		console.log(err);
-		res.status(500).send('There was a problem with the server.');
+		handleErrors(err, res);
 	}
 })
 

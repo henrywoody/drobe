@@ -1,6 +1,7 @@
 const	express = require('express'),
 		router = express.Router(),
-		Jacket = require('../../../models/jacket');
+		Jacket = require('../../../models/jacket'),
+		handleErrors = require('../../../modules/handle-db-errors');
 
 // Index
 router.get('/', async (req, res) => {
@@ -9,8 +10,7 @@ router.get('/', async (req, res) => {
 		const jackets = await Jacket.find({owner: user._id});
 		res.json(jackets);
 	} catch (err) {
-		console.log(err);
-		res.status(500).send('There was a problem with the server.');
+		handleErrors(err, res);
 	}
 })
 
@@ -30,12 +30,7 @@ router.get('/:id', async (req, res) => {
 
 		res.json(jacket);
 	} catch (err) {
-		if (err.name === 'CastError' || err.name === 'NotFound') {
-			res.status(404).send(`Could not find jacket with id: ${id}`);
-			return;
-		}
-		console.log(err);
-		res.status(500).send('There was a problem with the server.');
+		handleErrors(err, res);
 	}
 })
 
@@ -48,8 +43,7 @@ router.post('/', async (req, res) => {
 		const newJacket = await Jacket.create(jacketData);
 		res.json(newJacket);
 	} catch (err) {
-		console.log(err);
-		res.status(500).send('There was a problem with the server.');
+		handleErrors(err, res);
 	}
 })
 
@@ -72,12 +66,7 @@ router.put('/:id', async (req, res) => {
 		const updatedJacket = await Jacket.findByIdAndUpdate(id, jacketData, {new: true});
 		res.json(updatedJacket);
 	} catch (err) {
-		if (err.name === 'CastError' || err.name === 'NotFound') {
-			res.status(404).send(`Could not find jacket with id: ${id}`);
-			return;
-		}
-		console.log(err);
-		res.status(500).send('There was a problem with the server.');
+		handleErrors(err, res);
 	}
 })
 
@@ -99,12 +88,7 @@ router.delete('/:id', async (req, res) => {
 		await Jacket.findByIdAndRemove(id);
 		res.send('Successfully deleted.')
 	} catch (err) {
-		if (err.name === 'CastError' || err.name === 'NotFound') {
-			res.status(404).send(`Could not find jacket with id: ${id}`);
-			return;
-		}
-		console.log(err);
-		res.status(500).send('There was a problem with the server.')
+		handleErrors(err, res);
 	}
 })
 
