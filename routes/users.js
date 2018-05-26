@@ -22,13 +22,21 @@ router.get('/register', (req, res, next) => {
 	`)
 })
 
-router.post('/register', async (req, res, next) => {
+router.post('/register', async (req, res) => {
 	const { username, password } = req.body;
 	try {
 		const user = await User.register(new User({username: username}), password);
-		passport.authenticate('local')(req, res, () => {
-			res.redirect('/users/secret')
-		})
+
+		return passport.authenticate('local', (err, info) => {
+			if (!err) {
+				return res.json({
+					token: info.token,
+					user: info.user
+				})
+			} else {
+				return handleErrors(err, res);
+			}
+		})(req, res);
 	} catch (err) {
 		handleErrors(err, res);
 	}
@@ -45,22 +53,24 @@ router.get('/login', (req, res, next) => {
 	`)
 })
 
-router.post('/login', passport.authenticate('local', {
-	failureRedirect: 'login'
-}), async (req, res) => {
-	const { user } = req;
-
-	const payload = {
-		sub: user._id
+router.post('/login', (req, res) => {
+	const { username, password } = req.body;
+	if (!(username && password)) {
+		const err = new Error;
+		err.name = 'MissingCredentialsError';
+		return handleErrors(err, res);
 	}
 
-	try {
-		const token = await jwt.sign(payload, global.config.appSecret);
-		res.json({ token });
-	} catch (err) {
-		console.log(err);
-		res.status(500).send('There was a problem with the server.')
-	}
+	return passport.authenticate('local', (err, info) => {
+		if (!err) {
+			return res.json({
+				token: info.token,
+				user: info.user
+			})
+		} else {
+			return handleErrors(err, res);
+		}
+	})(req, res);
 })
 
 router.get('/logout', (req, res) => {

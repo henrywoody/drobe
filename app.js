@@ -9,7 +9,9 @@ const	createError		= require('http-errors'),
 		passport		= require('passport'),
 		localStrategy	= require('passport-local'),
 		passportLocalMongoose = require('passport-local-mongoose'),
-		cors			= require('cors');
+		jwt				= require('jsonwebtoken'),
+		cors			= require('cors'),
+		handleErrors	= require('./modules/handle-db-errors');
 
 global.config = require('./config')[process.env.NODE_ENV];
 
@@ -44,7 +46,19 @@ app.use(expressSession({
 app.use(passport.initialize());
 app.use(passport.session());
 
-passport.use(new localStrategy(User.authenticate()));
+passport.use(new localStrategy(async (username, password, done) => {
+	const result = await User.authenticate()(username, password);
+	
+	if (result.error)
+		return done(result.error);
+
+	const { user } = result;
+	const token = await jwt.sign({sub: user._id}, global.config.appSecret);
+
+	const info = { user, token };
+
+	return done(null, info);
+}));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 

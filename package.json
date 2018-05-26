@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "start": "nodemon ./bin/www",
-    "test-api": "NODE_ENV=test mocha test/api/v1"
+    "test-api": "NODE_ENV=test mocha test/api/v1",
+    "test-users": "NODE_ENV=test mocha test/users"
   },
   "dependencies": {
     "cookie-parser": "~1.4.3",
