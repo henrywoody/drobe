@@ -7,6 +7,11 @@ module.exports = (err, res) => {
 	if (err.code === 11000)
 		return res.status(400).json({error: 'DuplicateError'});
 
+	if (err.name === 'ValidationError')
+		return res.status(400).json({error: 'ValidationError'});
+
+
+	// User Stuff
 	if (err.name === 'MissingUsernameError')
 		return res.status(400).json({error: 'MissingUsernameError'});
 
