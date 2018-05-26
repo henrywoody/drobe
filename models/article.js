@@ -24,4 +24,6 @@ articleSchema = new mongoose.Schema({
 	discriminatorKey: 'kind'
 });
 
+articleSchema.index({name: 1, owner: 1}, {unique: true});
+
 module.exports = mongoose.model('Article', articleSchema);
