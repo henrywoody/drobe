@@ -6,14 +6,21 @@ only to be used for inheritance.
 const	mongoose = require('mongoose');
 
 articleSchema = new mongoose.Schema({
-	name: { type: String, required: true },
+	name: {
+		type: String,
+		required: true
+	},
 	description: String,
 	color: String,
 	maxTemp: Number,
 	minTemp: Number,
 	rainOK: Boolean,
 	image: String,
-	rating: Number,
+	rating: {
+		type: Number,
+		max: 5,
+		min: 0
+	},
 	wearDates: [Date],
 	owner: {
 		type: mongoose.Schema.Types.ObjectId,
