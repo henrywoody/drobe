@@ -38,7 +38,7 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
 	const { user } = req;
 	try {
-		const { pair: pairData } = req.body;
+		const { pants: pairData } = req.body;
 		pairData.owner = user._id
 		const newPair = await Pants.create(pairData);
 		res.json(newPair);
@@ -52,7 +52,7 @@ router.put('/:id', async (req, res) => {
 	const { user } = req;
 	const { id } = req.params;
 	try {
-		const { pair: pairData } = req.body;
+		const { pants: pairData } = req.body;
 		const pair = await Pants.findById(id);
 
 		if (!pair) {
