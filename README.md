@@ -32,3 +32,7 @@ Sounds great so far doesn't it?
 Well here's the catch. It's gonna take some time to set up. You have to upload your whole wardrobe to use it—or at least the parts of it that you care about / wear regularly. But also maybe this might inspire you to clean out that wardrobe that's getting a bit cluttered.
 
 After that though, it'll be smooth sailing.
+
+## Tech
+
+This project is written in the MERN stack. MongoDB serves as the database, the back-end is built with Express and Node, and the front-end is written in React.
