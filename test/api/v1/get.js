@@ -5,15 +5,13 @@ const	chai = require('chai'),
 		User = require('../../../models/user'),
 		Shirt = require('../../../models/shirt'),
 		Pants = require('../../../models/pants'),
-		Jacket = require('../../../models/jacket'),
-		Raincoat = require('../../../models/raincoat'),
+		Outerwear = require('../../../models/outerwear'),
 		request = require('../../helpers/request');
 
 const models = {
 	shirt: Shirt,
 	pants: Pants,
-	jacket: Jacket,
-	raincoat: Raincoat
+	outerwear: Outerwear
 };
 
 describe('API GET methods', () => {

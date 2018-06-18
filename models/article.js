@@ -15,6 +15,7 @@ articleSchema = new mongoose.Schema({
 	maxTemp: Number,
 	minTemp: Number,
 	rainOK: Boolean,
+	snowOK: Boolean,
 	image: String,
 	rating: {
 		type: Number,

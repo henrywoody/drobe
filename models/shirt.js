@@ -8,16 +8,10 @@ shirtSchema = new mongoose.Schema({
 			ref: 'Pants'
 		}
 	],
-	jackets: [
+	outerwears: [
 		{
 			type: mongoose.Schema.Types.ObjectId,
-			ref: 'Jacket'
-		}
-	],
-	raincoats: [
-		{
-			type: mongoose.Schema.Types.ObjectId,
-			ref: 'Raincoat'
+			ref: 'Outerwear'
 		}
 	]
 });

@@ -1,14 +1,14 @@
 const	express = require('express'),
 		router = express.Router(),
-		Raincoat = require('../../../models/raincoat'),
+		Outerwear = require('../../../models/outerwear'),
 		handleErrors = require('../../../modules/handle-db-errors');
 
 // Index
 router.get('/', async (req, res) => {
 	const { user } = req;
 	try {
-		const raincoats = await Raincoat.find({owner: user._id});
-		res.json(raincoats);
+		const outerwears = await Outerwear.find({owner: user._id});
+		res.json(outerwears);
 	} catch (err) {
 		handleErrors(err, res);
 	}
@@ -19,16 +19,16 @@ router.get('/:id', async (req, res) => {
 	const { user } = req;
 	const { id } = req.params;
 	try {
-		const raincoat = await Raincoat.findById(id);
-		if (!raincoat) {
-			const err = new Error('Raincoat Not Found.');
+		const outerwear = await Outerwear.findById(id);
+		if (!outerwear) {
+			const err = new Error('Outerwear Not Found.');
 			err.name = 'NotFound';
 			throw err;
 		}
-		if (!raincoat.owner.equals(user._id))
+		if (!outerwear.owner.equals(user._id))
 			return res.sendStatus(403);
 
-		res.json(raincoat);
+		res.json(outerwear);
 	} catch (err) {
 		handleErrors(err, res);
 	}
@@ -38,10 +38,10 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
 	const { user } = req;
 	try {
-		const { raincoat: raincoatData } = req.body;
-		raincoatData.owner = user._id;
-		const newRaincoat = await Raincoat.create(raincoatData);
-		res.json(newRaincoat);
+		const { outerwear: outerwearData } = req.body;
+		outerwearData.owner = user._id;
+		const newOuterwear = await Outerwear.create(outerwearData);
+		res.json(newOuterwear);
 	} catch (err) {
 		handleErrors(err, res);
 	}
@@ -52,19 +52,19 @@ router.put('/:id', async (req, res) => {
 	const { user } = req;
 	const { id } = req.params;
 	try {
-		const { raincoat: raincoatData } = req.body;
-		const raincoat = await Raincoat.findById(id);
+		const { outerwear: outerwearData } = req.body;
+		const outerwear = await Outerwear.findById(id);
 
-		if (!raincoat) {
-			const err = new Error('Raincoat Not Found.');
+		if (!outerwear) {
+			const err = new Error('Outerwear Not Found.');
 			err.name = 'NotFound';
 			throw err;
 		}
-		if (!raincoat.owner.equals(user._id))
+		if (!outerwear.owner.equals(user._id))
 			return res.sendStatus(403);
 
-		const updatedRaincoat = await Raincoat.findByIdAndUpdate(id, raincoatData, {new: true});
-		res.json(updatedRaincoat);
+		const updatedOuterwear = await Outerwear.findByIdAndUpdate(id, outerwearData, {new: true});
+		res.json(updatedOuterwear);
 	} catch (err) {
 		handleErrors(err, res);
 	}
@@ -75,17 +75,17 @@ router.delete('/:id', async (req, res) => {
 	const { user } = req;
 	const { id } = req.params;
 	try {
-		const raincoat = await Raincoat.findById(id);
+		const outerwear = await Outerwear.findById(id);
 
-		if (!raincoat) {
-			const err = new Error('Raincoat Not Found');
+		if (!outerwear) {
+			const err = new Error('Outerwear Not Found.');
 			err.name = 'NotFound';
 			throw err;
 		}
-		if (!raincoat.owner.equals(user._id))
+		if (!outerwear.owner.equals(user._id))
 			return res.sendStatus(403);
 
-		await Raincoat.findByIdAndRemove(id);
+		await Outerwear.findByIdAndRemove(id);
 		res.send('Successfully deleted.')
 	} catch (err) {
 		handleErrors(err, res);

@@ -1,8 +1,18 @@
 const	mongoose = require('mongoose'),
 		Article = require('./article');
 
-jacketSchema = new mongoose.Schema({
-	innerWear: Boolean,
+outerwearSchema = new mongoose.Schema({
+	innerLayer: Boolean,
+	specificType: {
+		type: String,
+		enum: [
+			'sweater',
+			'jacket',
+			'vest',
+			'raincoat',
+			'snowcoat'
+		]
+	},
 	shirts: [
 		{
 			type: mongoose.Schema.Types.ObjectId,
@@ -15,18 +25,12 @@ jacketSchema = new mongoose.Schema({
 			ref: 'Pants'
 		}
 	],
-	jackets: [
+	outerwears: [
 		{
 			type: mongoose.Schema.Types.ObjectId,
-			ref: 'Jacket'
-		}
-	],
-	raincoats: [
-		{
-			type: mongoose.Schema.Types.ObjectId,
-			ref: 'Raincoat'
+			ref: 'Outerwear'
 		}
 	]
 });
 
-module.exports = Article.discriminator('Jacket', jacketSchema);
+module.exports = Article.discriminator('Outerwear', outerwearSchema);
