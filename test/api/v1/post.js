@@ -201,6 +201,65 @@ describe('API POST methods', () => {
 				assert.strictEqual(response.status, 200);
 			});
 
+			if (articleName === 'outerwear') {
+				it ('should respond with a 400 error: ValidationError when given an invalid specific type', async () => {
+					const inputData = {
+						name: 'Invalid Coat',
+						specificType: 'SomethingElse'
+					};
+
+					const response = await request.post(
+						endpoint,
+						{
+							[articleName]: inputData
+						},
+						{
+							headers: {
+								"Authorization": `JWT ${badUser.token}`,
+								"Content-Type": 'application/json'
+							}
+						});
+
+					assert.strictEqual(response.status, 400);
+
+					jsonResponse = JSON.parse(response.text);
+
+					assert.exists(jsonResponse.error);
+					assert.strictEqual(jsonResponse.error, 'ValidationError')
+				});
+
+				it ('should return the newly created outerwear in JSON format when given a valid specificType', async () => {
+					const inputData = {
+						name: 'Invalid Coat',
+						specificType: 'jacket'
+					};
+
+					const response = await request.post(
+						endpoint,
+						{
+							[articleName]: inputData
+						},
+						{
+							headers: {
+								"Authorization": `JWT ${goodUser.token}`,
+								"Content-Type": 'application/json'
+							}
+						});
+
+					assert.strictEqual(response.status, 200);
+
+					const jsonResponse = JSON.parse(response.text);
+
+					for (const attribute in inputData) {
+						assert.exists(jsonResponse[attribute]);
+						assert.strictEqual(jsonResponse[attribute], inputData[attribute]);
+					}
+
+					assert.exists(jsonResponse.owner);
+					assert.strictEqual(jsonResponse.owner, goodUser._id);
+				})
+			}
+
 			after(async () => {
 				if (global.config.env === 'test')
 					await Model.remove({});
