@@ -12,13 +12,21 @@ export default class ArticlesIndex extends Component {
 		}
 	}
 
-	async componentDidUpdate(prevProps) {
+	componentWillMount() {
 		const { articles } = this.props;
-		if (!equal(prevProps.articles, articles)) {
-			const activeArticles = [...articles]; // all are active to start
-			const categories = ['All', ...new Set(articles.map(a => a.kind))];
-			this.setState({ articles, activeArticles, categories });
-		}
+		this.setup(articles)
+	}
+
+	componentDidUpdate(prevProps) {
+		const { articles } = this.props;
+		if (!equal(prevProps.articles, articles))
+			this.setup(articles)
+	}
+
+	async setup(articles) {
+		const activeArticles = [...articles]; // all are active to start
+		const categories = ['All', ...new Set(articles.map(a => a.kind))];
+		this.setState({ articles, activeArticles, categories });
 	}
 
 	filterArticles = (event) => {
@@ -36,9 +44,8 @@ export default class ArticlesIndex extends Component {
 	}
 
 	render() {
-		const { selectArticle } = this.props;
 		const { categories, activeArticles } = this.state;
-		const articleComponents = activeArticles.map(a => <SimpleArticle key={ a._id } data={ a } selectArticle={ selectArticle }/>);
+		const articleComponents = activeArticles.map(a => <SimpleArticle key={ a._id } data={ a }/>);
 
 		return (
 			<div>

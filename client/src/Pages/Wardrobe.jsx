@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { Switch, Route } from 'react-router-dom';
+import history from '../Modules/history';
 import ArticlesIndex from '../Components/ArticlesIndex.jsx';
 import DetailedArticle from '../Components/DetailedArticle.jsx'
 import callAPI from '../Modules/call-api';
@@ -7,13 +9,15 @@ export default class Wardrobe extends Component {
 	constructor() {
 		super();
 		this.state = {
-			articles: [],
-			selectedArticle: null,
-			activeComponent: 'Index'
+			articles: []
 		};
 	}
 
-	async componentWillMount() {
+	componentWillMount() {
+		this.fetchArticles();
+	}
+
+	async fetchArticles() {
 		const { user } = this.props;
 
 		// fetch articles for user
@@ -36,38 +40,21 @@ export default class Wardrobe extends Component {
 		this.setState({ articles });
 	}
 
-	selectArticle = (article) => {
-		this.setState({
-			selectedArticle: article,
-			activeComponent: 'Detail'
-		});
-	}
-
 	render() {
 		const { user } = this.props;
-		const { articles, selectedArticle, activeComponent } = this.state;
-
-		let component;
-		switch (activeComponent) {
-			case 'Index':
-				component = <ArticlesIndex articles={ articles } selectArticle={ this.selectArticle } user={ user }/>;
-				break;
-			case 'Detail':
-				component = <DetailedArticle data={ selectedArticle }/>;
-				break;
-			// case 'Edit':
-			// 	component = <ArticleForm data={ selectedArticle }/>;
-			// 	break;
-			// case 'New':
-			// 	component = <ArticleForm/>;
-			// 	break;
-		}
+		const { articles } = this.state;
 
 		return (
 			<main>
 				<h1>Wardrobe</h1>
 
-				{ component }
+				<Switch>
+					<Route exact path='/wardrobe' render={ () => <ArticlesIndex articles={ articles } user={ user }/> }/>
+					<Route exact path={ `/wardrobe/:articleKind/:articleId` } render={ props => <DetailedArticle {...props} user={ user }/> }/>
+					{ /* <Route exact path={ `/wardrobe/:articleKind/:articleId/edit` } render={ () => <ArticleForm data={ selectedArticle }/> }/>
+					<Route exact path='/wardrobe/new' render={ () => <ArticleForm/> }/> */ }
+				</Switch>
+				
 			</main>
 		)
 	}

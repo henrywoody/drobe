@@ -1,8 +1,24 @@
 import React, { Component } from 'react';
+import callAPI from '../Modules/call-api';
+import history from '../Modules/history';
 
 export default class DetailedArticle extends Component {
+	constructor() {
+		super();
+		this.state = {
+			data: {}
+		}
+	}
+
+	async componentWillMount() {
+		const { match, user } = this.props;
+		const { articleKind, articleId } = match.params;
+		const data = await callAPI(`${articleKind}/${articleId}`, null, user.token);
+		this.setState({ data });
+	}
+
 	render() {
-		const { data } = this.props;
+		const { data } = this.state;
 
 		const img = data.image ? (
 			<img src={ data.image }/>
