@@ -90,6 +90,10 @@ export default class ArticleForm extends Component {
 		if (response.error) {
 			this.handleError(response.error);
 		} else {
+			const { updateWardrobe } = this.props;
+			if (match.path === '/wardrobe/new')
+				updateWardrobe();
+			
 			const { _id } = response;
 			const kind = response.kind.toLowerCase() + (response.kind === 'Pants' ? '' : 's');
 			history.replace(`/wardrobe/${kind}/${_id}`);
@@ -98,6 +102,17 @@ export default class ArticleForm extends Component {
 
 	handleError(message) {
 		this.setState({ message });
+	}
+
+	handleCancel = () => {
+		const { match, history } = this.props;
+		const { articleKind, articleId } = match.params;
+
+		if (match.path === '/wardrobe/new') {
+			history.replace('/wardrobe');
+		} else {
+			history.replace(`/wardrobe/${articleKind}/${articleId}`);
+		}
 	}
 
 	render() {
@@ -167,6 +182,8 @@ export default class ArticleForm extends Component {
 				<input name='snowOK' type='checkbox' checked={ formOptions.snowOK } onChange={ this.handleChange }/>
 
 				<input type='submit'/>
+
+				<button onClick={ this.handleCancel }>Cancel</button>
 			</form>
 		)
 	}

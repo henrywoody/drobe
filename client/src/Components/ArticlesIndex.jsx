@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { NavLink } from 'react-router-dom';
 import SubNav from './SubNav.jsx';
 import SimpleArticle from './SimpleArticle.jsx';
 import equal from 'fast-deep-equal';
@@ -51,6 +52,7 @@ export default class ArticlesIndex extends Component {
 			<div>
 				<h2>Display</h2>
 				<SubNav items={ categories } handleClick={ this.filterArticles }/>
+				<NavLink exact to='/wardrobe/new'>New</NavLink>
 				{ articleComponents }
 			</div>
 		);

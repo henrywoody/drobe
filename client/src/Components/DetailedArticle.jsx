@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import callAPI from '../Modules/call-api';
 import history from '../Modules/history';
+import { NavLink } from 'react-router-dom';
 
 export default class DetailedArticle extends Component {
 	constructor() {
@@ -17,8 +18,19 @@ export default class DetailedArticle extends Component {
 		this.setState({ data });
 	}
 
+	handleDelete = () => {
+		const { match, history, user, updateWardrobe } = this.props;
+		const { articleKind, articleId } = match.params;
+		callAPI(`${articleKind}/${articleId}`, null, user.token, 'DELETE');
+		updateWardrobe();
+		history.replace('/wardrobe')
+	}
+
 	render() {
+		const { match } = this.props;
 		const { data } = this.state;
+
+		const { articleKind, articleId } = match.params;
 
 		const img = data.image ? (
 			<img src={ data.image }/>
@@ -37,6 +49,9 @@ export default class DetailedArticle extends Component {
 		return (
 			<div>
 				<h3>{ data.name }</h3>
+
+				<NavLink exact to={ `/wardrobe/${articleKind}/${articleId}/edit` }>Edit</NavLink>
+				<button onClick={ this.handleDelete }>Delete</button>
 
 				{ img }
 

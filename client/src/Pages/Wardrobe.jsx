@@ -18,7 +18,7 @@ export default class Wardrobe extends Component {
 		this.fetchArticles();
 	}
 
-	async fetchArticles() {
+	fetchArticles = async () => {
 		const { user } = this.props;
 
 		// fetch articles for user
@@ -51,9 +51,9 @@ export default class Wardrobe extends Component {
 
 				<Switch>
 					<Route exact path='/wardrobe' render={ () => <ArticlesIndex articles={ articles } user={ user }/> }/>
-					<Route exact path={ `/wardrobe/:articleKind/:articleId` } render={ props => <DetailedArticle { ...props } user={ user }/> }/>
+					<Route exact path={ `/wardrobe/:articleKind/:articleId` } render={ props => <DetailedArticle { ...props } updateWardrobe={ this.fetchArticles } user={ user }/> }/>
 					<Route exact path={ `/wardrobe/:articleKind/:articleId/edit` } render={ props => <ArticleForm { ...props } user={ user }/> }/>
-					<Route exact path='/wardrobe/new' render={ props => <ArticleForm { ...props } user={ user }/> } />
+					<Route exact path='/wardrobe/new' render={ props => <ArticleForm { ...props } updateWardrobe={ this.fetchArticles } user={ user }/> } />
 				</Switch>
 				
 			</main>
