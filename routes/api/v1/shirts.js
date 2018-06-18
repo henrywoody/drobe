@@ -86,7 +86,7 @@ router.delete('/:id', async (req, res) => {
 			return res.sendStatus(403);
 
 		await Shirt.findByIdAndRemove(id);
-		res.send('Successfully deleted.')
+		res.json({message: 'Successfully deleted.'})
 	} catch (err) {
 		handleErrors(err, res);
 	}
