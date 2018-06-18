@@ -74,7 +74,7 @@ export default class ArticleForm extends Component {
 
 	handleSubmit = async (event) => {
 		event.preventDefault();
-		const { match, user } = this.props;
+		const { match, history, user } = this.props;
 		const { formOptions } = this.state;
 
 		let response;
@@ -86,8 +86,14 @@ export default class ArticleForm extends Component {
 			const endpoint = `${articleKind}/${articleId}`;
 			response = await callAPI(endpoint, null, user.token, 'PUT', {[formOptions.kind.toLowerCase()]: formOptions});
 		}
-		if (response.error)
+
+		if (response.error) {
 			this.handleError(response.error);
+		} else {
+			const { _id } = response;
+			const kind = response.kind.toLowerCase() + (response.kind === 'Pants' ? '' : 's');
+			history.replace(`/wardrobe/${kind}/${_id}`);
+		}
 	}
 
 	handleError(message) {
