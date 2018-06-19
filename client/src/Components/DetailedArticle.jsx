@@ -50,6 +50,7 @@ export default class DetailedArticle extends Component {
 
 		return (
 			<div>
+				<NavLink exact to='/wardrobe'>Back</NavLink>
 				<h3>{ data.name }</h3>
 
 				<NavLink exact to={ `/wardrobe/${articleKind}/${articleId}/edit` }>Edit</NavLink>

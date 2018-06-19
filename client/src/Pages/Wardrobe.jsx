@@ -68,7 +68,7 @@ export default class Wardrobe extends Component {
 				<h1>Wardrobe</h1>
 
 				<Switch>
-					<Route exact path='/wardrobe' render={ () => <ArticlesIndex articles={ articles } user={ user }/> }/>
+					<Route exact path='/wardrobe' render={ props => <ArticlesIndex { ...props } articles={ articles } user={ user }/> }/>
 					<Route exact path={ `/wardrobe/:articleKind/:articleId` } render={ props => <DetailedArticle { ...props } updateWardrobe={ {remove: this.removeArticle} } user={ user }/> }/>
 					<Route exact path={ `/wardrobe/:articleKind/:articleId/edit` } render={ props => <ArticleForm { ...props } updateWardrobe={ {update: this.updateArticle} } user={ user }/> }/>
 					<Route exact path='/wardrobe/new' render={ props => <ArticleForm { ...props } updateWardrobe={ {add: this.addArticle} } user={ user }/> } />

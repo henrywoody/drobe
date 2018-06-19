@@ -45,8 +45,9 @@ export default class ArticlesIndex extends Component {
 	}
 
 	render() {
+		const { history } = this.props;
 		const { categories, activeArticles } = this.state;
-		const articleComponents = activeArticles.map(a => <SimpleArticle key={ a._id } data={ a }/>);
+		const articleComponents = activeArticles.map(a => <SimpleArticle key={ a._id } data={ a } history={ history }/>);
 
 		return (
 			<div>
