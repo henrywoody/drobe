@@ -41,6 +41,24 @@ export default class Wardrobe extends Component {
 		this.setState({ articles });
 	}
 
+	addArticle = (article) => {
+		const { articles } = this.state;
+		articles.push(article);
+		this.setState({ articles });
+	}
+
+	updateArticle = (article) => {
+		this.removeArticle(article);
+		this.addArticle(article);
+	}
+
+	removeArticle = (article) => {
+		const { articles } = this.state;
+		this.setState({
+			articles: articles.filter(a => a._id != article._id)
+		})
+	}
+
 	render() {
 		const { user } = this.props;
 		const { articles } = this.state;
@@ -51,9 +69,9 @@ export default class Wardrobe extends Component {
 
 				<Switch>
 					<Route exact path='/wardrobe' render={ () => <ArticlesIndex articles={ articles } user={ user }/> }/>
-					<Route exact path={ `/wardrobe/:articleKind/:articleId` } render={ props => <DetailedArticle { ...props } updateWardrobe={ this.fetchArticles } user={ user }/> }/>
-					<Route exact path={ `/wardrobe/:articleKind/:articleId/edit` } render={ props => <ArticleForm { ...props } user={ user }/> }/>
-					<Route exact path='/wardrobe/new' render={ props => <ArticleForm { ...props } updateWardrobe={ this.fetchArticles } user={ user }/> } />
+					<Route exact path={ `/wardrobe/:articleKind/:articleId` } render={ props => <DetailedArticle { ...props } updateWardrobe={ {remove: this.removeArticle} } user={ user }/> }/>
+					<Route exact path={ `/wardrobe/:articleKind/:articleId/edit` } render={ props => <ArticleForm { ...props } updateWardrobe={ {update: this.updateArticle} } user={ user }/> }/>
+					<Route exact path='/wardrobe/new' render={ props => <ArticleForm { ...props } updateWardrobe={ {add: this.addArticle} } user={ user }/> } />
 				</Switch>
 				
 			</main>

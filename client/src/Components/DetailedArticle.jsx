@@ -21,8 +21,10 @@ export default class DetailedArticle extends Component {
 	handleDelete = () => {
 		const { match, history, user, updateWardrobe } = this.props;
 		const { articleKind, articleId } = match.params;
+		const { data } = this.state;
+		
 		callAPI(`${articleKind}/${articleId}`, null, user.token, 'DELETE');
-		updateWardrobe();
+		updateWardrobe.remove(data);
 		history.replace('/wardrobe')
 	}
 

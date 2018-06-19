@@ -91,8 +91,11 @@ export default class ArticleForm extends Component {
 			this.handleError(response.error);
 		} else {
 			const { updateWardrobe } = this.props;
-			if (match.path === '/wardrobe/new')
-				updateWardrobe();
+			if (match.path === '/wardrobe/new') {
+				updateWardrobe.add(response);
+			} else {
+				updateWardrobe.update(response);
+			}
 			
 			const { _id } = response;
 			const kind = response.kind.toLowerCase() + (response.kind === 'Pants' ? '' : 's');
