@@ -1,6 +1,8 @@
 const	express = require('express'),
 		router = express.Router(),
+		Shirt = require('../../../models/shirt'),
 		Pants = require('../../../models/pants'),
+		Outerwear = require('../../../models/outerwear'),
 		verifyIds = require('../../../modules/verify-ids'),
 		handleErrors = require('../../../modules/handle-db-errors');
 
@@ -54,6 +56,19 @@ router.post('/', async (req, res) => {
 		}
 
 		const newPair = await Pants.create(pairData);
+
+		// add reference to the other articles
+		if (pairData.shirts) {
+			for (const modelId of pairData.shirts) {
+				await Shirt.findByIdAndUpdate(modelId, { $push: {pants: newPair._id} });
+			}
+		}
+		if (pairData.outerwears) {
+			for (const modelId of pairData.outerwears) {
+				await Outerwear.findByIdAndUpdate(modelId, { $push: {pants: newPair._id} });
+			}
+		}
+
 		res.json(newPair);
 	} catch (err) {
 		handleErrors(err, res);

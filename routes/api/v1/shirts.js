@@ -1,6 +1,8 @@
 const	express = require('express'),
 		router = express.Router(),
 		Shirt = require('../../../models/shirt'),
+		Pants = require('../../../models/pants'),
+		Outerwear = require('../../../models/outerwear'),
 		verifyIds = require('../../../modules/verify-ids'),
 		handleErrors = require('../../../modules/handle-db-errors');
 
@@ -54,6 +56,20 @@ router.post('/', async (req, res) => {
 		}
 
 		const newShirt = await Shirt.create(shirtData);
+
+		// add reference to the other articles
+			// revisit this... the `await`s are needed because otherwise the other models do not update
+		if (shirtData.pants) {
+			for (const modelId of shirtData.pants) {
+				await Pants.findByIdAndUpdate(modelId, { $push: {shirts: newShirt._id} });
+			}
+		}
+		if (shirtData.outerwears) {
+			for (const modelId of shirtData.outerwears) {
+				await Outerwear.findByIdAndUpdate(modelId, { $push: {shirts: newShirt._id} });
+			}
+		}
+
 		res.json(newShirt);
 	} catch (err) {
 		handleErrors(err, res);
@@ -101,7 +117,7 @@ router.delete('/:id', async (req, res) => {
 	try {
 		const shirt = await Shirt.findById(id);
 
-		if (!Shirt) {
+		if (!shirt) {
 			const err = new Error('Shirt Not Found.');
 			err.name = 'NotFound';
 			throw err;

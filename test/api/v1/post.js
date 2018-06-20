@@ -300,11 +300,24 @@ describe('API POST methods', () => {
 
 			it(`should return the newly created ${singularArticleName} in JSON format when given valid associated article ids`, async () => {
 				const inputData = {
-					name: `Linked ${singularArticleName}`,
-					shirts: [testShirt._id],
-					pants: [testPants._id],
-					outerwears: [testOuterwearGood._id]
+					name: `Linked ${singularArticleName}`
 				};
+
+				switch (articleName) {
+					case 'shirt':
+						inputData.pants = [testPants._id];
+						inputData.outerwears = [testOuterwearGood._id];
+						break;
+					case 'pants':
+						inputData.shirts = [testShirt._id];
+						inputData.outerwears = [testOuterwearGood._id];
+						break;
+					case 'outerwear':
+						inputData.shirts = [testShirt._id];
+						inputData.pants = [testPants._id];
+						inputData.outerwears = [testOuterwearGood._id];
+						break;
+				}
 
 				const response = await request.post(
 					endpoint,
@@ -323,8 +336,84 @@ describe('API POST methods', () => {
 
 				const jsonResponse = JSON.parse(response.text);
 
+				for (const attribute in inputData) {
+					assert.exists(jsonResponse[attribute]);
+					if (Array.isArray(jsonResponse[attribute])) {
+						assert.deepEqual(jsonResponse[attribute], inputData[attribute])
+					} else {
+						assert.strictEqual(jsonResponse[attribute], inputData[attribute]);
+					}
+				}
+
 				assert.exists(jsonResponse.owner);
 				assert.strictEqual(jsonResponse.owner, goodUser._id);
+			});
+
+			it(`should update associated articles with references to the new article`, async () => {
+				const inputData = {
+					name: `Second Linked ${singularArticleName}`
+				};
+
+				switch (articleName) {
+					case 'shirt':
+						inputData.pants = [testPants._id];
+						inputData.outerwears = [testOuterwearGood._id];
+						break;
+					case 'pants':
+						inputData.shirts = [testShirt._id];
+						inputData.outerwears = [testOuterwearGood._id];
+						break;
+					case 'outerwear':
+						inputData.shirts = [testShirt._id];
+						inputData.pants = [testPants._id];
+						inputData.outerwears = [testOuterwearGood._id];
+						break;
+				}
+
+				const headers = {
+					headers: {
+						"Authorization": `JWT ${goodUser.token}`,
+						"Content-Type": 'application/json'
+					}
+				}
+
+				const response = await request.post(
+					endpoint,
+					{
+						[articleName]: inputData
+					},
+					headers
+					);
+
+				assert.strictEqual(response.status, 200);
+
+
+				const jsonResponse = JSON.parse(response.text);
+
+				const updatedTestShirtResponse = await request.get('/api/v1/shirts', testShirt._id, headers);
+				const updatedTestPantsResponse = await request.get('/api/v1/pants', testPants._id, headers);
+				const updatedTestOuterwearResponse = await request.get('/api/v1/outerwears', testOuterwearGood._id, headers);
+
+				const updatedTestShirt = JSON.parse(updatedTestShirtResponse.text);
+				const updatedTestPants = JSON.parse(updatedTestPantsResponse.text);
+				const updatedTestOuterwear = JSON.parse(updatedTestOuterwearResponse.text);
+
+				switch (articleName) {
+					case 'shirt':
+						assert.include(updatedTestPants[pluralArticleName], jsonResponse._id);
+						assert.include(updatedTestOuterwear[pluralArticleName], jsonResponse._id);
+						break;
+					case 'pants':
+						assert.include(updatedTestShirt[pluralArticleName], jsonResponse._id);
+						assert.include(updatedTestOuterwear[pluralArticleName], jsonResponse._id);
+						break;
+					case 'outerwear':
+						assert.include(updatedTestShirt[pluralArticleName], jsonResponse._id);
+						assert.include(updatedTestPants[pluralArticleName], jsonResponse._id);
+						assert.include(updatedTestOuterwear[pluralArticleName], jsonResponse._id);
+						break;
+				}
+
 			});
 
 			if (articleName === 'outerwear') {

@@ -9,7 +9,6 @@ module.exports = async (model, ids, ownerId) => {
 			if (!result) {
 				return [id, 'InvalidIdForModel'];
 			} else if (!result.owner.equals(ownerId)) {
-				console.log(`${result.owner} != ${ownerId}`)
 				return [id, 'InvalidIdForOwner'];
 			}
 			return [id, true];
