@@ -333,7 +333,6 @@ describe('API POST methods', () => {
 
 				assert.strictEqual(response.status, 200);
 
-
 				const jsonResponse = JSON.parse(response.text);
 
 				for (const attribute in inputData) {

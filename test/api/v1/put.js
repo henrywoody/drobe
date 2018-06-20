@@ -246,20 +246,6 @@ describe('API PUT methods', () => {
 				}
 			});
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 			it('should respond with a 400 error: InvalidIdForModel when associated article ids are invalid for the specified article kind', async () => {
 				const newArticleData = {
 					name: `Linked First ${singularArticleName}`,
@@ -319,10 +305,23 @@ describe('API PUT methods', () => {
 			it(`should update the requested ${singularArticleName} with the given data and return the updated ${singularArticleName} if given valid linked article ids`, async () => {
 				const newArticleData = {
 					name: `Linked First ${singularArticleName}`,
-					description: 'now with linked articles',
-					shirts: [testShirt._id],
-					pants: [testPants._id],
-					outerwears: [testOuterwearGood._id]
+					description: 'now with linked articles'
+				}
+
+				switch (articleName) {
+					case 'shirt':
+						newArticleData.pants = [testPants._id];
+						newArticleData.outerwears = [testOuterwearGood._id];
+						break;
+					case 'pants':
+						newArticleData.shirts = [testShirt._id];
+						newArticleData.outerwears = [testOuterwearGood._id];
+						break;
+					case 'outerwear':
+						newArticleData.shirts = [testShirt._id];
+						newArticleData.pants = [testPants._id];
+						newArticleData.outerwears = [testOuterwearGood._id];
+						break;
 				}
 
 				const response = await request.put(
@@ -342,6 +341,15 @@ describe('API PUT methods', () => {
 
 				const jsonResponse = JSON.parse(response.text);
 
+				for (const attribute in newArticleData) {
+					assert.exists(jsonResponse[attribute]);
+					if (Array.isArray(jsonResponse[attribute])) {
+						assert.deepEqual(jsonResponse[attribute], newArticleData[attribute])
+					} else {
+						assert.strictEqual(jsonResponse[attribute], newArticleData[attribute]);
+					}
+				}
+
 				assert.exists(jsonResponse.owner);
 				assert.strictEqual(jsonResponse.owner, goodUser._id);
 			});
@@ -356,13 +364,136 @@ describe('API PUT methods', () => {
 
 
 
+			it(`should update newly associated articles with references to the updated article when references are added`, async () => {
+				const newArticleData = {
+					name: `Linked Second ${singularArticleName}`
+				};
+
+				switch (articleName) {
+					case 'shirt':
+						newArticleData.pants = [testPants._id];
+						newArticleData.outerwears = [testOuterwearGood._id];
+						break;
+					case 'pants':
+						newArticleData.shirts = [testShirt._id];
+						newArticleData.outerwears = [testOuterwearGood._id];
+						break;
+					case 'outerwear':
+						newArticleData.shirts = [testShirt._id];
+						newArticleData.pants = [testPants._id];
+						newArticleData.outerwears = [testOuterwearGood._id];
+						break;
+				}
+
+				const headers = {
+					headers: {
+						"Authorization": `JWT ${goodUser.token}`,
+						"Content-Type": 'application/json'
+					}
+				}
+
+				const response = await request.put(
+					endpoint,
+					goodArticle2._id,
+					{
+						[articleName]: newArticleData
+					},
+					headers
+					);
+
+				assert.strictEqual(response.status, 200);
+
+				const updatedTestShirtResponse = await request.get('/api/v1/shirts', testShirt._id, headers);
+				const updatedTestPantsResponse = await request.get('/api/v1/pants', testPants._id, headers);
+				const updatedTestOuterwearResponse = await request.get('/api/v1/outerwears', testOuterwearGood._id, headers);
+
+				const updatedTestShirt = JSON.parse(updatedTestShirtResponse.text);
+				const updatedTestPants = JSON.parse(updatedTestPantsResponse.text);
+				const updatedTestOuterwear = JSON.parse(updatedTestOuterwearResponse.text);
+
+				switch (articleName) {
+					case 'shirt':
+						assert.include(updatedTestPants[pluralArticleName], goodArticle2._id);
+						assert.include(updatedTestOuterwear[pluralArticleName], goodArticle2._id);
+						break;
+					case 'pants':
+						assert.include(updatedTestShirt[pluralArticleName], goodArticle2._id);
+						assert.include(updatedTestOuterwear[pluralArticleName], goodArticle2._id);
+						break;
+					case 'outerwear':
+						assert.include(updatedTestShirt[pluralArticleName], goodArticle2._id);
+						assert.include(updatedTestPants[pluralArticleName], goodArticle2._id);
+						assert.include(updatedTestOuterwear[pluralArticleName], goodArticle2._id);
+						break;
+				}
+
+			});
 
 
+			it(`should update newly associated articles with to remove references to the updated article when references are removed`, async () => {
+				const newArticleData = {
+					name: `Linked Second ${singularArticleName}`
+				};
 
+				switch (articleName) {
+					case 'shirt':
+						newArticleData.pants = [];
+						newArticleData.outerwears = [];
+						break;
+					case 'pants':
+						newArticleData.shirts = [];
+						newArticleData.outerwears = [];
+						break;
+					case 'outerwear':
+						newArticleData.shirts = [];
+						newArticleData.pants = [];
+						newArticleData.outerwears = [];
+						break;
+				}
 
+				const headers = {
+					headers: {
+						"Authorization": `JWT ${goodUser.token}`,
+						"Content-Type": 'application/json'
+					}
+				}
 
+				const response = await request.put(
+					endpoint,
+					goodArticle2._id,
+					{
+						[articleName]: newArticleData
+					},
+					headers
+					);
 
+				assert.strictEqual(response.status, 200);
 
+				const updatedTestShirtResponse = await request.get('/api/v1/shirts', testShirt._id, headers);
+				const updatedTestPantsResponse = await request.get('/api/v1/pants', testPants._id, headers);
+				const updatedTestOuterwearResponse = await request.get('/api/v1/outerwears', testOuterwearGood._id, headers);
+
+				const updatedTestShirt = JSON.parse(updatedTestShirtResponse.text);
+				const updatedTestPants = JSON.parse(updatedTestPantsResponse.text);
+				const updatedTestOuterwear = JSON.parse(updatedTestOuterwearResponse.text);
+
+				switch (articleName) {
+					case 'shirt':
+						assert.notInclude(updatedTestPants[pluralArticleName], goodArticle2._id);
+						assert.notInclude(updatedTestOuterwear[pluralArticleName], goodArticle2._id);
+						break;
+					case 'pants':
+						assert.notInclude(updatedTestShirt[pluralArticleName], goodArticle2._id);
+						assert.notInclude(updatedTestOuterwear[pluralArticleName], goodArticle2._id);
+						break;
+					case 'outerwear':
+						assert.notInclude(updatedTestShirt[pluralArticleName], goodArticle2._id);
+						assert.notInclude(updatedTestPants[pluralArticleName], goodArticle2._id);
+						assert.notInclude(updatedTestOuterwear[pluralArticleName], goodArticle2._id);
+						break;
+				}
+
+			});
 
 			afterEach(async () => {
 				if (global.config.env === 'test') {

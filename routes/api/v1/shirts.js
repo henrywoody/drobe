@@ -55,6 +55,7 @@ router.post('/', async (req, res) => {
 			}
 		}
 
+		// create the shirt
 		const newShirt = await Shirt.create(shirtData);
 
 		// add reference to the other articles
@@ -82,6 +83,9 @@ router.put('/:id', async (req, res) => {
 	const { id } = req.params;
 	try {
 		const { shirt: shirtData } = req.body;
+		shirtData.pants = shirtData.pants || [];
+		shirtData.outerwears = shirtData.outerwears || [];
+
 		const shirt = await Shirt.findById(id);
 		
 		if (!shirt) {
@@ -103,7 +107,36 @@ router.put('/:id', async (req, res) => {
 			}
 		}
 
+		// update the shirt
 		const updatedShirt = await Shirt.findByIdAndUpdate(id, shirtData, {new: true});
+
+		// add/remove new/removed associations from associated articles
+		for (const modelId of shirtData.pants) {
+			if (!shirt.pants.includes(modelId)) {
+				// newly added references
+				await Pants.findByIdAndUpdate(modelId, { $push: {shirts: shirt._id} });
+			}
+		}
+		for (const modelId of shirt.pants) {
+			if (!shirtData.pants.includes(modelId)) {
+				// newly removed references
+				await Pants.findByIdAndUpdate(modelId, { $pull: {shirts: shirt._id} });
+			}
+		}
+
+		for (const modelId of shirtData.outerwears) {
+			if (!shirt.outerwears.includes(modelId)) {
+				// newly added references
+				await Outerwear.findByIdAndUpdate(modelId, { $push: {shirts: shirt._id} });
+			}
+		}
+		for (const modelId of shirt.outerwears) {
+			if (!shirtData.outerwears.includes(modelId)) {
+				// newly removed references
+				await Outerwear.findByIdAndUpdate(modelId, { $pull: {shirts: shirt._id} });
+			}
+		}
+
 		res.json(updatedShirt);
 	} catch (err) {
 		handleErrors(err, res);

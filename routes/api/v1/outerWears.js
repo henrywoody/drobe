@@ -56,6 +56,7 @@ router.post('/', async (req, res) => {
 			}
 		}
 
+		// create the outerwear
 		const newOuterwear = await Outerwear.create(outerwearData);
 
 		// add reference to the other articles
@@ -87,6 +88,10 @@ router.put('/:id', async (req, res) => {
 	const { id } = req.params;
 	try {
 		const { outerwear: outerwearData } = req.body;
+		outerwearData.shirts = outerwearData.shirts || [];
+		outerwearData.pants = outerwearData.pants || [];
+		outerwearData.outerwears = outerwearData.outerwears || [];
+
 		const outerwear = await Outerwear.findById(id);
 
 		if (!outerwear) {
@@ -109,7 +114,49 @@ router.put('/:id', async (req, res) => {
 			}
 		}
 
+		// update the outerwear
 		const updatedOuterwear = await Outerwear.findByIdAndUpdate(id, outerwearData, {new: true});
+
+		// add/remove new/removed associations from associated articles
+		for (const modelId of outerwearData.shirts) {
+			if (!outerwear.shirts.includes(modelId)) {
+				// newly added references
+				await Shirt.findByIdAndUpdate(modelId, { $push: {outerwears: outerwear._id} });
+			}
+		}
+		for (const modelId of outerwear.shirts) {
+			if (!outerwearData.shirts.includes(modelId)) {
+				// newly removed references
+				await Shirt.findByIdAndUpdate(modelId, { $pull: {outerwears: outerwear._id} });
+			}
+		}
+
+		for (const modelId of outerwearData.pants) {
+			if (!outerwear.pants.includes(modelId)) {
+				// newly added references
+				await Pants.findByIdAndUpdate(modelId, { $push: {outerwears: outerwear._id} });
+			}
+		}
+		for (const modelId of outerwear.pants) {
+			if (!outerwearData.pants.includes(modelId)) {
+				// newly removed references
+				await Pants.findByIdAndUpdate(modelId, { $pull: {outerwears: outerwear._id} });
+			}
+		}
+
+		for (const modelId of outerwearData.outerwears) {
+			if (!outerwear.outerwears.includes(modelId)) {
+				// newly added references
+				await Outerwear.findByIdAndUpdate(modelId, { $push: {outerwears: outerwear._id} });
+			}
+		}
+		for (const modelId of outerwear.outerwears) {
+			if (!outerwearData.outerwears.includes(modelId)) {
+				// newly removed references
+				await Outerwear.findByIdAndUpdate(modelId, { $pull: {outerwears: outerwear._id} });
+			}
+		}
+
 		res.json(updatedOuterwear);
 	} catch (err) {
 		handleErrors(err, res);
