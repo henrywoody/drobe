@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import callAPI from '../Modules/call-api';
 import history from '../Modules/history';
 import { NavLink } from 'react-router-dom';
+import SmallArticle from './SmallArticle.jsx';
 
 export default class DetailedArticle extends Component {
 	constructor() {
@@ -11,11 +12,28 @@ export default class DetailedArticle extends Component {
 		}
 	}
 
-	async componentWillMount() {
-		const { match, user } = this.props;
+	componentWillMount() {
+		const { history, match, user } = this.props;
 		const { articleKind, articleId } = match.params;
+
+		this.setupData(articleKind, articleId);
+
+		this.unlisten = history.listen((location, action) => {
+			if (location.pathname.match(/wardrobe\/\w*?\/\w*?$/)) {
+				const [_, kind, id] = location.pathname.match(/wardrobe\/(\w*?)\/(\w*?)$/);
+				this.setupData(kind, id);
+			}
+		})
+	}
+
+	componentWillUnmount() {
+		this.unlisten();
+	}
+
+	async setupData(articleKind, articleId) {
+		const { user } = this.props;
 		const data = await callAPI(`${articleKind}/${articleId}`, null, user.token);
-		this.setState({ data });
+		this.setState({ data });	
 	}
 
 	handleDelete = () => {
@@ -25,11 +43,16 @@ export default class DetailedArticle extends Component {
 		
 		callAPI(`${articleKind}/${articleId}`, null, user.token, 'DELETE');
 		updateWardrobe.remove(data);
-		history.replace('/wardrobe')
+		history.replace('/wardrobe');
+	}
+
+	routeToArticle = async (kind, id) => {
+		const { history } = this.props;
+		history.replace(`/wardrobe/${kind}/${id}`);
 	}
 
 	render() {
-		const { match } = this.props;
+		const { match, existingArticles } = this.props;
 		const { data } = this.state;
 
 		const { articleKind, articleId } = match.params;
@@ -42,10 +65,20 @@ export default class DetailedArticle extends Component {
 
 		const additionalBits = [];
 		for (const key in data) {
-			if (data[key] && !['_id', 'owner', 'name', 'image', 'description', 'kind', 'shirts', 'pants', 'outerwears'].includes(key))
+			if (data[key] && !['_id', 'owner', 'name', 'image', 'description', 'kind', 'shirts', 'pants', 'outerwears'].includes(key)) {
 				additionalBits.push(
 					<li key={ key }><strong>{ key }</strong>: { data[key] }</li>
 				);
+			} else if (['shirts', 'pants', 'outerwears'].includes(key)) {
+				additionalBits.push(
+					<div>
+						{ data[key].map(id => {
+							const a = existingArticles.filter(a => a._id === id)[0];
+							return <SmallArticle key={ a._id } field={ key } id={ a._id } name={ a.name } image={ a.image } onClick={ this.routeToArticle }/>;
+						}) }
+					</div>
+				);
+			}
 		}
 
 		return (
