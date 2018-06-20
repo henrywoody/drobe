@@ -150,12 +150,21 @@ export default class ArticleForm extends Component {
 	}
 
 	render() {
-		const { existingArticles } = this.props;
+		const { existingArticles, match } = this.props;
 		const { articleKinds, articleSearchOptions, formOptions, message } = this.state;
 
 		const articleKindOptions = articleKinds.map(kind => {
 			return <option key={ kind } value={ kind }>{ kind }</option>
 		});
+
+		const articleKindField = match.path === '/wardrobe/new' ? (
+			<div>
+				<label htmlFor='kind'>Kind</label>
+				<select name='kind' value={ formOptions.kind } onChange={ this.handleChange }>
+					{ articleKindOptions }
+				</select>
+			</div>
+		) : ( null )
 
 		let additionalFields = {};
 		if (formOptions.kind === 'Outerwear') {
@@ -267,10 +276,7 @@ export default class ArticleForm extends Component {
 			<form onSubmit={ this.handleSubmit }>
 				{ message }
 
-				<label htmlFor='kind'>Kind</label>
-				<select name='kind' value={ formOptions.kind } onChange={ this.handleChange }>
-					{ articleKindOptions }
-				</select>
+				{ articleKindField }
 
 				{ additionalFields.specificType }
 
