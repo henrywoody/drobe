@@ -1,6 +1,7 @@
 const	express = require('express'),
 		router = express.Router(),
 		Outerwear = require('../../../models/outerwear'),
+		verifyIds = require('../../../modules/verify-ids'),
 		handleErrors = require('../../../modules/handle-db-errors');
 
 // Index
@@ -40,6 +41,19 @@ router.post('/', async (req, res) => {
 	try {
 		const { outerwear: outerwearData } = req.body;
 		outerwearData.owner = user._id;
+
+		// Verify attached Ids
+		const checked = await Promise.all([
+			verifyIds('shirt', outerwearData.shirts, user._id),
+			verifyIds('pants', outerwearData.pants, user._id),
+			verifyIds('outerwear', outerwearData.outerwears, user._id)
+		]);
+		for (const check of checked) {
+			if (check !== true) {
+				throw check;
+			}
+		}
+
 		const newOuterwear = await Outerwear.create(outerwearData);
 		res.json(newOuterwear);
 	} catch (err) {
@@ -62,6 +76,18 @@ router.put('/:id', async (req, res) => {
 		}
 		if (!outerwear.owner.equals(user._id))
 			return res.sendStatus(403);
+
+		// Verify attached Ids
+		const checked = await Promise.all([
+			verifyIds('shirt', outerwearData.shirts, user._id),
+			verifyIds('pants', outerwearData.pants, user._id),
+			verifyIds('outerwear', outerwearData.outerwears, user._id)
+		]);
+		for (const check of checked) {
+			if (check !== true) {
+				throw check;
+			}
+		}
 
 		const updatedOuterwear = await Outerwear.findByIdAndUpdate(id, outerwearData, {new: true});
 		res.json(updatedOuterwear);

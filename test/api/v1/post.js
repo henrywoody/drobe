@@ -16,6 +16,7 @@ const models = {
 
 describe('API POST methods', () => {
 	let goodUser, badUser;
+	let testShirt, testPants, testOuterwearGood, testOuterwearBad;
 
 	before(async () => {
 		if (global.config.env !== 'test') {
@@ -32,6 +33,50 @@ describe('API POST methods', () => {
 			badData = JSON.parse(badResponse.text);
 			goodUser = {...goodData.user, token: goodData.token};
 			badUser = {...badData.user, token: badData.token};
+
+			// set up some articles to attach
+			const [testShirtResponse, testPantsResponse, testOuterwearResponse1, testOuterwearResponse2] = await Promise.all([
+					request.post('/api/v1/shirts', {
+							shirt: {name: 'Test Shirt'}
+						},
+						{
+							headers: {
+								"Authorization": `JWT ${goodUser.token}`,
+								"Content-Type": 'application/json'
+							}
+					}),
+					request.post('/api/v1/pants', {
+							pants: {name: 'Test Pants'}
+						},
+						{
+							headers: {
+								"Authorization": `JWT ${goodUser.token}`,
+								"Content-Type": 'application/json'
+							}
+					}),
+					request.post('/api/v1/outerwears', {
+							outerwear: {name: 'Good Test Outerwear'}
+						},
+						{
+							headers: {
+								"Authorization": `JWT ${goodUser.token}`,
+								"Content-Type": 'application/json'
+							}
+					}),
+					request.post('/api/v1/outerwears', {
+							outerwear: {name: 'Bad Test Outerwear'}
+						},
+						{
+							headers: {
+								"Authorization": `JWT ${badUser.token}`,
+								"Content-Type": 'application/json'
+							}
+					})
+				]);
+			testShirt = JSON.parse(testShirtResponse.text);
+			testPants = JSON.parse(testPantsResponse.text);
+			testOuterwearGood = JSON.parse(testOuterwearResponse1.text);
+			testOuterwearBad = JSON.parse(testOuterwearResponse2.text);
 		}
 	})
 
@@ -201,8 +246,89 @@ describe('API POST methods', () => {
 				assert.strictEqual(response.status, 200);
 			});
 
+			it('should respond with a 400 error: InvalidIdForModel when associated article ids are invalid for the specified article kind', async () => {
+				const inputData = {
+					name: 'This isnt going to work',
+					outerwears: [testPants._id]
+				};
+
+				const response = await request.post(
+					endpoint,
+					{
+						[articleName]: inputData
+					},
+					{
+						headers: {
+							"Authorization": `JWT ${goodUser.token}`,
+							"Content-Type": 'application/json'
+						}
+					});
+
+				assert.strictEqual(response.status, 400);
+
+				const jsonResponse = JSON.parse(response.text);
+
+				assert.exists(jsonResponse.error);
+				assert.strictEqual(jsonResponse.error, 'InvalidIdForModel');
+			});
+
+			it('should respond with a 403 error: InvalidIdForOwner when associated article ids are invalid for the specified article kind', async () => {
+				const inputData = {
+					name: 'This isnt going to work',
+					outerwears: [testOuterwearBad._id]
+				};
+
+				const response = await request.post(
+					endpoint,
+					{
+						[articleName]: inputData
+					},
+					{
+						headers: {
+							"Authorization": `JWT ${goodUser.token}`,
+							"Content-Type": 'application/json'
+						}
+					});
+
+				assert.strictEqual(response.status, 403);
+
+				const jsonResponse = JSON.parse(response.text);
+
+				assert.exists(jsonResponse.error);
+				assert.strictEqual(jsonResponse.error, 'InvalidIdForOwner');
+			});
+
+			it(`should return the newly created ${singularArticleName} in JSON format when given valid associated article ids`, async () => {
+				const inputData = {
+					name: `Linked ${singularArticleName}`,
+					shirts: [testShirt._id],
+					pants: [testPants._id],
+					outerwears: [testOuterwearGood._id]
+				};
+
+				const response = await request.post(
+					endpoint,
+					{
+						[articleName]: inputData
+					},
+					{
+						headers: {
+							"Authorization": `JWT ${goodUser.token}`,
+							"Content-Type": 'application/json'
+						}
+					});
+
+				assert.strictEqual(response.status, 200);
+
+
+				const jsonResponse = JSON.parse(response.text);
+
+				assert.exists(jsonResponse.owner);
+				assert.strictEqual(jsonResponse.owner, goodUser._id);
+			});
+
 			if (articleName === 'outerwear') {
-				it ('should respond with a 400 error: ValidationError when given an invalid specific type', async () => {
+				it('should respond with a 400 error: ValidationError when given an invalid specific type', async () => {
 					const inputData = {
 						name: 'Invalid Coat',
 						specificType: 'SomethingElse'
@@ -259,16 +385,16 @@ describe('API POST methods', () => {
 					assert.strictEqual(jsonResponse.owner, goodUser._id);
 				})
 			}
-
-			after(async () => {
-				if (global.config.env === 'test')
-					await Model.remove({});
-			});
 		});
 	}
 
 	after( async () => {
 		if (global.config.env === 'test')
-			await User.remove({});
+			await Promise.all([
+				User.remove({}),
+				Shirt.remove({}),
+				Pants.remove({}),
+				Outerwear.remove({})
+			]);
 	})
 });

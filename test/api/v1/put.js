@@ -16,6 +16,7 @@ const models = {
 
 describe('API PUT methods', () => {
 	let goodUser, badUser;
+	let testShirt, testPants, testOuterwearGood, testOuterwearBad;
 
 	before(async () => {
 		if (global.config.env !== 'test') {
@@ -32,6 +33,50 @@ describe('API PUT methods', () => {
 			badData = JSON.parse(badResponse.text);
 			goodUser = {...goodData.user, token: goodData.token};
 			badUser = {...badData.user, token: badData.token};
+
+			// set up some articles to attach
+			const [testShirtResponse, testPantsResponse, testOuterwearResponse1, testOuterwearResponse2] = await Promise.all([
+					request.post('/api/v1/shirts', {
+							shirt: {name: 'Test Shirt'}
+						},
+						{
+							headers: {
+								"Authorization": `JWT ${goodUser.token}`,
+								"Content-Type": 'application/json'
+							}
+					}),
+					request.post('/api/v1/pants', {
+							pants: {name: 'Test Pants'}
+						},
+						{
+							headers: {
+								"Authorization": `JWT ${goodUser.token}`,
+								"Content-Type": 'application/json'
+							}
+					}),
+					request.post('/api/v1/outerwears', {
+							outerwear: {name: 'Good Test Outerwear'}
+						},
+						{
+							headers: {
+								"Authorization": `JWT ${goodUser.token}`,
+								"Content-Type": 'application/json'
+							}
+					}),
+					request.post('/api/v1/outerwears', {
+							outerwear: {name: 'Bad Test Outerwear'}
+						},
+						{
+							headers: {
+								"Authorization": `JWT ${badUser.token}`,
+								"Content-Type": 'application/json'
+							}
+					})
+				]);
+			testShirt = JSON.parse(testShirtResponse.text);
+			testPants = JSON.parse(testPantsResponse.text);
+			testOuterwearGood = JSON.parse(testOuterwearResponse1.text);
+			testOuterwearBad = JSON.parse(testOuterwearResponse2.text);
 		}
 	})
 
@@ -201,15 +246,143 @@ describe('API PUT methods', () => {
 				}
 			});
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+			it('should respond with a 400 error: InvalidIdForModel when associated article ids are invalid for the specified article kind', async () => {
+				const newArticleData = {
+					name: `Linked First ${singularArticleName}`,
+					description: 'now with linked articles',
+					outerwears: [testPants._id]
+				}
+
+				const response = await request.put(
+					endpoint,
+					goodArticle1._id,
+					{
+						[articleName]: newArticleData
+					},
+					{
+						headers: {
+							"Authorization": `JWT ${goodUser.token}`,
+							"Content-Type": 'application/json'
+						}
+					});
+
+				assert.strictEqual(response.status, 400);
+
+				const jsonResponse = JSON.parse(response.text);
+
+				assert.exists(jsonResponse.error);
+				assert.strictEqual(jsonResponse.error, 'InvalidIdForModel');
+			});
+
+			it('should respond with a 403 error: InvalidIdForOwner when associated article ids are invalid for the specified article kind', async () => {
+				const newArticleData = {
+					name: `Linked First ${singularArticleName}`,
+					description: 'now with linked articles',
+					outerwears: [testOuterwearBad._id]
+				}
+
+				const response = await request.put(
+					endpoint,
+					goodArticle1._id,
+					{
+						[articleName]: newArticleData
+					},
+					{
+						headers: {
+							"Authorization": `JWT ${goodUser.token}`,
+							"Content-Type": 'application/json'
+						}
+					});
+
+				assert.strictEqual(response.status, 403);
+
+				const jsonResponse = JSON.parse(response.text);
+
+				assert.exists(jsonResponse.error);
+				assert.strictEqual(jsonResponse.error, 'InvalidIdForOwner');
+			});
+
+			it(`should update the requested ${singularArticleName} with the given data and return the updated ${singularArticleName} if given valid linked article ids`, async () => {
+				const newArticleData = {
+					name: `Linked First ${singularArticleName}`,
+					description: 'now with linked articles',
+					shirts: [testShirt._id],
+					pants: [testPants._id],
+					outerwears: [testOuterwearGood._id]
+				}
+
+				const response = await request.put(
+					endpoint,
+					goodArticle1._id,
+					{
+						[articleName]: newArticleData
+					},
+					{
+						headers: {
+							"Authorization": `JWT ${goodUser.token}`,
+							"Content-Type": 'application/json'
+						}
+					});
+
+				assert.strictEqual(response.status, 200);
+
+				const jsonResponse = JSON.parse(response.text);
+
+				assert.exists(jsonResponse.owner);
+				assert.strictEqual(jsonResponse.owner, goodUser._id);
+			});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 			afterEach(async () => {
-				if (global.config.env === 'test')
-					await Model.remove({});
+				if (global.config.env === 'test') {
+					await Promise.all([
+						Model.findByIdAndRemove(goodArticle1._id),
+						Model.findByIdAndRemove(goodArticle2._id),
+						Model.findByIdAndRemove(badArticle._id)
+					]);
+				}
 			});
 		});
 	}
 
 	after( async () => {
 		if (global.config.env === 'test')
-			await User.remove({});
+			await Promise.all([
+				User.remove({}),
+				Shirt.remove({}),
+				Pants.remove({}),
+				Outerwear.remove({})
+			]);
 	})
 });
