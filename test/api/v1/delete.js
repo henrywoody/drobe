@@ -16,6 +16,7 @@ const models = {
 
 describe('API DELETE methods', () => {
 	let goodUser, badUser;
+	let testShirt, testPants, testOuterwearGood, testOuterwearBad;
 
 	before(async () => {
 		if (global.config.env !== 'test') {
@@ -32,6 +33,50 @@ describe('API DELETE methods', () => {
 			badData = JSON.parse(badResponse.text);
 			goodUser = {...goodData.user, token: goodData.token};
 			badUser = {...badData.user, token: badData.token};
+
+			// set up some articles to attach
+			const [testShirtResponse, testPantsResponse, testOuterwearResponse1, testOuterwearResponse2] = await Promise.all([
+					request.post('/api/v1/shirts', {
+							shirt: {name: 'Test Shirt'}
+						},
+						{
+							headers: {
+								"Authorization": `JWT ${goodUser.token}`,
+								"Content-Type": 'application/json'
+							}
+					}),
+					request.post('/api/v1/pants', {
+							pants: {name: 'Test Pants'}
+						},
+						{
+							headers: {
+								"Authorization": `JWT ${goodUser.token}`,
+								"Content-Type": 'application/json'
+							}
+					}),
+					request.post('/api/v1/outerwears', {
+							outerwear: {name: 'Good Test Outerwear'}
+						},
+						{
+							headers: {
+								"Authorization": `JWT ${goodUser.token}`,
+								"Content-Type": 'application/json'
+							}
+					}),
+					request.post('/api/v1/outerwears', {
+							outerwear: {name: 'Bad Test Outerwear'}
+						},
+						{
+							headers: {
+								"Authorization": `JWT ${badUser.token}`,
+								"Content-Type": 'application/json'
+							}
+					})
+				]);
+			testShirt = JSON.parse(testShirtResponse.text);
+			testPants = JSON.parse(testPantsResponse.text);
+			testOuterwearGood = JSON.parse(testOuterwearResponse1.text);
+			testOuterwearBad = JSON.parse(testOuterwearResponse2.text);
 		}
 	})
 
@@ -93,7 +138,7 @@ describe('API DELETE methods', () => {
 				assert.strictEqual(response.status, 404);
 			});
 
-			it('should delete the requested shirt if it is owned by the user', async () => {
+			it(`should delete the requested ${singularArticleName} if it is owned by the user`, async () => {
 				const response = await request.delete(
 					endpoint,
 					goodArticle1._id,
@@ -119,15 +164,92 @@ describe('API DELETE methods', () => {
 				assert.strictEqual(getResponse.status, 404);
 			});
 
-			after(async () => {
-				if (global.config.env === 'test')
-					await Model.remove({});
+			it(`should remove references to the current ${singularArticleName} from associated articles when the current ${singularArticleName} is deleted`, async () => {
+				// add some associations
+				const newArticleData = {
+					name: `Linked Second ${singularArticleName}`,
+					description: 'now with linked articles'
+				}
+
+				switch (articleName) {
+					case 'shirt':
+						newArticleData.pants = [testPants._id];
+						newArticleData.outerwears = [testOuterwearGood._id];
+						break;
+					case 'pants':
+						newArticleData.shirts = [testShirt._id];
+						newArticleData.outerwears = [testOuterwearGood._id];
+						break;
+					case 'outerwear':
+						newArticleData.shirts = [testShirt._id];
+						newArticleData.pants = [testPants._id];
+						newArticleData.outerwears = [testOuterwearGood._id];
+						break;
+				}
+
+				const headers = {
+					headers: {
+						"Authorization": `JWT ${goodUser.token}`,
+						"Content-Type": 'application/json'
+					}
+				}
+
+				const updateResponse = await request.put(
+					endpoint,
+					goodArticle2._id,
+					{
+						[articleName]: newArticleData
+					},
+					headers
+				);
+
+				assert.strictEqual(updateResponse.status, 200);
+
+				// delete the article
+				const deleteResponse = await request.delete(
+					endpoint,
+					goodArticle2._id,
+					headers
+				);
+
+				assert.strictEqual(deleteResponse.status, 200);
+
+				// check referenced articles
+				const updatedTestShirtResponse = await request.get('/api/v1/shirts', testShirt._id, headers);
+				const updatedTestPantsResponse = await request.get('/api/v1/pants', testPants._id, headers);
+				const updatedTestOuterwearResponse = await request.get('/api/v1/outerwears', testOuterwearGood._id, headers);
+
+				const updatedTestShirt = JSON.parse(updatedTestShirtResponse.text);
+				const updatedTestPants = JSON.parse(updatedTestPantsResponse.text);
+				const updatedTestOuterwear = JSON.parse(updatedTestOuterwearResponse.text);
+
+				switch (articleName) {
+					case 'shirt':
+						assert.notInclude(updatedTestPants[pluralArticleName], goodArticle2._id);
+						assert.notInclude(updatedTestOuterwear[pluralArticleName], goodArticle2._id);
+						break;
+					case 'pants':
+						assert.notInclude(updatedTestShirt[pluralArticleName], goodArticle2._id);
+						assert.notInclude(updatedTestOuterwear[pluralArticleName], goodArticle2._id);
+						break;
+					case 'outerwear':
+						assert.notInclude(updatedTestShirt[pluralArticleName], goodArticle2._id);
+						assert.notInclude(updatedTestPants[pluralArticleName], goodArticle2._id);
+						assert.notInclude(updatedTestOuterwear[pluralArticleName], goodArticle2._id);
+						break;
+				}
+
 			});
 		});
 	}
 
 	after( async () => {
 		if (global.config.env === 'test')
-			await User.remove({});
+			await Promise.all([
+				User.remove({}),
+				Shirt.remove({}),
+				Pants.remove({}),
+				Outerwear.remove({})
+			]);
 	})
 });

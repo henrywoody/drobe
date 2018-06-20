@@ -158,7 +158,17 @@ router.delete('/:id', async (req, res) => {
 		if (!shirt.owner.equals(user._id))
 			return res.sendStatus(403);
 
+		// remove the shirt
 		await Shirt.findByIdAndRemove(id);
+
+		// remove references to the shirt
+		for (const modelId of shirt.pants) {
+			await Pants.findByIdAndUpdate(modelId, { $pull: {shirts: id} });
+		}
+		for (const modelId of shirt.outerwears) {
+			await Outerwear.findByIdAndUpdate(modelId, { $pull: {shirts: id} });
+		}
+
 		res.json({message: 'Successfully deleted.'})
 	} catch (err) {
 		handleErrors(err, res);

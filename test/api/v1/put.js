@@ -354,16 +354,6 @@ describe('API PUT methods', () => {
 				assert.strictEqual(jsonResponse.owner, goodUser._id);
 			});
 
-
-
-
-
-
-
-
-
-
-
 			it(`should update newly associated articles with references to the updated article when references are added`, async () => {
 				const newArticleData = {
 					name: `Linked Second ${singularArticleName}`
