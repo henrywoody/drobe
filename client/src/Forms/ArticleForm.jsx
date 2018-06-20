@@ -1,11 +1,17 @@
 import React, { Component } from 'react';
 import callAPI from '../Modules/call-api';
+import SmallArticle from '../Components/SmallArticle.jsx';
 
 export default class ArticleForm extends Component {
 	constructor() {
 		super();
 		this.state = {
 			articleKinds: ['Shirt', 'Pants', 'Outerwear'],
+			articleSearchOptions: {
+				shirts: '',
+				pants: '',
+				outerwears: ''
+			},
 			formOptions: {
 				kind: 'Shirt',
 				name: '',
@@ -18,7 +24,10 @@ export default class ArticleForm extends Component {
 				rainOK: false,
 				snowOK: false,
 				specificType: 'sweater',
-				innerLayer: false
+				innerLayer: false,
+				shirts: [],
+				pants: [],
+				outerwears: []
 			},
 			message: null
 		};
@@ -31,8 +40,9 @@ export default class ArticleForm extends Component {
 			const { articleKind, articleId } = match.params;
 			const data = await callAPI(`${articleKind}/${articleId}`, null, user.token);
 
-			for (const option in formOptions) {
-				formOptions[option] = data[option];
+			for (const option in data) {
+				if (option in formOptions)
+					formOptions[option] = data[option];
 			}
 		}
 		this.setState({ formOptions });
@@ -118,8 +128,30 @@ export default class ArticleForm extends Component {
 		}
 	}
 
+	handleSearchChange = (event) => {
+		const { name, value } = event.target;
+		const { articleSearchOptions } = this.state;
+
+		articleSearchOptions[name] = value;
+		this.setState({ articleSearchOptions });
+	}
+
+	addAssociatedArticle = (fieldName, id) => {
+		const { formOptions } = this.state;
+		formOptions[fieldName].push(id);
+		formOptions[fieldName] = [...new Set(formOptions[fieldName])];
+		this.setState({ formOptions });
+	}
+
+	removeAssociatedArticle = (fieldName, id) => {
+		const { formOptions } = this.state;
+		formOptions[fieldName].splice(formOptions[fieldName].indexOf(id), 1);
+		this.setState({ formOptions });
+	}
+
 	render() {
-		const { articleKinds, formOptions, message } = this.state;
+		const { existingArticles } = this.props;
+		const { articleKinds, articleSearchOptions, formOptions, message } = this.state;
 
 		const articleKindOptions = articleKinds.map(kind => {
 			return <option key={ kind } value={ kind }>{ kind }</option>
@@ -144,6 +176,91 @@ export default class ArticleForm extends Component {
 					<input type='checkbox' checked={ formOptions.innerLayer }/>
 				</div>
 			)
+		}
+
+
+		// Added Articles
+		const addedShirts = existingArticles.filter(a => {
+			return formOptions.shirts.includes(a._id);
+		}).map(s => {
+			return <SmallArticle key={ s._id } field={ 'shirts' } id={ s._id } name={ s.name } image={ s.image } onClick={ this.removeAssociatedArticle }/>
+		});
+
+		const addedPants = existingArticles.filter(a => {
+			return formOptions.pants.includes(a._id);
+		}).map(s => {
+			return <SmallArticle key={ s._id } field={ 'pants' } id={ s._id } name={ s.name } image={ s.image } onClick={ this.removeAssociatedArticle }/>
+		});
+
+		const addedOuterwears = existingArticles.filter(a => {
+			return formOptions.outerwears.includes(a._id);
+		}).map(s => {
+			return <SmallArticle key={ s._id } field={ 'outerwears' } id={ s._id } name={ s.name } image={ s.image } onClick={ this.removeAssociatedArticle }/>
+		})
+
+
+		// Suggested (not yet added) Articles
+		const shirtSuggestions = existingArticles.filter(a => {
+			return a.kind === 'Shirt' && !formOptions.shirts.includes(a._id) && a.name.match(new RegExp(`^${articleSearchOptions.shirts}`, 'i'));
+		}).map(s => {
+			return <SmallArticle key={ s._id } field={ 'shirts' } id={ s._id } name={ s.name } image={ s.image } onClick={ this.addAssociatedArticle }/>
+		});
+
+		const pantsSuggestions = existingArticles.filter(a => {
+			return a.kind === 'Pants' && !formOptions.pants.includes(a._id) && a.name.match(new RegExp(`^${articleSearchOptions.pants}`, 'i'));
+		}).map(p => {
+			return <SmallArticle key={ p._id } field={ 'pants' } id={ p._id } name={ p.name } image={ p.image } onClick={ this.addAssociatedArticle }/>
+		});
+
+		const outerwearSuggestions = existingArticles.filter(a => {
+			return a.kind === 'Outerwear' && !formOptions.outerwears.includes(a._id) && a.name.match(new RegExp(`^${articleSearchOptions.outerwears}`, 'i'));
+		}).map(p => {
+			return <SmallArticle key={ p._id } field={ 'outerwears' } id={ p._id } name={ p.name } image={ p.image } onClick={ this.addAssociatedArticle }/>
+		});
+
+		// Form Fields for Associat(ing/ed) Articles
+		let associatedArticleFields = [];
+		if (['Pants', 'Outerwear'].includes(formOptions.kind)) {
+			associatedArticleFields.push(
+				<div key='shirtsField'>
+
+					{ addedShirts }
+
+					<label htmlFor='shirts'>Shirts</label>
+					<input name='shirts' type='search' value={ articleSearchOptions.shirts } onChange={ this.handleSearchChange }/>
+
+					{ shirtSuggestions }
+
+				</div>
+			);
+		}
+		if (['Shirt', 'Outerwear'].includes(formOptions.kind)) {
+			associatedArticleFields.push(
+				<div key='pantsField'>
+
+					{ addedPants }
+
+					<label htmlFor='pants'>Pants</label>
+					<input name='pants' type='search' value={ articleSearchOptions.pants } onChange={ this.handleSearchChange }/>
+
+					{ pantsSuggestions }
+
+				</div>
+			);
+		}
+		if (['Shirt', 'Pants', 'Outerwear'].includes(formOptions.kind)) {
+			associatedArticleFields.push(
+				<div key='outerwearsField'>
+
+					{ addedOuterwears}
+
+					<label htmlFor='outerwears'>Outerwear</label>
+					<input name='outerwears' type='search' value={ articleSearchOptions.outerwears } onChange={ this.handleSearchChange }/>
+
+					{ outerwearSuggestions }
+
+				</div>
+			);
 		}
 
 		return (
@@ -183,6 +300,8 @@ export default class ArticleForm extends Component {
 
 				<label htmlFor='snowOK'>Snow</label>
 				<input name='snowOK' type='checkbox' checked={ formOptions.snowOK } onChange={ this.handleChange }/>
+
+				{ associatedArticleFields }
 
 				<input type='submit'/>
 
