@@ -71,7 +71,7 @@ export default class DetailedArticle extends Component {
 				);
 			} else if (['shirts', 'pants', 'outerwears'].includes(key)) {
 				additionalBits.push(
-					<div>
+					<div key={ key }>
 						{ data[key].map(id => {
 							const a = existingArticles.filter(a => a._id === id)[0];
 							return <SmallArticle key={ a._id } field={ key } id={ a._id } name={ a.name } image={ a.image } onClick={ this.routeToArticle }/>;

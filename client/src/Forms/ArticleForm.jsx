@@ -50,7 +50,6 @@ export default class ArticleForm extends Component {
 
 	handleChange = (event) => {
 		const { name, type, value, checked } = event.target;
-		console.log(name, type, value, checked)
 		const { formOptions } = this.state;
 
 		// handling checkboxes
