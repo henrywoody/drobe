@@ -50,6 +50,7 @@ export default class ArticleForm extends Component {
 
 	handleChange = (event) => {
 		const { name, type, value, checked } = event.target;
+		console.log(name, type, value, checked)
 		const { formOptions } = this.state;
 
 		// handling checkboxes
@@ -182,7 +183,7 @@ export default class ArticleForm extends Component {
 			additionalFields.innerLayer = (
 				<div>
 					<label htmlFor='innerLayer'>Inner Layer</label>
-					<input type='checkbox' checked={ formOptions.innerLayer }/>
+					<input name='innerLayer' type='checkbox' checked={ formOptions.innerLayer } onChange={ this.handleChange }/>
 				</div>
 			)
 		}
