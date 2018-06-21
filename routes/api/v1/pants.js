@@ -1,5 +1,6 @@
 const	express = require('express'),
 		router = express.Router(),
+		mongoose = require('mongoose'),
 		Shirt = require('../../../models/shirt'),
 		Pants = require('../../../models/pants'),
 		Outerwear = require('../../../models/outerwear'),
@@ -111,26 +112,26 @@ router.put('/:id', async (req, res) => {
 
 		// add/remove new/removed associations from associated articles
 		for (const modelId of pairData.shirts) {
-			if (!pair.shirts.includes(modelId)) {
+			if (!pair.shirts.some(id => id.equals(mongoose.Types.ObjectId(modelId)))) {
 				// newly added references
 				await Shirt.findByIdAndUpdate(modelId, { $push: {pants: pair._id} });
 			}
 		}
 		for (const modelId of pair.shirts) {
-			if (!pairData.shirts.includes(modelId)) {
+			if (!pairData.shirts.some(id => mongoose.Types.ObjectId(id).equals(modelId))) {
 				// newly removed references
 				await Shirt.findByIdAndUpdate(modelId, { $pull: {pants: pair._id} });
 			}
 		}
 
 		for (const modelId of pairData.outerwears) {
-			if (!pair.outerwears.includes(modelId)) {
+			if (!pair.outerwears.some(id => id.equals(mongoose.Types.ObjectId(modelId)))) {
 				// newly added references
 				await Outerwear.findByIdAndUpdate(modelId, { $push: {pants: pair._id} });
 			}
 		}
 		for (const modelId of pair.outerwears) {
-			if (!pairData.outerwears.includes(modelId)) {
+			if (!pairData.outerwears.some(id => mongoose.Types.ObjectId(id).equals(modelId))) {
 				// newly removed references
 				await Outerwear.findByIdAndUpdate(modelId, { $pull: {pants: pair._id} });
 			}

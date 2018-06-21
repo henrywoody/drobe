@@ -1,5 +1,6 @@
 const	express = require('express'),
 		router = express.Router(),
+		mongoose = require('mongoose'),
 		Shirt = require('../../../models/shirt'),
 		Pants = require('../../../models/pants'),
 		Outerwear = require('../../../models/outerwear'),
@@ -119,39 +120,41 @@ router.put('/:id', async (req, res) => {
 
 		// add/remove new/removed associations from associated articles
 		for (const modelId of outerwearData.shirts) {
-			if (!outerwear.shirts.includes(modelId)) {
+			if (!outerwear.shirts.some(id => id.equals(mongoose.Types.ObjectId(modelId)))) {
 				// newly added references
+				console.log('new ref')
 				await Shirt.findByIdAndUpdate(modelId, { $push: {outerwears: outerwear._id} });
 			}
 		}
 		for (const modelId of outerwear.shirts) {
-			if (!outerwearData.shirts.includes(modelId)) {
+			if (!outerwearData.shirts.some(id => mongoose.Types.ObjectId(id).equals(modelId))) {
+				console.log('removed ref')
 				// newly removed references
 				await Shirt.findByIdAndUpdate(modelId, { $pull: {outerwears: outerwear._id} });
 			}
 		}
 
 		for (const modelId of outerwearData.pants) {
-			if (!outerwear.pants.includes(modelId)) {
+			if (!outerwear.pants.some(id => id.equals(mongoose.Types.ObjectId(modelId)))) {
 				// newly added references
 				await Pants.findByIdAndUpdate(modelId, { $push: {outerwears: outerwear._id} });
 			}
 		}
 		for (const modelId of outerwear.pants) {
-			if (!outerwearData.pants.includes(modelId)) {
+			if (!outerwearData.pants.some(id => mongoose.Types.ObjectId(id).equals(modelId))) {
 				// newly removed references
 				await Pants.findByIdAndUpdate(modelId, { $pull: {outerwears: outerwear._id} });
 			}
 		}
 
 		for (const modelId of outerwearData.outerwears) {
-			if (!outerwear.outerwears.includes(modelId)) {
+			if (!outerwear.outerwears.some(id => id.equals(mongoose.Types.ObjectId(modelId)))) {
 				// newly added references
 				await Outerwear.findByIdAndUpdate(modelId, { $push: {outerwears: outerwear._id} });
 			}
 		}
 		for (const modelId of outerwear.outerwears) {
-			if (!outerwearData.outerwears.includes(modelId)) {
+			if (!outerwearData.outerwears.some(id => mongoose.Types.ObjectId(id).equals(modelId))) {
 				// newly removed references
 				await Outerwear.findByIdAndUpdate(modelId, { $pull: {outerwears: outerwear._id} });
 			}

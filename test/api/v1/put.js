@@ -16,7 +16,6 @@ const models = {
 
 describe('API PUT methods', () => {
 	let goodUser, badUser;
-	let testShirt, testPants, testOuterwearGood, testOuterwearBad;
 
 	before(async () => {
 		if (global.config.env !== 'test') {
@@ -33,50 +32,6 @@ describe('API PUT methods', () => {
 			badData = JSON.parse(badResponse.text);
 			goodUser = {...goodData.user, token: goodData.token};
 			badUser = {...badData.user, token: badData.token};
-
-			// set up some articles to attach
-			const [testShirtResponse, testPantsResponse, testOuterwearResponse1, testOuterwearResponse2] = await Promise.all([
-					request.post('/api/v1/shirts', {
-							shirt: {name: 'Test Shirt'}
-						},
-						{
-							headers: {
-								"Authorization": `JWT ${goodUser.token}`,
-								"Content-Type": 'application/json'
-							}
-					}),
-					request.post('/api/v1/pants', {
-							pants: {name: 'Test Pants'}
-						},
-						{
-							headers: {
-								"Authorization": `JWT ${goodUser.token}`,
-								"Content-Type": 'application/json'
-							}
-					}),
-					request.post('/api/v1/outerwears', {
-							outerwear: {name: 'Good Test Outerwear'}
-						},
-						{
-							headers: {
-								"Authorization": `JWT ${goodUser.token}`,
-								"Content-Type": 'application/json'
-							}
-					}),
-					request.post('/api/v1/outerwears', {
-							outerwear: {name: 'Bad Test Outerwear'}
-						},
-						{
-							headers: {
-								"Authorization": `JWT ${badUser.token}`,
-								"Content-Type": 'application/json'
-							}
-					})
-				]);
-			testShirt = JSON.parse(testShirtResponse.text);
-			testPants = JSON.parse(testPantsResponse.text);
-			testOuterwearGood = JSON.parse(testOuterwearResponse1.text);
-			testOuterwearBad = JSON.parse(testOuterwearResponse2.text);
 		}
 	})
 
@@ -89,6 +44,7 @@ describe('API PUT methods', () => {
 			const endpoint = `/api/v1/${pluralArticleName}`;
 
 			let goodArticle1, goodArticle2, badArticle;
+			let testShirt, testPants, testOuterwearGood, testOuterwearBad;
 
 			const	goodArticle1Name = `first good ${singularArticleName}`,
 					goodArticle2Name = `second good ${singularArticleName}`,
@@ -105,6 +61,50 @@ describe('API PUT methods', () => {
 				goodArticle1 = JSON.parse(goodResponse1.text);
 				goodArticle2 = JSON.parse(goodResponse2.text);
 				badArticle = JSON.parse(badResponse.text);
+
+				// set up some articles to attach
+				const [testShirtResponse, testPantsResponse, testOuterwearResponse1, testOuterwearResponse2] = await Promise.all([
+						request.post('/api/v1/shirts', {
+								shirt: {name: 'Test Shirt'}
+							},
+							{
+								headers: {
+									"Authorization": `JWT ${goodUser.token}`,
+									"Content-Type": 'application/json'
+								}
+						}),
+						request.post('/api/v1/pants', {
+								pants: {name: 'Test Pants'}
+							},
+							{
+								headers: {
+									"Authorization": `JWT ${goodUser.token}`,
+									"Content-Type": 'application/json'
+								}
+						}),
+						request.post('/api/v1/outerwears', {
+								outerwear: {name: 'Good Test Outerwear'}
+							},
+							{
+								headers: {
+									"Authorization": `JWT ${goodUser.token}`,
+									"Content-Type": 'application/json'
+								}
+						}),
+						request.post('/api/v1/outerwears', {
+								outerwear: {name: 'Bad Test Outerwear'}
+							},
+							{
+								headers: {
+									"Authorization": `JWT ${badUser.token}`,
+									"Content-Type": 'application/json'
+								}
+						})
+					]);
+				testShirt = JSON.parse(testShirtResponse.text);
+				testPants = JSON.parse(testPantsResponse.text);
+				testOuterwearGood = JSON.parse(testOuterwearResponse1.text);
+				testOuterwearBad = JSON.parse(testOuterwearResponse2.text);
 			});
 
 			it('should respond with a 401 status when an authorization header is not supplied', async () => {
@@ -485,12 +485,121 @@ describe('API PUT methods', () => {
 
 			});
 
+			it('should update other properties without changing associated articles if they are not changed', async () => {
+				const newArticleData = {
+					name: `Linked First ${singularArticleName}`
+				};
+
+				switch (articleName) {
+					case 'shirt':
+						newArticleData.pants = [testPants._id];
+						newArticleData.outerwears = [testOuterwearGood._id];
+						break;
+					case 'pants':
+						newArticleData.shirts = [testShirt._id];
+						newArticleData.outerwears = [testOuterwearGood._id];
+						break;
+					case 'outerwear':
+						newArticleData.shirts = [testShirt._id];
+						newArticleData.pants = [testPants._id];
+						newArticleData.outerwears = [testOuterwearGood._id];
+						break;
+				}
+
+				const headers = {
+					headers: {
+						"Authorization": `JWT ${goodUser.token}`,
+						"Content-Type": 'application/json'
+					}
+				}
+
+				await request.put(
+					endpoint,
+					goodArticle1._id,
+					{
+						[articleName]: newArticleData
+					},
+					headers
+					);
+
+				const response = await request.put(
+					endpoint,
+					goodArticle1._id,
+					{
+						[articleName]: {
+							...newArticleData,
+							rating: 4
+						}
+					},
+					headers
+					);
+
+				assert.strictEqual(response.status, 200);
+
+				const updatedGoodArticle1 = JSON.parse(response.text);
+				
+				const updatedTestShirtResponse = await request.get('/api/v1/shirts', testShirt._id, headers);
+				const updatedTestPantsResponse = await request.get('/api/v1/pants', testPants._id, headers);
+				const updatedTestOuterwearResponse = await request.get('/api/v1/outerwears', testOuterwearGood._id, headers);
+
+				const updatedTestShirt = JSON.parse(updatedTestShirtResponse.text);
+				const updatedTestPants = JSON.parse(updatedTestPantsResponse.text);
+				const updatedTestOuterwear = JSON.parse(updatedTestOuterwearResponse.text);
+
+				switch (articleName) {
+					case 'shirt':
+						assert.lengthOf(updatedGoodArticle1.pants, 1, `length of updatedGoodArticle1.pants`);
+						assert.lengthOf(updatedGoodArticle1.outerwears, 1, `length of updatedGoodArticle1.outerwears`);
+
+						assert.include(updatedGoodArticle1.pants, testPants._id);
+						assert.include(updatedGoodArticle1.outerwears, testOuterwearGood._id);
+
+						assert.lengthOf(updatedTestPants[pluralArticleName], 1, `length of updatedTestPants.${pluralArticleName}`);
+						assert.lengthOf(updatedTestOuterwear[pluralArticleName], 1, `length of updatedTestOuterwear.${pluralArticleName}`);
+
+						assert.include(updatedTestPants[pluralArticleName], goodArticle1._id);
+						assert.include(updatedTestOuterwear[pluralArticleName], goodArticle1._id);
+						break;
+					case 'pants':
+						assert.lengthOf(updatedGoodArticle1.shirts, 1, `length of updatedGoodArticle1.shirts`);
+						assert.lengthOf(updatedGoodArticle1.outerwears, 1, `length of updatedGoodArticle1.outerwears`);
+
+						assert.include(updatedGoodArticle1.shirts, testShirt._id);
+						assert.include(updatedGoodArticle1.outerwears, testOuterwearGood._id);
+
+						assert.lengthOf(updatedTestShirt[pluralArticleName], 1, `length of updatedTestShirt.${pluralArticleName}`);
+						assert.lengthOf(updatedTestOuterwear[pluralArticleName], 1, `length of updatedTestOuterwear.${pluralArticleName}`);
+
+						assert.include(updatedTestShirt[pluralArticleName], goodArticle1._id);
+						assert.include(updatedTestOuterwear[pluralArticleName], goodArticle1._id);
+						break;
+					case 'outerwear':
+						assert.lengthOf(updatedGoodArticle1.shirts, 1, `length of updatedGoodArticle1.shirts`);
+						assert.lengthOf(updatedGoodArticle1.pants, 1, `length of updatedGoodArticle1.pants`);
+						assert.lengthOf(updatedGoodArticle1.outerwears, 1, `length of updatedGoodArticle1.outerwears`);
+
+						assert.include(updatedGoodArticle1.shirts, testShirt._id);
+						assert.include(updatedGoodArticle1.pants, testPants._id);
+						assert.include(updatedGoodArticle1.outerwears, testOuterwearGood._id);
+
+						assert.lengthOf(updatedTestShirt[pluralArticleName], 1, `length of updatedTestShirt.${pluralArticleName}`);
+						assert.lengthOf(updatedTestPants[pluralArticleName], 1, `length of updatedTestPants.${pluralArticleName}`);
+						assert.lengthOf(updatedTestOuterwear[pluralArticleName], 1, `length of updatedTestOuterwear.${pluralArticleName}`);
+
+						assert.include(updatedTestShirt[pluralArticleName], goodArticle1._id);
+						assert.include(updatedTestPants[pluralArticleName], goodArticle1._id);
+						assert.include(updatedTestOuterwear[pluralArticleName], goodArticle1._id);
+						break;
+				}
+
+			});
+
 			afterEach(async () => {
 				if (global.config.env === 'test') {
 					await Promise.all([
-						Model.findByIdAndRemove(goodArticle1._id),
-						Model.findByIdAndRemove(goodArticle2._id),
-						Model.findByIdAndRemove(badArticle._id)
+						Shirt.remove({}),
+						Pants.remove({}),
+						Outerwear.remove({})
 					]);
 				}
 			});
