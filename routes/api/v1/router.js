@@ -3,10 +3,12 @@ const	express = require('express'),
 
 const	shirtsRouter = require('./shirts'),
 		pantsRouter = require('./pants'),
-		outerwearsRouter = require('./outerwears');
+		outerwearsRouter = require('./outerwears'),
+		outfitsRouter = require('./outfits');
 
 router.use('/shirts', shirtsRouter);
 router.use('/pants', pantsRouter);
 router.use('/outerwears', outerwearsRouter);
+router.use('/outfits', outfitsRouter);
 
 module.exports = router;
