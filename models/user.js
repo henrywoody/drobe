@@ -7,7 +7,11 @@ const userSchema = new mongoose.Schema({
 		unique: true,
 		required: true
 	},
-	password: String
+	password: String,
+	location: {
+		type: Map,
+		of: String
+	}
 });
 
 userSchema.plugin(passportLocalMongoose);

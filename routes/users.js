@@ -4,6 +4,7 @@ const	express = require('express'),
 		User = require('../models/user'),
 		passport = require('passport'),
 		jwt = require('jsonwebtoken'),
+		tokenAuth = require('../middleware/token-auth'),
 		handleErrors = require('../modules/handle-db-errors');
 
 /* GET users listing. */
@@ -23,9 +24,11 @@ router.get('/register', (req, res, next) => {
 })
 
 router.post('/register', async (req, res) => {
-	const { username, password } = req.body;
+	const { user: userData } = req.body;
+	const { username, password, location } = userData;
+
 	try {
-		const user = await User.register(new User({username: username}), password);
+		const user = await User.register(new User({username: username, location: location}), password);
 
 		return passport.authenticate('local', (err, info) => {
 			if (!err) {
@@ -41,6 +44,27 @@ router.post('/register', async (req, res) => {
 		handleErrors(err, res);
 	}
 })
+
+router.put('/:id', tokenAuth, async (req, res) => {
+	const { user } = req;
+	const { id } = req.params;
+	try {
+		const userModel = await User.findById(id);
+
+		if (!userModel)
+			res.sendStatus(404);
+
+		if (user._id != id)
+			res.sendStatus(403);
+
+		const { user: userData } = req.body;
+		const updatedUser = await User.findByIdAndUpdate(id, userData, {new: true});
+
+		res.json(updatedUser);
+	} catch (err) {
+		handleErrors(err, res);
+	}
+});
 
 router.get('/login', (req, res, next) => {
 	res.send(`
