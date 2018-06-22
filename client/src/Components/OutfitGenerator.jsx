@@ -70,15 +70,21 @@ export default class OutfitGenerator extends Component {
 			outfitDisplay = <p>Loading...</p>;
 		} else {
 			outfitDisplay = [];
-			if (outfit.outerwears && outfit.outerwears.length)
+			if (outfit.outerwears && outfit.outerwears.length) {
+				outfitDisplay.push(<h3 key={ `outerwear-${Math.random()}` }>Outerwear</h3>);
 				outfitDisplay.push(...outfit.outerwears.map(o => {
 					return <SimpleArticle key={ o._id } data={ o } history={ history }/>;
 				}));
+			}
 
-			if (outfit.shirt)
+			if (outfit.shirt) {
+				outfitDisplay.push(<h3 key='shirt'>Shirt</h3>);
 				outfitDisplay.push(<SimpleArticle key={ outfit.shirt._id } data={ outfit.shirt } history={ history }/>);
-			if (outfit.pants)
+			}
+			if (outfit.pants){
+				outfitDisplay.push(<h3 key='pants'>Pants</h3>);
 				outfitDisplay.push(<SimpleArticle key={ outfit.pants._id } data={ outfit.pants } history={ history }/>);
+			}
 
 			if (outfit.shirt || outfit.pants)
 				outfitDisplay.push(<button key='wear-button' onClick={ this.handleSelect }>Wear</button>)
