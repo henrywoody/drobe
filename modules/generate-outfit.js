@@ -1,8 +1,29 @@
 const	Shirt = require('../models/shirt'),
 		Pants = require('../models/pants'),
 		Outerwear = require('../models/outerwear'),
-		request = require('request-promise-native'),
-		queryString = require('query-string');
+		getWeather = require('./get-weather');
+
+function selectRandom(articles) {
+	const weightedArray = articles.map((a, i) => {
+		let weight = 1;
+		
+		// weight by days since last worn
+		weight *= Math.floor((Date.now() - a.lastWorn)/(1000*60*60*24)) + 1;
+		// weight by rating
+		weight *= a.rating;
+
+		const weightArray = [];
+		for (let n = 0; n < weight; n++) {
+			weightArray.push(i);
+		}
+
+		return weightArray;
+	}).reduce((acc, x) => acc.concat(x), []);
+
+	const weightedIndex = Math.floor(Math.random() * weightedArray.length);
+	const articleIndex = weightedArray[weightedIndex];
+	return articles[articleIndex];
+}
 
 module.exports = async (user, {shirtId=null, pantsId=null, outerwearId=null}={}) => {
 	/*
@@ -10,32 +31,17 @@ module.exports = async (user, {shirtId=null, pantsId=null, outerwearId=null}={})
 		Takes into account more information than matching, like the weather
 	*/
 
-	// user.location = {};
-	// user.location.latitude = '34.3';
-	// user.location.longitude = '-118.5';
-
 	const latitude = user.location.get('latitude');
 	const longitude = user.location.get('longitude');
 
-	const weatherURL = `https://api.darksky.net/forecast/${process.env.WEATHER_API_KEY}/${latitude},${longitude}`;
-	const weatherResponse = await request(weatherURL);
-	const weatherData = JSON.parse(weatherResponse).daily.data[0];
+	const weather = await getWeather(latitude, longitude);
 
-	const {
-		temperatureLow: minTemp,
-		temperatureHigh: maxTemp,
-		precipProbability: rainProb,
-		precipIntensity: rainRate
-	} = weatherData;
-
-	const aveTemp = (minTemp + maxTemp)/2;
-	const weather = { minTemp, maxTemp, aveTemp, rainProb, rainRate };
 	const weatherRef = {
 		rainOKRainProb: 0.5,
 		raincoatRainRate: 1,
 		outerwearTemp: 70,
 		twoOuterwearsTemp: 50
-	}
+	};
 
 	const outfit = {
 		shirt: null,
@@ -47,20 +53,20 @@ module.exports = async (user, {shirtId=null, pantsId=null, outerwearId=null}={})
 		owner: user._id,
 		minTemp: { $lte: weather.minTemp },
 		maxTemp: { $gte: weather.maxTemp },
-	}
+	};
 
 	// ==========
 	// Outerwear
 	// ==========
 	if (weather.rainProb > weatherRef.rainOKRainProb) {
 		// if it's likely to rain
-		let possibleOuterwear, count;
+		let possibleOuterwear;
 
 		if (weather.rainRate >= weatherRef.raincoatRainRate) {
 			// if rainRate above moderate drizzle
 			// first try for a raincoat
 			possibleOuterwear = await Outerwear.find({...articleQuery, specificType: 'raincoat'});
-			count = possibleOuterwear.length;
+			const count = possibleOuterwear.length;
 			if (!count) {
 				// if none, just go for a rainOK peice of outerwear
 				possibleOuterwear = await Outerwear.find({...articleQuery, rainOK: true});
@@ -72,24 +78,19 @@ module.exports = async (user, {shirtId=null, pantsId=null, outerwearId=null}={})
 		}
 
 		// pick one randomly
-		count = possibleOuterwear.length;
-		const index = Math.floor(Math.random() * count);
-		outfit.outerwears.push(possibleOuterwear[index]);
+		outfit.outerwears.push(selectRandom(possibleOuterwear));
 
 	} else if (weather.aveTemp <= weatherRef.outerwearTemp) {
 		// if its cold enough for a piece of outerwear
 		const possibleOuterwear = await Outerwear.find({...articleQuery, specificType: { $ne: 'raincoat' }});
-		const count = possibleOuterwear.length;
-		const index = Math.floor(Math.random() * count);
-		outfit.outerwears.push(possibleOuterwear[index]);
+		outfit.outerwears.push(selectRandom(possibleOuterwear));
 	}
 
 	if (weather.aveTemp <= weatherRef.twoOuterwearsTemp) {
 		// if its cold enough for a second piece of outerwear
-		const possibleOuterwear = await Outerwear.find({...articleQuery, innerLayer: true});
-		const count = possibleOuterwear.length;
-		const index = Math.floor(Math.random() * count);
-		outfit.outerwears.push(possibleOuterwear[index]);
+		const associatedOuterwearIds = outfit.outerwears[0].outerwears;
+		const possibleOuterwear = await Outerwear.find({...articleQuery, innerLayer: true, _id: { $in: associatedOuterwearIds }});
+		outfit.outerwears.push(selectRandom(possibleOuterwear));
 	}
 
 	// ==========
@@ -103,19 +104,14 @@ module.exports = async (user, {shirtId=null, pantsId=null, outerwearId=null}={})
 		shirtQuery = {...articleQuery};
 	}
 	const possibleShirts = await Shirt.find(shirtQuery);
-	const shirtCount = possibleShirts.length;
-	const shirtIndex = Math.floor(Math.random() * shirtCount);
-	console.log(possibleShirts)
-	outfit.shirt = possibleShirts[shirtIndex];
+	outfit.shirt = selectRandom(possibleShirts);
 
 	// ==========
 	// Pants
 	// ==========
 	const associatedPantsIds = outfit.outerwears.concat(outfit.shirt).map(a => a.pants).reduce((acc, p) => acc.concat(p));
 	const possiblePants = await Pants.find({...articleQuery, _id: { $in: associatedPantsIds }});
-	const pantsCount = possiblePants.length;
-	const pantsIndex = Math.floor(Math.random() * pantsCount);
-	outfit.pants = possiblePants[pantsIndex];
+	outfit.pants = selectRandom(possiblePants);
 
 
 	return outfit;

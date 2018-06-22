@@ -22,6 +22,10 @@ articleSchema = new mongoose.Schema({
 		max: 5,
 		min: 0
 	},
+	lastWorn: {
+		type: Date,
+		default: Date.now
+	},
 	wearDates: [Date],
 	owner: {
 		type: mongoose.Schema.Types.ObjectId,
