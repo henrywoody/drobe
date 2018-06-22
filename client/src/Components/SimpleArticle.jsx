@@ -1,13 +1,10 @@
 import React, { Component } from 'react';
-import { NavLink } from 'react-router-dom';
 
 export default class SimpleArticle extends Component {
 	handleClick = () => {
 		const { data, history } = this.props;
 		const kind = data.kind.toLowerCase() + (data.kind === 'Pants' ? '' : 's');
 		history.replace(`/wardrobe/${kind}/${data._id}`);
-		// <NavLink exact to={ `wardrobe/${kind}/${data._id}` }>Select</NavLink>
-
 	}
 
 	render() {

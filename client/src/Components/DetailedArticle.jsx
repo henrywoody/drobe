@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import callAPI from '../Modules/call-api';
-import history from '../Modules/history';
 import { NavLink } from 'react-router-dom';
 import SmallArticle from './SmallArticle.jsx';
 
@@ -13,7 +12,7 @@ export default class DetailedArticle extends Component {
 	}
 
 	componentWillMount() {
-		const { history, match, user } = this.props;
+		const { history, match } = this.props;
 		const { articleKind, articleId } = match.params;
 
 		this.setupData(articleKind, articleId);
