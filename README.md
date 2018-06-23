@@ -36,3 +36,5 @@ After that though, it'll be smooth sailing.
 ## Tech
 
 This project is written in the MERN stack. MongoDB serves as the database, the back-end is built with Express and Node, and the front-end is written in React.
+
+For weather data, this project uses the [Dark Sky API](https://darksky.net/dev). To get coordinates for users (for use in the Dark Sky API), this project uses the [Google Geocoding API](https://developers.google.com/maps/documentation/geocoding/intro).
