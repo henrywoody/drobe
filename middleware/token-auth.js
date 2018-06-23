@@ -3,9 +3,12 @@ const	jwt = require('jsonwebtoken'),
 		User = require('../models/user');
 
 module.exports = async (req, res, next) => {
-	if (!req.headers.authorization) {
+	if (req.path.match(/\/v\d+\/data\/coordinates/))
+		return next();
+
+	if (!req.headers.authorization)
 		return res.sendStatus(401);
-	}
+
 	const token = req.headers.authorization.split(' ')[1];
 
 	let decoded;
