@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import callAPI from '../Modules/call-api';
-import history from '../Modules/history';
 import SimpleArticle from './SimpleArticle.jsx';
 
 export default class OutfitGenerator extends Component {
@@ -62,6 +61,7 @@ export default class OutfitGenerator extends Component {
 	}
 
 	render() {
+		const { history } = this.props;
 		const { outfit, loading } = this.state;
 		
 		let outfitDisplay;

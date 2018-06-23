@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Switch, Route } from 'react-router-dom';
-import history from '../Modules/history';
 import ArticlesIndex from '../Components/ArticlesIndex.jsx';
 import DetailedArticle from '../Components/DetailedArticle.jsx'
 import ArticleForm from '../Forms/ArticleForm.jsx';

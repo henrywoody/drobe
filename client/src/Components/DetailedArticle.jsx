@@ -12,7 +12,7 @@ export default class DetailedArticle extends Component {
 	}
 
 	componentWillMount() {
-		const { history, match } = this.props;
+		const { match, history } = this.props;
 		const { articleKind, articleId } = match.params;
 
 		this.setupData(articleKind, articleId);
@@ -82,7 +82,6 @@ export default class DetailedArticle extends Component {
 
 		return (
 			<div>
-				<NavLink exact to='/wardrobe'>Back</NavLink>
 				<h3>{ data.name }</h3>
 
 				<NavLink exact to={ `/wardrobe/${articleKind}/${articleId}/edit` }>Edit</NavLink>

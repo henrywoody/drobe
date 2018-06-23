@@ -12,7 +12,12 @@ export default class App extends Component {
 			user: {
 				_id: "5b269bbc16b19be6a4203974",
 				username: "test",
-				token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1YjI2OWJiYzE2YjE5YmU2YTQyMDM5NzQiLCJpYXQiOjE1MjkyNTY4OTJ9.Y4OZW6nH8L_6CRFSdhltzrpFkshPyRoWIjfbaovUIBI"
+				token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1YjI2OWJiYzE2YjE5YmU2YTQyMDM5NzQiLCJpYXQiOjE1MjkyNTY4OTJ9.Y4OZW6nH8L_6CRFSdhltzrpFkshPyRoWIjfbaovUIBI",
+				location: {
+					latitude: '34.4',
+					longitude: '-118.5',
+					name: 'Los Angeles, CA, USA'
+				}
 			}
 		}
 	}
@@ -28,8 +33,8 @@ export default class App extends Component {
 				] }/>
 
 				<Switch>
-					<Route exact path='/' render={ () => <Home user={ user }/> }/>
-					<Route path='/wardrobe' render={ () => <Wardrobe user={ user }/> }/>
+					<Route exact path='/' render={ props => <Home { ...props } user={ user }/> }/>
+					<Route path='/wardrobe' render={ props => <Wardrobe { ...props } user={ user }/> }/>
 				</Switch>
 			</div>
 		);

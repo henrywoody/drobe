@@ -84,7 +84,7 @@ export default class ArticleForm extends Component {
 
 	handleSubmit = async (event) => {
 		event.preventDefault();
-		const { match, history, user } = this.props;
+		const { match, user, history } = this.props;
 		const { formOptions } = this.state;
 
 		let response;
