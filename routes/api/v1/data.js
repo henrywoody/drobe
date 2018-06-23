@@ -22,7 +22,7 @@ router.get('/coordinates', async (req, res) => {
 	const locationData = await getCoordinates(address);
 
 	if (!locationData)
-		res.status(400).send('LocationNotFound');
+		res.status(400).json({error: 'LocationNotFound'});
 
 	res.json(locationData);
 });
