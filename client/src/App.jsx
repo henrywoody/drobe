@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Switch, Route } from 'react-router-dom';
+import callAPI from './Modules/call-api';
 import Header from './Components/Header.jsx';
 import Home from './Pages/Home.jsx';
 import Wardrobe from './Pages/Wardrobe.jsx';
@@ -18,12 +19,64 @@ export default class App extends Component {
 					longitude: '-118.5',
 					name: 'Los Angeles, CA, USA'
 				}
-			}
+			},
+			articles: []
 		}
 	}
 
-	render() {
+	componentWillMount() {
+		this.fetchArticles();
+	}
+
+	fetchArticles = async () => {
 		const { user } = this.state;
+
+		// fetch articles for user
+		const [
+			shirts,
+			pants,
+			outerwears
+		] = await Promise.all([
+			callAPI('shirts', null, user.token),
+			callAPI('pants', null, user.token),
+			callAPI('outerwears', null, user.token)
+		]);
+
+		const articles = [
+			...shirts,
+			...pants,
+			...outerwears
+		];
+
+		this.setState({ articles });
+	}
+
+	addArticle = (article) => {
+		const { articles } = this.state;
+		articles.push(article);
+		this.setState({ articles });
+	}
+
+	updateArticle = (article) => {
+		this.removeArticle(article);
+		this.addArticle(article);
+	}
+
+	removeArticle = (article) => {
+		const { articles } = this.state;
+		this.setState({
+			articles: articles.filter(a => a._id != article._id)
+		})
+	}
+
+	render() {
+		const { user, articles } = this.state;
+
+		const updateWardrobe = {
+			add: this.addArticle,
+			update: this.updateArticle,
+			remove: this.removeArticle
+		}
 
 		return (
 			<div className="App">
@@ -34,7 +87,7 @@ export default class App extends Component {
 
 				<Switch>
 					<Route exact path='/' render={ props => <Home { ...props } user={ user }/> }/>
-					<Route path='/wardrobe' render={ props => <Wardrobe { ...props } user={ user }/> }/>
+					<Route path='/wardrobe' render={ props => <Wardrobe { ...props } articles={ articles } updateWardrobe={ updateWardrobe } user={ user }/> }/>
 				</Switch>
 			</div>
 		);
