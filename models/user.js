@@ -9,8 +9,17 @@ const userSchema = new mongoose.Schema({
 	},
 	password: String,
 	location: {
-		type: Map,
-		of: String
+		name: {
+			type: String
+		},
+		latitude: {
+			type: Number,
+			required: true
+		},
+		longitude: {
+			type: Number,
+			required: true
+		}
 	}
 });
 
