@@ -25,7 +25,7 @@ export default class OutfitGenerator extends Component {
 		const newDate = Date.now();
 
 		if (outfit.outerwears && outfit.outerwears.length) {
-			for (const outerwear of outfit.outerwear) {
+			for (const outerwear of outfit.outerwears) {
 				const endpoint = `outerwears/${outerwear._id}`;
 				callAPI(endpoint, null, user.token, 'PUT', {
 					outerwear: {
