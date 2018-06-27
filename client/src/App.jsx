@@ -7,6 +7,7 @@ import Wardrobe from './Pages/Wardrobe.jsx';
 import Login from './Pages/Login.jsx';
 import Register from './Pages/Register.jsx';
 import Logout from './Pages/Logout.jsx';
+import NotFound from './Pages/404.jsx';
 import './App.css';
 
 export default class App extends Component {
@@ -104,13 +105,14 @@ export default class App extends Component {
 			<Switch>
 				<Route exact path='/' render={ props => <Home { ...props } user={ user }/> }/>
 				<Route path='/wardrobe' render={ props => <Wardrobe { ...props } articles={ articles } updateWardrobe={ updateWardrobe } user={ user }/> }/>
-				<Route path='/logout' render={ props => <Logout { ...props} logUserOut={ this.logUserOut }/> }/>
+				<Route exact path='/logout' render={ props => <Logout { ...props} logUserOut={ this.logUserOut }/> }/>
+				<Route component={ NotFound }/>
 			</Switch>
 		) : (
 			<Switch>
-				<Route exact path='/' render={ props => <Login { ...props } logUserIn={ this.logUserIn }/> }/>
 				<Route exact path='/register' render={ props => <Register { ...props } logUserIn={ this.logUserIn }/> }/>
-				<Route path='/logout' render={ props => <Logout { ...props} logUserOut={ this.logUserOut }/> }/>
+				<Route exact path='/logout' render={ props => <Logout { ...props} logUserOut={ this.logUserOut }/> }/>
+				<Route path='/' render={ props => <Login { ...props } logUserIn={ this.logUserIn }/> }/>
 			</Switch>
 		);
 
