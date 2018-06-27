@@ -6,6 +6,7 @@ import Home from './Pages/Home.jsx';
 import Wardrobe from './Pages/Wardrobe.jsx';
 import Login from './Pages/Login.jsx';
 import Register from './Pages/Register.jsx';
+import Logout from './Pages/Logout.jsx';
 import './App.css';
 
 export default class App extends Component {
@@ -23,12 +24,15 @@ export default class App extends Component {
 	}
 
 	logUserIn = async (user, token) => {
-		console.log(user)
 		await this.setState({
 			user: {...user, token: token},
 			isAuthenticated: true
 		});
 		this.fetchArticles();
+	}
+
+	logUserOut = () => {
+		this.setState({ isAuthenticated: false, user: {}});
 	}
 
 	fetchArticles = async () => {
@@ -86,7 +90,8 @@ export default class App extends Component {
 		const links = isAuthenticated ? (
 			[
 				{name: 'Home', exact: true, href: '/'},
-				{name: 'Wardrobe', exact: false, href: '/wardrobe'}
+				{name: 'Wardrobe', exact: false, href: '/wardrobe'},
+				{name: 'Logout', exact: true, href: '/logout'}
 			]
 		) : (
 			[
@@ -99,11 +104,13 @@ export default class App extends Component {
 			<Switch>
 				<Route exact path='/' render={ props => <Home { ...props } user={ user }/> }/>
 				<Route path='/wardrobe' render={ props => <Wardrobe { ...props } articles={ articles } updateWardrobe={ updateWardrobe } user={ user }/> }/>
+				<Route path='/logout' render={ props => <Logout { ...props} logUserOut={ this.logUserOut }/> }/>
 			</Switch>
 		) : (
 			<Switch>
 				<Route exact path='/' render={ props => <Login { ...props } logUserIn={ this.logUserIn }/> }/>
 				<Route exact path='/register' render={ props => <Register { ...props } logUserIn={ this.logUserIn }/> }/>
+				<Route path='/logout' render={ props => <Logout { ...props} logUserOut={ this.logUserOut }/> }/>
 			</Switch>
 		);
 
