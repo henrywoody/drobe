@@ -4,6 +4,7 @@ import { NavLink } from 'react-router-dom';
 export default class Logout extends Component {
 	componentWillMount() {
 		const { logUserOut } = this.props;
+		fetch('/users/logout');
 		logUserOut();
 	}
 
