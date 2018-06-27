@@ -11,6 +11,10 @@ router.post('/register', async (req, res) => {
 	const { user: userData } = req.body;
 	const { username, password, location } = userData;
 
+	// for passport
+	req.body.username = username;
+	req.body.password = password;
+
 	try {
 		const user = await User.register(new User({username: username, location: location}), password);
 
