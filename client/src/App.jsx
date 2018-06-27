@@ -21,7 +21,14 @@ export default class App extends Component {
 	}
 
 	componentWillMount() {
-		this.fetchArticles();
+		const user = JSON.parse(localStorage.getItem('user'));
+		const lastRefresh = Number(localStorage.getItem('lastRefresh'));
+		if (user && Date.now() - lastRefresh < 1000 * 60 * 60 * 24 * 14) {// must log back in after 2 weeks of inactivity
+			this.logUserIn(user, user.token)
+		} else if (user) {
+			localStorage.setItem('user', null);
+			localStorage.setItem('lastRefresh', null);
+		}
 	}
 
 	logUserIn = async (user, token) => {
@@ -29,11 +36,15 @@ export default class App extends Component {
 			user: {...user, token: token},
 			isAuthenticated: true
 		});
+		localStorage.setItem('user', JSON.stringify({...user, token}));
+		localStorage.setItem('lastRefresh', Date.now().toString());
 		this.fetchArticles();
 	}
 
 	logUserOut = () => {
 		this.setState({ isAuthenticated: false, user: {}});
+		localStorage.setItem('user', null);
+		localStorage.setItem('lastRefresh', null);
 	}
 
 	fetchArticles = async () => {
