@@ -26,7 +26,6 @@ export default class UserForm extends Component {
 	}
 
 	handleSubmit = async (event) => {
-		console.log('SUBMIT')
 		event.preventDefault();
 		const { formType, logUserIn } = this.props;
 		const { formOptions } = this.state;
@@ -82,8 +81,6 @@ export default class UserForm extends Component {
 	render() {
 		const { formType } = this.props;
 		const { formOptions, message } = this.state;
-
-		console.log(formOptions)
 
 		const formInputs = [];
 		formInputs.push(
