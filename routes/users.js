@@ -7,22 +7,6 @@ const	express = require('express'),
 		tokenAuth = require('../middleware/token-auth'),
 		handleErrors = require('../modules/handle-db-errors');
 
-/* GET users listing. */
-router.get('/', (req, res, next) => {
-  res.send('respond with a resource');
-});
-
-router.get('/register', (req, res, next) => {
-	res.send(`
-		<h1>Welcome</h1>
-		<form method="POST" action="/users/register">
-			<input type="text" placeholder="username" name="username">
-			<input type="password" placeholder="password" name="password">
-			<input type="submit">
-		</form>
-	`)
-})
-
 router.post('/register', async (req, res) => {
 	const { user: userData } = req.body;
 	const { username, password, location } = userData;
@@ -48,6 +32,7 @@ router.post('/register', async (req, res) => {
 router.put('/:id', tokenAuth, async (req, res) => {
 	const { user } = req;
 	const { id } = req.params;
+
 	try {
 		const userModel = await User.findById(id);
 
@@ -66,19 +51,14 @@ router.put('/:id', tokenAuth, async (req, res) => {
 	}
 });
 
-router.get('/login', (req, res, next) => {
-	res.send(`
-		<h1>Login</h1>
-		<form method="POST" action="/users/login">
-			<input type="text" placeholder="username" name="username">
-			<input type="password" placeholder="password" name="password">
-			<input type="submit">
-		</form>
-	`)
-})
-
 router.post('/login', (req, res) => {
-	const { username, password } = req.body;
+	const { user: userData } = req.body;
+	const { username, password } = userData;
+
+	// for passport
+	req.body.username = username;
+	req.body.password = password;
+
 	if (!(username && password)) {
 		const err = new Error;
 		err.name = 'MissingCredentialsError';
@@ -99,11 +79,7 @@ router.post('/login', (req, res) => {
 
 router.get('/logout', (req, res) => {
 	req.logout();
-	res.redirect('/');
-})
-
-router.get('/secret', (req, res, next) => {
-	res.send('nice secret');
+	res.sendStatus(200);
 })
 
 module.exports = router;
