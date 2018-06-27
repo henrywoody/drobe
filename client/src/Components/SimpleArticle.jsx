@@ -18,7 +18,7 @@ export default class SimpleArticle extends Component {
 
 		return (
 			<div onClick={ this.handleClick }>
-				<h3>{ data.name }</h3>
+				<span>{ data.name }</span>
 
 				{ img }
 
