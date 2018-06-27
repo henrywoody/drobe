@@ -4,22 +4,16 @@ import callAPI from './Modules/call-api';
 import Header from './Components/Header.jsx';
 import Home from './Pages/Home.jsx';
 import Wardrobe from './Pages/Wardrobe.jsx';
+import Login from './Pages/Login.jsx';
+import Register from './Pages/Register.jsx';
 import './App.css';
 
 export default class App extends Component {
 	constructor() {
 		super();
 		this.state = {
-			user: {
-				_id: "5b269bbc16b19be6a4203974",
-				username: "test",
-				token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1YjI2OWJiYzE2YjE5YmU2YTQyMDM5NzQiLCJpYXQiOjE1MjkyNTY4OTJ9.Y4OZW6nH8L_6CRFSdhltzrpFkshPyRoWIjfbaovUIBI",
-				location: {
-					latitude: '34.4',
-					longitude: '-118.5',
-					name: 'Los Angeles, CA, USA'
-				}
-			},
+			user: {},
+			isAuthenticated: false,
 			articles: []
 		}
 	}
@@ -28,8 +22,19 @@ export default class App extends Component {
 		this.fetchArticles();
 	}
 
+	logUserIn = async (user, token) => {
+		console.log(user)
+		await this.setState({
+			user: {...user, token: token},
+			isAuthenticated: true
+		});
+		this.fetchArticles();
+	}
+
 	fetchArticles = async () => {
-		const { user } = this.state;
+		const { user, isAuthenticated } = this.state;
+		if (!isAuthenticated)
+			return;
 
 		// fetch articles for user
 		const [
@@ -70,7 +75,7 @@ export default class App extends Component {
 	}
 
 	render() {
-		const { user, articles } = this.state;
+		const { user, isAuthenticated, articles } = this.state;
 
 		const updateWardrobe = {
 			add: this.addArticle,
@@ -78,17 +83,35 @@ export default class App extends Component {
 			remove: this.removeArticle
 		}
 
+		const links = isAuthenticated ? (
+			[
+				{name: 'Home', exact: true, href: '/'},
+				{name: 'Wardrobe', exact: false, href: '/wardrobe'}
+			]
+		) : (
+			[
+				{name: 'Login', exact: true, href: '/'},
+				{name: 'Register', exact: true, href: '/register'}
+			]
+		);
+
+		const content = isAuthenticated ? (
+			<Switch>
+				<Route exact path='/' render={ props => <Home { ...props } user={ user }/> }/>
+				<Route path='/wardrobe' render={ props => <Wardrobe { ...props } articles={ articles } updateWardrobe={ updateWardrobe } user={ user }/> }/>
+			</Switch>
+		) : (
+			<Switch>
+				<Route exact path='/' render={ props => <Login { ...props } logUserIn={ this.logUserIn }/> }/>
+				<Route exact path='/register' render={ props => <Register { ...props } logUserIn={ this.logUserIn }/> }/>
+			</Switch>
+		);
+
 		return (
 			<div className="App">
-				<Header links={ [
-						{name: 'Home', exact: true, href: '/'},
-						{name: 'Wardrobe', exact: false, href: '/wardrobe'}
-				] }/>
+				<Header links={ links }/>
 
-				<Switch>
-					<Route exact path='/' render={ props => <Home { ...props } user={ user }/> }/>
-					<Route path='/wardrobe' render={ props => <Wardrobe { ...props } articles={ articles } updateWardrobe={ updateWardrobe } user={ user }/> }/>
-				</Switch>
+				{ content }
 			</div>
 		);
 	}
