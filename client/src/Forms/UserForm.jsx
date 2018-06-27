@@ -9,9 +9,11 @@ export default class UserForm extends Component {
 				username: '',
 				password: '',
 				passwordCheck: '',
-				location: '',
-				latitude: '',
-				longitude: ''
+				location: {
+					name: '',
+					latitude: '',
+					longitude: ''
+				}
 			},
 			message: ''
 		}
@@ -21,17 +23,22 @@ export default class UserForm extends Component {
 		const { name, value } = event.target;
 		const { formOptions } = this.state;
 
-		formOptions[name] = value;
+		const matched = name.match(/(\w*?)-(\w*)/);
+		if (matched) {
+			const [_, name1, name2] = matched;
+			formOptions[name1][name2] = value;
+		} else {
+			formOptions[name] = value;
+		}
 		this.setState({ formOptions });
 	}
 
 	handleSubmit = async (event) => {
 		event.preventDefault();
-		const { formType, logUserIn } = this.props;
-		const { formOptions } = this.state;
+		const { formType, logUserIn, history } = this.props;
 
 		if (formType === 'register') {
-			if (formOptions.password !== formOptions.passwordCheck)
+			if (this.state.formOptions.password !== this.state.formOptions.passwordCheck)
 				this.setState({message: 'Passwords do not match.'});
 
 			const coordinateCheck = await this.findCoordinates();
@@ -39,12 +46,14 @@ export default class UserForm extends Component {
 				return;
 		}
 
+		const { formOptions } = this.state;
+
 		const response = await fetch(`/users/${formType}`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify(formOptions)
+			body: JSON.stringify({user: formOptions})
 		})
 
 		if (response.status !== 200) {
@@ -56,24 +65,30 @@ export default class UserForm extends Component {
 		} else {
 			const jsonResponse = await response.json();
 			logUserIn(jsonResponse.user, jsonResponse.token);
+			
+			if (formType === 'register')
+				history.replace('/');
 		}
 	}
 
-	findCoordinates = async () => {
+	findCoordinates = async (event) => {
+		if (event) event.preventDefault();
+
 		const { formOptions, message } = this.state;
 		const locationMessage = 'Location not recognized.'
 
-		const locationData = await callAPI('data/coordinates', {address: formOptions.location});
+		const locationData = await callAPI('data/coordinates', {address: formOptions.location.name});
 		if (locationData.error) {
 			this.setState({message: locationMessage});
 		} else {
+			const { location: name, latitude, longitude } = locationData;
 			const updatedState = {
-				formOptions: {...formOptions, ...locationData}
+				formOptions: {...formOptions, location: { name, latitude, longitude }}
 			}
 			if (message === locationMessage)
 				updatedState.message = '';
 
-			this.setState(updatedState);
+			await this.setState(updatedState);
 			return true
 		}
 	}
@@ -111,9 +126,9 @@ export default class UserForm extends Component {
 			);
 
 			formInputs.push(
-				<div key='location'>
-					<label htmlFor='location'>Location</label>
-					<input name='location' type='text' placeholder='location' value={ formOptions.location } onChange={ this.handleChange }/>
+				<div key='location-name'>
+					<label htmlFor='location-name'>Location</label>
+					<input name='location-name' type='text' placeholder='location' value={ formOptions.location.name } onChange={ this.handleChange }/>
 					<button onClick={ this.findCoordinates }>Validate</button>
 				</div>
 			)

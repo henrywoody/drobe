@@ -4,13 +4,13 @@ import UserForm from '../Forms/UserForm.jsx';
 
 export default class Register extends Component {
 	render() {
-		const { logUserIn } = this.props;
+		const { logUserIn, history } = this.props;
 
 		return (
 			<main>
 				<h1>Register</h1>
 
-				<UserForm formType='register' logUserIn={ logUserIn }/>
+				<UserForm formType='register' logUserIn={ logUserIn } history={ history }/>
 
 				<p>
 					Have an account? <NavLink exact to='/'>Login here</NavLink>
