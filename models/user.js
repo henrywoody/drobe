@@ -13,12 +13,10 @@ const userSchema = new mongoose.Schema({
 			type: String
 		},
 		latitude: {
-			type: Number,
-			required: true
+			type: Number
 		},
 		longitude: {
-			type: Number,
-			required: true
+			type: Number
 		}
 	}
 });
