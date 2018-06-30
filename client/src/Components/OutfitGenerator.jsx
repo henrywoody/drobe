@@ -12,8 +12,10 @@ export default class OutfitGenerator extends Component {
 	}
 
 	generateOutfit = async () => {
-		await this.setState({ loading: true });
 		const { user } = this.props;
+
+		await this.setState({ loading: true });
+
 		const outfit = await callAPI('outfits/today', null, user.token);
 		this.setState({ outfit, loading: false });
 	}
@@ -37,6 +39,7 @@ export default class OutfitGenerator extends Component {
 				)
 			}
 		}
+
 		if (outfit.shirt) {
 			const endpoint = `shirts/${outfit.shirt._id}`;
 			callAPI(endpoint, null, user.token, 'PUT', {
@@ -61,9 +64,9 @@ export default class OutfitGenerator extends Component {
 	}
 
 	render() {
-		const { history } = this.props;
+		const { disabled, history } = this.props;
 		const { outfit, loading } = this.state;
-		
+
 		let outfitDisplay;
 
 		if (loading) {
@@ -94,7 +97,7 @@ export default class OutfitGenerator extends Component {
 			<div>
 				<h2>Outfit</h2>
 				{  outfitDisplay  }
-				<button onClick={ this.generateOutfit }>Generate Outfit</button>
+				<button disabled={ disabled } onClick={ this.generateOutfit }>Generate Outfit</button>
 			</div>
 		)
 	}

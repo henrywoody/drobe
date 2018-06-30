@@ -108,7 +108,7 @@ export default class App extends Component {
 
 	render() {
 		const { user, isAuthenticated, articles } = this.state;
-
+		
 		const updateWardrobe = {
 			add: this.addArticle,
 			update: this.updateArticle,
@@ -130,7 +130,7 @@ export default class App extends Component {
 
 		const content = isAuthenticated ? (
 			<Switch>
-				<Route exact path='/' render={ props => <Home { ...props } updateUser={ this.updateUser } user={ user }/> }/>
+				<Route exact path='/' render={ props => <Home { ...props } userHasClothes={ !!articles.length } updateUser={ this.updateUser } user={ user }/> }/>
 				<Route path='/wardrobe' render={ props => <Wardrobe { ...props } articles={ articles } updateWardrobe={ updateWardrobe } user={ user }/> }/>
 				<Route exact path='/logout' render={ props => <Logout { ...props} logUserOut={ this.logUserOut }/> }/>
 				<Route component={ NotFound }/>
