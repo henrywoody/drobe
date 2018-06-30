@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Switch, Route } from 'react-router-dom';
 import callAPI from './Modules/call-api';
+import updateUser from './Modules/update-user';
 import Header from './Components/Header.jsx';
 import Home from './Pages/Home.jsx';
 import Wardrobe from './Pages/Wardrobe.jsx';
@@ -23,28 +24,43 @@ export default class App extends Component {
 	componentWillMount() {
 		const user = JSON.parse(localStorage.getItem('user'));
 		const lastRefresh = Number(localStorage.getItem('lastRefresh'));
+
 		if (user && Date.now() - lastRefresh < 1000 * 60 * 60 * 24 * 14) {// must log back in after 2 weeks of inactivity
 			this.logUserIn(user, user.token)
 		} else if (user) {
-			localStorage.setItem('user', null);
-			localStorage.setItem('lastRefresh', null);
+			this.clearUserInfo();
 		}
+	}
+
+	storeUserInfo(user) {
+		localStorage.setItem('user', JSON.stringify(user));
+		localStorage.setItem('lastRefresh', Date.now().toString());
+	}
+
+	clearUserInfo() {
+		localStorage.setItem('user', null);
+		localStorage.setItem('lastRefresh', null);
 	}
 
 	logUserIn = async (user, token) => {
 		await this.setState({
-			user: {...user, token: token},
+			user: {...user, token},
 			isAuthenticated: true
 		});
-		localStorage.setItem('user', JSON.stringify({...user, token}));
-		localStorage.setItem('lastRefresh', Date.now().toString());
+		
+		this.storeUserInfo({...user, token});
 		this.fetchArticles();
+	}
+
+	updateUser = async (user) => {
+		const updatedUser = await updateUser(user._id, user.token, { user });
+		this.storeUserInfo({...updatedUser, token: user.token});
+		this.setState({ user: {...updatedUser, token: user.token} });
 	}
 
 	logUserOut = () => {
 		this.setState({ isAuthenticated: false, user: {}});
-		localStorage.setItem('user', null);
-		localStorage.setItem('lastRefresh', null);
+		this.clearUserInfo();
 	}
 
 	fetchArticles = async () => {
@@ -114,7 +130,7 @@ export default class App extends Component {
 
 		const content = isAuthenticated ? (
 			<Switch>
-				<Route exact path='/' render={ props => <Home { ...props } user={ user }/> }/>
+				<Route exact path='/' render={ props => <Home { ...props } updateUser={ this.updateUser } user={ user }/> }/>
 				<Route path='/wardrobe' render={ props => <Wardrobe { ...props } articles={ articles } updateWardrobe={ updateWardrobe } user={ user }/> }/>
 				<Route exact path='/logout' render={ props => <Logout { ...props} logUserOut={ this.logUserOut }/> }/>
 				<Route component={ NotFound }/>
