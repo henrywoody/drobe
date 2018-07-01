@@ -17,35 +17,24 @@ router.get('/', async (req, res) => {
 	const { user } = req;
 	try {
 		const outerwears = await Outerwear.find({owner: user._id});
-		outerwears.forEach(outerwear => outerwear.image = null); // dont send image data here
-		res.json(outerwears);
+		const imageFormattedouterwears = outerwears.map(outerwear => {
+			outerwear = outerwear.toObject();
+			// encode image if there is one
+			const { data, contentType } = outerwear.image;
+			if (data && contentType) {
+				outerwear.image = b64encodeImage(data, contentType);
+			} else {
+				outerwear.image = null;
+			}
+			return outerwear;
+		});
+		res.json(imageFormattedouterwears);
 	} catch (err) {
 		handleErrors(err, res);
 	}
 })
 
 // Detail
-router.get('/:id/image', async (req, res) => {
-	const { user } = req;
-	const { id } = req.params;
-	try {
-		const outerwear = await Outerwear.findById(id);
-		if (!outerwear) {
-			const err = new Error('Outerwear Not Found.');
-			err.name = 'NotFound';
-			throw err;
-		}
-		if (!outerwear.owner.equals(user._id))
-			return res.sendStatus(403);
-
-		const { data, contentType } = outerwear.image;
-		const encoded = b64encodeImage(data, contentType);
-		res.json({image: encoded});
-	} catch (err) {
-		handleErrors(err, res);
-	}
-})
-
 router.get('/:id', async (req, res) => {
 	const { user } = req;
 	const { id } = req.params;
@@ -59,8 +48,15 @@ router.get('/:id', async (req, res) => {
 		if (!outerwear.owner.equals(user._id))
 			return res.sendStatus(403);
 
-		outerwear.image = null; // dont send image data here
-		res.json(outerwear);
+		const outerwearObject = outerwear.toObject();
+		// encode image if there is one
+		const { data, contentType } = outerwear.image;
+		if (data && contentType) {
+			outerwearObject.image = b64encodeImage(data, contentType);
+		} else {
+			outerwearObject.image = null;
+		}
+		res.json(outerwearObject);
 	} catch (err) {
 		handleErrors(err, res);
 	}

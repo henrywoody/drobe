@@ -17,35 +17,24 @@ router.get('/', async (req, res) => {
 	const { user } = req;
 	try {
 		const shirts = await Shirt.find({owner: user._id});
-		shirts.forEach(shirt => shirt.image = null); // dont send image data here
-		res.json(shirts);
+		const imageFormmatedShirts = shirts.map(shirt => {
+			shirt = shirt.toObject();
+			// encode image if there is one
+			const { data, contentType } = shirt.image;
+			if (data && contentType) {
+				shirt.image = b64encodeImage(data, contentType);
+			} else {
+				shirt.image = null;
+			}
+			return shirt;
+		});
+		res.json(imageFormmatedShirts);
 	} catch (err) {
 		handleErrors(err, res);
 	}
 })
 
 // Detail
-router.get('/:id/image', async (req, res) => {
-	const { user } = req;
-	const { id } = req.params;
-	try {
-		const shirt = await Shirt.findById(id);
-		if (!shirt) {
-			const err = new Error('Shirt Not Found.');
-			err.name = 'NotFound';
-			throw err;
-		}
-		if (!shirt.owner.equals(user._id))
-			return res.sendStatus(403);
-
-		const { data, contentType } = shirt.image;
-		const encoded = b64encodeImage(data, contentType);
-		res.json({image: encoded});
-	} catch (err) {
-		handleErrors(err, res);
-	}
-})
-
 router.get('/:id', async (req, res) => {
 	const { user } = req;
 	const { id } = req.params;
@@ -59,8 +48,15 @@ router.get('/:id', async (req, res) => {
 		if (!shirt.owner.equals(user._id))
 			return res.sendStatus(403);
 
-		shirt.image = null // dont send image data here
-		res.json(shirt);
+		const shirtObject = shirt.toObject();
+		// encode image if there is one
+		const { data, contentType } = shirt.image;
+		if (data && contentType) {
+			shirtObject.image = b64encodeImage(data, contentType);
+		} else {
+			shirtObject.image = null;
+		}
+		res.json(shirtObject);
 	} catch (err) {
 		handleErrors(err, res);
 	}

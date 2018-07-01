@@ -17,35 +17,24 @@ router.get('/', async (req, res) => {
 	const { user } = req;
 	try {
 		const pants = await Pants.find({owner: user._id});
-		pants.forEach(pair => pair.image = null); // dont send image data here
-		res.json(pants);
+		const imageFormattedPants = pants.map(pair => {
+			pair = pair.toObject();
+			// encode image if there is one
+			const { data, contentType } = pair.image;
+			if (data && contentType) {
+				pair.image = b64encodeImage(data, contentType);
+			} else {
+				pair.image = null;
+			}
+			return pair;
+		});
+		res.json(imageFormattedPants);
 	} catch (err) {
 		handleErrors(err, res);
 	}
 })
 
 // Detail
-router.get('/:id/image', async (req, res) => {
-	const { user } = req;
-	const { id } = req.params;
-	try {
-		const pair = await Pants.findById(id);
-		if (!pair) {
-			const err = new Error('Pants Not Found.');
-			err.name = 'NotFound';
-			throw err;
-		}
-		if (!pair.owner.equals(user._id))
-			return res.sendStatus(403);
-
-		const { data, contentType } = pair.image;
-		const encoded = b64encodeImage(data, contentType);
-		res.json({image: encoded});
-	} catch (err) {
-		handleErrors(err, res);
-	}
-})
-
 router.get('/:id', async (req, res) => {
 	const { user } = req;
 	const { id } = req.params;
@@ -59,8 +48,15 @@ router.get('/:id', async (req, res) => {
 		if (!pair.owner.equals(user._id))
 			return res.sendStatus(403);
 
-		pair.image = null; // dont send image data here
-		res.json(pair);
+		const pairObject = pair.toObject();
+		// encode image if there is one
+		const { data, contentType } = pair.image
+		if (data && contentType) {
+			pairObject.image = b64encodeImage(data, contentType);
+		} else {
+			pairObject.image = null;
+		}
+		res.json(pairObject);
 	} catch (err) {
 		handleErrors(err, res);
 	}
@@ -74,7 +70,6 @@ router.post('/', async (req, res) => {
 		await new Promise((resolve, reject) => { 
 			upload.single('image')(req, res, (err) => {
 				if (err) {
-					console.log(err)
 					res.json({error: 'There was an error with the image upload'});
 					reject();
 				}
