@@ -44,8 +44,10 @@ export default class ArticleForm extends Component {
 			const data = await callAPI(`${articleKind}/${articleId}`, null, user.token);
 
 			for (const option in data) {
-				if (option in formOptions)
+				if (option in formOptions) {
+					if (option === 'image') continue;
 					formOptions[option] = data[option];
+				}
 			}
 		}
 		this.setState({ formOptions });
@@ -74,19 +76,6 @@ export default class ArticleForm extends Component {
 
 			if (message === imageTooLargeMessage)
 				newMessage = null;
-
-			// const { user } = this.props;
-			// const formData = new FormData();
-			// formData.append('image', file, file.name)
-			// const respo = await fetch('/api/v1/upload', {
-			// 	method: 'POST',
-			// 	headers: {
-			// 		'Authorization': `JWT ${user.token}`,
-			// 		// 'Content-Type': 'application/json',
-			// 		// 'Content-Type': 'multipart/form-data'
-			// 	},
-			// 	body: formData
-			// });
 
 			formOptions.image = {
 				path: value,
