@@ -68,17 +68,20 @@ router.get('/:id', async (req, res) => {
 
 // Create
 router.post('/', async (req, res) => {
+	console.log('POST')
 	const { user } = req;
 	try {
 		let pairData;
 		await new Promise((resolve, reject) => { 
 			upload.single('image')(req, res, (err) => {
 				if (err) {
-					res.send({error: 'There was an error with the image upload'});
+					console.log(err)
+					res.json({error: 'There was an error with the image upload'});
 					reject();
 				}
-
-				pairData = JSON.parse(req.body.shirt)
+				console.log('past err')
+				pairData = JSON.parse(req.body.pants)
+				console.log(pairData)
 				pairData.owner = user._id;
 				// image
 				pairData.image = {}

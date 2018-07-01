@@ -74,11 +74,11 @@ router.post('/', async (req, res) => {
 		await new Promise((resolve, reject) => { 
 			upload.single('image')(req, res, (err) => {
 				if (err) {
-					res.send({error: 'There was an error with the image upload'});
+					res.json({error: 'There was an error with the image upload'});
 					reject();
 				}
 
-				outerwearData = JSON.parse(req.body.shirt)
+				outerwearData = JSON.parse(req.body.outerwear)
 				outerwearData.owner = user._id;
 				// image
 				outerwearData.image = {}
