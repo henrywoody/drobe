@@ -22,6 +22,27 @@ router.get('/', async (req, res) => {
 	}
 })
 
+// Detail
+router.get('/:id/image', async (req, res) => {
+	const { user } = req;
+	const { id } = req.params;
+	try {
+		const shirt = await Shirt.findById(id);
+		if (!shirt) {
+			const err = new Error('Shirt Not Found.');
+			err.name = 'NotFound';
+			throw err;
+		}
+		if (!shirt.owner.equals(user._id))
+			return res.sendStatus(403);
+
+		res.contentType(shirt.image.contentType);
+		res.send(shirt.image.data);
+	} catch (err) {
+		handleErrors(err, res);
+	}
+})
+
 router.get('/:id', async (req, res) => {
 	const { user } = req;
 	const { id } = req.params;

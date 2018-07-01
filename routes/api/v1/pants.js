@@ -23,6 +23,26 @@ router.get('/', async (req, res) => {
 })
 
 // Detail
+router.get('/:id/image', async (req, res) => {
+	const { user } = req;
+	const { id } = req.params;
+	try {
+		const pair = await Pants.findById(id);
+		if (!pair) {
+			const err = new Error('Pants Not Found.');
+			err.name = 'NotFound';
+			throw err;
+		}
+		if (!pair.owner.equals(user._id))
+			return res.sendStatus(403);
+
+		res.contentType(pair.image.contentType);
+		res.send(pair.image.data);
+	} catch (err) {
+		handleErrors(err, res);
+	}
+})
+
 router.get('/:id', async (req, res) => {
 	const { user } = req;
 	const { id } = req.params;
