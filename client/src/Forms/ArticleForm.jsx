@@ -16,7 +16,10 @@ export default class ArticleForm extends Component {
 				kind: 'Shirt',
 				name: '',
 				description: '',
-				image: '',
+				image: {
+					path: '',
+					data: null
+				},
 				rating: '0',
 				color: '',
 				minTemp: 50,
@@ -48,13 +51,48 @@ export default class ArticleForm extends Component {
 		this.setState({ formOptions });
 	}
 
-	handleChange = (event) => {
+	handleChange = async (event) => {
 		const { name, type, value, checked } = event.target;
-		const { formOptions } = this.state;
+		const { formOptions, message } = this.state;
+		let newMessage = message;
 
 		// handling checkboxes
 		if (type === 'checkbox') {
 			formOptions[name] = checked;
+		} else if (name === 'image') { // handling image upload
+			const imageTooLargeMessage = 'Image is too large, must be less than 16 MB.';
+			const file = event.target.files[0];
+			console.log(file)
+
+			if (file.size >= 16 * 1024 * 1024) { // max file size 16MB
+				formOptions.image.data = '';
+				return this.setState({
+					message: imageTooLargeMessage,
+					formOptions
+				});
+			}
+
+			if (message === imageTooLargeMessage)
+				newMessage = null;
+
+			// const { user } = this.props;
+			// const formData = new FormData();
+			// formData.append('image', file, file.name)
+			// const respo = await fetch('/api/v1/upload', {
+			// 	method: 'POST',
+			// 	headers: {
+			// 		'Authorization': `JWT ${user.token}`,
+			// 		// 'Content-Type': 'application/json',
+			// 		// 'Content-Type': 'multipart/form-data'
+			// 	},
+			// 	body: formData
+			// });
+
+			formOptions.image = {
+				path: value,
+				data: file
+			}
+
 		} else {
 			formOptions[name] = value;
 		}
@@ -79,7 +117,7 @@ export default class ArticleForm extends Component {
 				formOptions.snowOK = false;
 			}
 		}
-		this.setState({ formOptions });
+		this.setState({ formOptions, message: newMessage });
 	}
 
 	handleSubmit = async (event) => {
@@ -87,15 +125,20 @@ export default class ArticleForm extends Component {
 		const { match, user, history } = this.props;
 		const { formOptions } = this.state;
 
-		let response;
+		let endpoint, method;
 		if (match.path === '/wardrobe/new') {
-			const endpoint = formOptions.kind.toLowerCase() + (formOptions.kind === 'Pants' ? '' : 's');
-			response = await callAPI(endpoint, null, user.token, 'POST', {[formOptions.kind.toLowerCase()]: formOptions});
+			endpoint = formOptions.kind.toLowerCase() + (formOptions.kind === 'Pants' ? '' : 's');
+			method = 'POST';
 		} else {
 			const { articleKind, articleId } = match.params;
-			const endpoint = `${articleKind}/${articleId}`;
-			response = await callAPI(endpoint, null, user.token, 'PUT', {[formOptions.kind.toLowerCase()]: formOptions});
+			endpoint = `${articleKind}/${articleId}`;
+			method = 'PUT';
 		}
+
+		const formData = new FormData();
+		formData.append('image', formOptions.image.data);
+		formData.append(formOptions.kind.toLowerCase(), JSON.stringify(formOptions));
+		const response = await callAPI(endpoint, null, user.token, method, formData, {includesImage: true});
 
 		if (response.error) {
 			this.handleError(response.error);
@@ -152,7 +195,7 @@ export default class ArticleForm extends Component {
 	render() {
 		const { existingArticles, match } = this.props;
 		const { articleKinds, articleSearchOptions, formOptions, message } = this.state;
-
+		console.log(formOptions)
 		const articleKindOptions = articleKinds.map(kind => {
 			return <option key={ kind } value={ kind }>{ kind }</option>
 		});
@@ -287,7 +330,7 @@ export default class ArticleForm extends Component {
 				<textarea name='description' value={ formOptions.description } placeholder='description' onChange={ this.handleChange }/>
 
 				<label htmlFor='image'>Image</label>
-				<input name='image' type='url' value={ formOptions.image } placeholder='http://image.com/image' onChange={ this.handleChange }/>
+				<input name='image' type='file' value={ formOptions.image.path } onChange={ this.handleChange }/>
 
 				<label htmlFor='rating'>Rating</label>
 				<input name='rating' type='range' min='0' max='5' value={ formOptions.rating } onChange={ this.handleChange }/>
