@@ -1,6 +1,6 @@
 import queryString from 'query-string';
 
-export default async function callAPI(url, query, token, method, body, { includesImage=false, responseImage=false }={}) {
+export default async function callAPI(url, query, token, method, body, { includesImage=false }={}) {
 	let fullUrl = `/api/v1/${url}`;
 
 	if (query)
@@ -24,7 +24,5 @@ export default async function callAPI(url, query, token, method, body, { include
 
 	const result = await fetch(fullUrl, additionalInfo);
 
-	if (responseImage)
-		return result;
 	return result.json();
 }

@@ -7,7 +7,8 @@ export default class DetailedArticle extends Component {
 	constructor() {
 		super();
 		this.state = {
-			data: {}
+			data: {},
+			imgData: null
 		}
 	}
 
@@ -32,7 +33,15 @@ export default class DetailedArticle extends Component {
 	async setupData(articleKind, articleId) {
 		const { user } = this.props;
 		const data = await callAPI(`${articleKind}/${articleId}`, null, user.token);
-		this.setState({ data });	
+		await this.setState({ data });
+		this.fetchImage();
+	}
+
+	async fetchImage() {
+		const { user } = this.props;
+		const { data } = this.state;
+		const response = await callAPI(`shirts/${data._id}/image`, null, user.token, 'GET', null, { responseImage: true});
+		this.setState({ imgData: response.image });
 	}
 
 	handleDelete = () => {
@@ -52,15 +61,9 @@ export default class DetailedArticle extends Component {
 
 	render() {
 		const { match, existingArticles } = this.props;
-		const { data } = this.state;
+		const { data, imgData } = this.state;
 
 		const { articleKind, articleId } = match.params;
-
-		const img = data.image ? (
-			<img src={ data.image }/>
-		) : (
-			null
-		);
 
 		const additionalBits = [];
 		for (const key in data) {
@@ -87,7 +90,7 @@ export default class DetailedArticle extends Component {
 				<NavLink exact to={ `/wardrobe/${articleKind}/${articleId}/edit` }>Edit</NavLink>
 				<button onClick={ this.handleDelete }>Delete</button>
 
-				{ img }
+				<img src={ imgData ? imgData : '' } alt='image'/>
 
 				<p>{ data.description }</p>
 
