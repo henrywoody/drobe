@@ -5,7 +5,11 @@ const	express = require('express'),
 		Pants = require('../../../models/pants'),
 		Outerwear = require('../../../models/outerwear'),
 		verifyIds = require('../../../modules/verify-ids'),
-		handleErrors = require('../../../modules/handle-db-errors');
+		handleErrors = require('../../../modules/handle-db-errors')
+		multer = require('multer');
+
+const	storage = multer.memoryStorage(),
+		upload = multer({ storage: storage });
 
 // Index
 router.get('/', async (req, res) => {
@@ -42,8 +46,25 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
 	const { user } = req;
 	try {
-		const { outerwear: outerwearData } = req.body;
-		outerwearData.owner = user._id;
+		let outerwearData;
+		await new Promise((resolve, reject) => { 
+			upload.single('image')(req, res, (err) => {
+				if (err) {
+					res.send({error: 'There was an error with the image upload'});
+					reject();
+				}
+
+				outerwearData = JSON.parse(req.body.shirt)
+				outerwearData.owner = user._id;
+				// image
+				outerwearData.image = {}
+				if (req.file) {
+					outerwearData.image.data = req.file.buffer;
+					outerwearData.image.contentType = req.file.mimetype;
+				}
+				resolve();
+			})
+		});
 
 		// Verify attached Ids
 		const checked = await Promise.all([

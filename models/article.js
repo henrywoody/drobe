@@ -16,7 +16,10 @@ articleSchema = new mongoose.Schema({
 	minTemp: Number,
 	rainOK: Boolean,
 	snowOK: Boolean,
-	image: String,
+	image: {
+		data: Buffer,
+		contentType: String
+	},
 	rating: {
 		type: Number,
 		max: 5,
