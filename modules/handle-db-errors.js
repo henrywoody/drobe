@@ -31,9 +31,12 @@ module.exports = (err, res) => {
 	if (err.name === 'IncorrectUsernameError' || err.name === 'IncorrectPasswordError')
 		return res.status(400).json({error: 'InvalidCredentialsError'});
 
-	if (err.name === 'MissingCredentialsError') {
-		return res.status(400).json({error: 'MissingCredentialsError'})
-	}
+	if (err.name === 'MissingCredentialsError')
+		return res.status(400).json({error: 'MissingCredentialsError'});
+
+	if (err.name === 'FormatError')
+		return res.status(400).json({error: 'FormatError'});
+
 
 	console.log(err);
 	return res.stat(500).json({error: 'There was a problem with the server.'});

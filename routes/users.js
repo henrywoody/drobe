@@ -9,6 +9,11 @@ const	express = require('express'),
 
 router.post('/register', async (req, res) => {
 	const { user: userData } = req.body;
+	if (!userData) { // check that user object was given
+		const err = new Error;
+		err.name = 'FormatError';
+		return handleErrors(err, res);
+	}
 	const { username, password, location } = userData;
 
 	// for passport
@@ -57,6 +62,11 @@ router.put('/:id', tokenAuth, async (req, res) => {
 
 router.post('/login', (req, res) => {
 	const { user: userData } = req.body;
+	if (!userData) { // check that user object was given
+		const err = new Error;
+		err.name = 'FormatError';
+		return handleErrors(err, res);
+	}
 	const { username, password } = userData;
 
 	// for passport

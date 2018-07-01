@@ -18,8 +18,19 @@ describe('Users endpoint', () => {
 	});
 
 	describe('Register', () => {
+		it('should return a 400 status with FormatError if no user object is given', async () => {
+			const response = await request.post(`${endpoint}/register`, {});
+
+			assert.strictEqual(response.status, 400);
+
+			const jsonResponse = JSON.parse(response.text);
+
+			assert.exists(jsonResponse.error);
+			assert.strictEqual(jsonResponse.error, 'FormatError');
+		});
+
 		it('should return a 400 status with MissingUsernameError if no username is given', async () => {
-			const response = await request.post(`${endpoint}/register`, {password: 'goodpassword123'});
+			const response = await request.post(`${endpoint}/register`, {user: {password: 'goodpassword123'}});
 
 			assert.strictEqual(response.status, 400);
 
@@ -30,7 +41,7 @@ describe('Users endpoint', () => {
 		});
 
 		it('should return a 400 status with MissingPasswordError if no password is given', async () => {
-			const response = await request.post(`${endpoint}/register`, {username: 'good_username1'});
+			const response = await request.post(`${endpoint}/register`, {user: {username: 'good_username1'}});
 
 			assert.strictEqual(response.status, 400);
 
@@ -41,7 +52,7 @@ describe('Users endpoint', () => {
 		});
 
 		it('should return a JWT if a username and password are given', async () => {
-			const response = await request.post(`${endpoint}/register`, {username: 'good_username1', password: 'goodpassword123'});
+			const response = await request.post(`${endpoint}/register`, {user: {username: 'good_username1', password: 'goodpassword123'}});
 
 			assert.strictEqual(response.status, 200);
 
@@ -51,8 +62,8 @@ describe('Users endpoint', () => {
 		})
 
 		it('should return a 400 status with UserExistsError if a taken username is given', async () => {
-			await request.post(`${endpoint}/register`, {username: 'good_username2', password: 'goodpassword123'});
-			const response = await request.post(`${endpoint}/register`, {username: 'good_username2', password: 'goodpassword123'});
+			await request.post(`${endpoint}/register`, {user: {username: 'good_username2', password: 'goodpassword123'}});
+			const response = await request.post(`${endpoint}/register`, {user: {username: 'good_username2', password: 'goodpassword123'}});
 
 			assert.strictEqual(response.status, 400);
 
@@ -72,11 +83,23 @@ describe('Users endpoint', () => {
 	describe('Login', () => {
 		before(async () => {
 			// make a user
-			await request.post(`${endpoint}/register`, {username: 'good_username', password: 'goodpassword123'});
+			await request.post(`${endpoint}/register`, {user: {username: 'good_username', password: 'goodpassword123'}});
+		});
+
+		it('should return a 400 status with FormatError when no user object is given', async () => {
+			const response = await request.post(`${endpoint}/login`, {});
+
+			assert.strictEqual(response.status, 400);
+
+			const jsonResponse = JSON.parse(response.text);
+
+			assert.exists(jsonResponse.error);
+			assert.strictEqual(jsonResponse.error, 'FormatError');
+
 		});
 
 		it('should return a 400 status with MissingCredentialsError when username and password are missing', async () => {
-			const response = await request.post(`${endpoint}/login`, {});
+			const response = await request.post(`${endpoint}/login`, {user: {}});
 
 			assert.strictEqual(response.status, 400);
 
@@ -88,7 +111,7 @@ describe('Users endpoint', () => {
 		});
 
 		it('should return a 400 status with MissingCredentialsError when username is missing', async () => {
-			const response = await request.post(`${endpoint}/login`, {});
+			const response = await request.post(`${endpoint}/login`, {user: {password: 'somepassword'}});
 
 			assert.strictEqual(response.status, 400);
 
@@ -100,7 +123,7 @@ describe('Users endpoint', () => {
 		});
 
 		it('should return a 400 status with MissingCredentialsError when password is missing', async () => {
-			const response = await request.post(`${endpoint}/login`, {});
+			const response = await request.post(`${endpoint}/login`, {user: {username: 'someusername'}});
 
 			assert.strictEqual(response.status, 400);
 
@@ -112,7 +135,7 @@ describe('Users endpoint', () => {
 		});
 
 		it('should return a 400 status with InvalidCredentialsError when an invalid username is given', async () => {
-			const response = await request.post(`${endpoint}/login`, {username: 'bad_username', password: 'doesntmatter'});
+			const response = await request.post(`${endpoint}/login`, {user: {username: 'bad_username', password: 'doesntmatter'}});
 
 			assert.strictEqual(response.status, 400);
 
@@ -123,7 +146,7 @@ describe('Users endpoint', () => {
 		});
 
 		it('should return a 400 status with InvalidCredentialsError when an invalid password for a valid username is given', async () => {
-			const response = await request.post(`${endpoint}/login`, {username: 'good_username', password: 'badpassword456'});
+			const response = await request.post(`${endpoint}/login`, {user: {username: 'good_username', password: 'badpassword456'}});
 
 			assert.strictEqual(response.status, 400);
 
