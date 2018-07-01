@@ -6,7 +6,8 @@ const	express = require('express'),
 		Outerwear = require('../../../models/outerwear'),
 		verifyIds = require('../../../modules/verify-ids'),
 		handleErrors = require('../../../modules/handle-db-errors')
-		multer = require('multer');
+		multer = require('multer'),
+		b64encodeImage = require('../../../modules/b64encodeImage');
 
 const	storage = multer.memoryStorage(),
 		upload = multer({ storage: storage });
@@ -16,6 +17,7 @@ router.get('/', async (req, res) => {
 	const { user } = req;
 	try {
 		const outerwears = await Outerwear.find({owner: user._id});
+		outerwears.forEach(outerwear => outerwear.image = null); // dont send image data here
 		res.json(outerwears);
 	} catch (err) {
 		handleErrors(err, res);
@@ -36,8 +38,9 @@ router.get('/:id/image', async (req, res) => {
 		if (!outerwear.owner.equals(user._id))
 			return res.sendStatus(403);
 
-		res.contentType(outerwear.image.contentType);
-		res.send(outerwear.image.data);
+		const { data, contentType } = outerwear.image;
+		const encoded = b64encodeImage(data, contentType);
+		res.json({image: encoded});
 	} catch (err) {
 		handleErrors(err, res);
 	}
@@ -56,6 +59,7 @@ router.get('/:id', async (req, res) => {
 		if (!outerwear.owner.equals(user._id))
 			return res.sendStatus(403);
 
+		outerwear.image = null; // dont send image data here
 		res.json(outerwear);
 	} catch (err) {
 		handleErrors(err, res);
