@@ -68,7 +68,6 @@ router.get('/:id', async (req, res) => {
 
 // Create
 router.post('/', async (req, res) => {
-	console.log('POST')
 	const { user } = req;
 	try {
 		let pairData;
@@ -79,9 +78,8 @@ router.post('/', async (req, res) => {
 					res.json({error: 'There was an error with the image upload'});
 					reject();
 				}
-				console.log('past err')
+
 				pairData = JSON.parse(req.body.pants)
-				console.log(pairData)
 				pairData.owner = user._id;
 				// image
 				pairData.image = {}
@@ -130,11 +128,33 @@ router.put('/:id', async (req, res) => {
 	const { user } = req;
 	const { id } = req.params;
 	try {
-		const { pants: pairData } = req.body;
-		pairData.shirts = pairData.shirts || [];
-		pairData.outerwears = pairData.outerwears || [];
+		let pairData;
+		await new Promise((resolve, reject) => { 
+			upload.single('image')(req, res, (err) => {
+				if (err) {
+					res.json({error: 'There was an error with the image upload'});
+					reject();
+				}
+
+				pairData = JSON.parse(req.body.pants)
+				pairData.owner = user._id;
+				pairData.shirts = pairData.shirts || [];
+				pairData.outerwears = pairData.outerwears || [];
+				// image
+				pairData.image = {}
+				if (req.file) {
+					pairData.image.data = req.file.buffer;
+					pairData.image.contentType = req.file.mimetype;
+				}
+				resolve();
+			})
+		});
 
 		const pair = await Pants.findById(id);
+		if (!Object.keys(pairData.image).length) {
+			// if no new image supplied, don't update the image
+			pairData.image = pair.image;
+		}
 
 		if (!pair) {
 			const err = new Error('Pants Not Found.');

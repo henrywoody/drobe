@@ -128,11 +128,33 @@ router.put('/:id', async (req, res) => {
 	const { user } = req;
 	const { id } = req.params;
 	try {
-		const { shirt: shirtData } = req.body;
-		shirtData.pants = shirtData.pants || [];
-		shirtData.outerwears = shirtData.outerwears || [];
+		let shirtData;
+		await new Promise((resolve, reject) => { 
+			upload.single('image')(req, res, (err) => {
+				if (err) {
+					res.json({error: 'There was an error with the image upload'});
+					reject();
+				}
+
+				shirtData = JSON.parse(req.body.shirt)
+				shirtData.owner = user._id;
+				shirtData.pants = shirtData.pants || [];
+				shirtData.outerwears = shirtData.outerwears || [];
+				// image
+				shirtData.image = {}
+				if (req.file) {
+					shirtData.image.data = req.file.buffer;
+					shirtData.image.contentType = req.file.mimetype;
+				}
+				resolve();
+			})
+		});
 
 		const shirt = await Shirt.findById(id);
+		if (!Object.keys(shirtData.image).length) {
+			// if no new image supplied, don't update the image
+			shirtData.image = shirt.image;
+		}
 		
 		if (!shirt) {
 			const err = new Error('Shirt Not Found.');
