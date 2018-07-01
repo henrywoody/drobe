@@ -20,7 +20,7 @@ router.get('/', async (req, res) => {
 		const imageFormattedPants = pants.map(pair => {
 			pair = pair.toObject();
 			// encode image if there is one
-			const { data, contentType } = pair.image;
+			const { data, contentType } = pair.image || {};
 			if (data && contentType) {
 				pair.image = b64encodeImage(data, contentType);
 			} else {

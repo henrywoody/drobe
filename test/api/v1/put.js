@@ -24,8 +24,8 @@ describe('API PUT methods', () => {
 		} else {
 			// set up users
 			const [ goodResponse, badResponse ] = await Promise.all([
-					request.post(`/users/register`, {username: 'good_username', password: 'goodpassword123'}),
-					request.post(`/users/register`, {username: 'bad_username', password: 'badpassword123'})
+					request.post(`/users/register`, {user: {username: 'good_username', password: 'goodpassword123'}}, {type: 'json'}),
+					request.post(`/users/register`, {user: {username: 'bad_username', password: 'badpassword123'}}, {type: 'json'})
 				]);
 
 			goodData = JSON.parse(goodResponse.text);
@@ -53,9 +53,9 @@ describe('API PUT methods', () => {
 			beforeEach(async () => {
 				// set up articles
 				const [ goodResponse1, goodResponse2, badResponse ] = await Promise.all([
-						request.post(endpoint, {[articleName]: {name: goodArticle1Name}}, {headers: {"Authorization": `JWT ${goodUser.token}`, "Content-Type": 'application/json'}}),
-						request.post(endpoint, {[articleName]: {name: goodArticle2Name}}, {headers: {"Authorization": `JWT ${goodUser.token}`, "Content-Type": 'application/json'}}),
-						request.post(endpoint, {[articleName]: {name: badArticleName}}, {headers: {"Authorization": `JWT ${badUser.token}`, "Content-Type": 'application/json'}})
+						request.post(endpoint, {[articleName]: {name: goodArticle1Name}}, {headers: {"Authorization": `JWT ${goodUser.token}`}}),
+						request.post(endpoint, {[articleName]: {name: goodArticle2Name}}, {headers: {"Authorization": `JWT ${goodUser.token}`}}),
+						request.post(endpoint, {[articleName]: {name: badArticleName}}, {headers: {"Authorization": `JWT ${badUser.token}`}})
 					]);
 
 				goodArticle1 = JSON.parse(goodResponse1.text);
@@ -68,37 +68,25 @@ describe('API PUT methods', () => {
 								shirt: {name: 'Test Shirt'}
 							},
 							{
-								headers: {
-									"Authorization": `JWT ${goodUser.token}`,
-									"Content-Type": 'application/json'
-								}
+								headers: {"Authorization": `JWT ${goodUser.token}`}
 						}),
 						request.post('/api/v1/pants', {
 								pants: {name: 'Test Pants'}
 							},
 							{
-								headers: {
-									"Authorization": `JWT ${goodUser.token}`,
-									"Content-Type": 'application/json'
-								}
+								headers: {"Authorization": `JWT ${goodUser.token}`}
 						}),
 						request.post('/api/v1/outerwears', {
 								outerwear: {name: 'Good Test Outerwear'}
 							},
 							{
-								headers: {
-									"Authorization": `JWT ${goodUser.token}`,
-									"Content-Type": 'application/json'
-								}
+								headers: {"Authorization": `JWT ${goodUser.token}`}
 						}),
 						request.post('/api/v1/outerwears', {
 								outerwear: {name: 'Bad Test Outerwear'}
 							},
 							{
-								headers: {
-									"Authorization": `JWT ${badUser.token}`,
-									"Content-Type": 'application/json'
-								}
+								headers: {"Authorization": `JWT ${badUser.token}`}
 						})
 					]);
 				testShirt = JSON.parse(testShirtResponse.text);
@@ -120,10 +108,7 @@ describe('API PUT methods', () => {
 						[articleName]: {new: 'data'}
 					},
 					{
-						headers: {
-							"Authorization": `JWT ${goodUser.token}`,
-							"Content-Type": 'application/json'
-						}
+						headers: {"Authorization": `JWT ${goodUser.token}`}
 					});
 				assert.strictEqual(response.status, 403);
 			});
@@ -136,10 +121,7 @@ describe('API PUT methods', () => {
 						[articleName]: {new: 'data'}
 					},
 					{
-						headers: {
-							"Authorization": `JWT ${goodUser.token}`,
-							"Content-Type": 'application/json'
-						}
+						headers: {"Authorization": `JWT ${goodUser.token}`}
 					});
 				assert.strictEqual(response.status, 404);
 			});
@@ -157,10 +139,7 @@ describe('API PUT methods', () => {
 						[articleName]: newArticleData
 					},
 					{
-						headers: {
-							"Authorization": `JWT ${goodUser.token}`,
-							"Content-Type": 'application/json'
-						}
+						headers: {"Authorization": `JWT ${goodUser.token}`}
 					});
 
 				assert.strictEqual(response.status, 200);
@@ -184,10 +163,7 @@ describe('API PUT methods', () => {
 						}
 					},
 					{
-						headers: {
-							"Authorization": `JWT ${goodUser.token}`,
-							"Content-Type": 'application/json'
-						}
+						headers: {"Authorization": `JWT ${goodUser.token}`}
 					});
 
 				assert.strictEqual(response.status, 400);
@@ -202,10 +178,7 @@ describe('API PUT methods', () => {
 					endpoint,
 					goodArticle1._id,
 					{
-						headers: {
-							"Authorization": `JWT ${goodUser.token}`,
-							"Content-Type": 'application/json'
-						}
+						headers: {"Authorization": `JWT ${goodUser.token}`}
 					});
 
 				assert.strictEqual(checkResponse.status, 200);
@@ -230,10 +203,7 @@ describe('API PUT methods', () => {
 						[articleName]: newArticleData
 					},
 					{
-						headers: {
-							"Authorization": `JWT ${goodUser.token}`,
-							"Content-Type": 'application/json'
-						}
+						headers: {"Authorization": `JWT ${goodUser.token}`}
 					});
 
 				assert.strictEqual(response.status, 200);
@@ -260,10 +230,7 @@ describe('API PUT methods', () => {
 						[articleName]: newArticleData
 					},
 					{
-						headers: {
-							"Authorization": `JWT ${goodUser.token}`,
-							"Content-Type": 'application/json'
-						}
+						headers: {"Authorization": `JWT ${goodUser.token}`}
 					});
 
 				assert.strictEqual(response.status, 400);
@@ -288,10 +255,7 @@ describe('API PUT methods', () => {
 						[articleName]: newArticleData
 					},
 					{
-						headers: {
-							"Authorization": `JWT ${goodUser.token}`,
-							"Content-Type": 'application/json'
-						}
+						headers: {"Authorization": `JWT ${goodUser.token}`}
 					});
 
 				assert.strictEqual(response.status, 403);
@@ -331,10 +295,7 @@ describe('API PUT methods', () => {
 						[articleName]: newArticleData
 					},
 					{
-						headers: {
-							"Authorization": `JWT ${goodUser.token}`,
-							"Content-Type": 'application/json'
-						}
+						headers: {"Authorization": `JWT ${goodUser.token}`}
 					});
 
 				assert.strictEqual(response.status, 200);
@@ -376,10 +337,7 @@ describe('API PUT methods', () => {
 				}
 
 				const headers = {
-					headers: {
-						"Authorization": `JWT ${goodUser.token}`,
-						"Content-Type": 'application/json'
-					}
+					headers: {"Authorization": `JWT ${goodUser.token}`}
 				}
 
 				const response = await request.put(
@@ -442,10 +400,7 @@ describe('API PUT methods', () => {
 				}
 
 				const headers = {
-					headers: {
-						"Authorization": `JWT ${goodUser.token}`,
-						"Content-Type": 'application/json'
-					}
+					headers: {"Authorization": `JWT ${goodUser.token}`}
 				}
 
 				const response = await request.put(
@@ -507,10 +462,7 @@ describe('API PUT methods', () => {
 				}
 
 				const headers = {
-					headers: {
-						"Authorization": `JWT ${goodUser.token}`,
-						"Content-Type": 'application/json'
-					}
+					headers: {"Authorization": `JWT ${goodUser.token}`}
 				}
 
 				await request.put(

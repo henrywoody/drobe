@@ -25,8 +25,8 @@ describe('API DELETE methods', () => {
 		} else {
 			// set up users
 			const [ goodResponse, badResponse ] = await Promise.all([
-					request.post(`/users/register`, {username: 'good_username', password: 'goodpassword123'}),
-					request.post(`/users/register`, {username: 'bad_username', password: 'badpassword123'})
+					request.post(`/users/register`, {user: {username: 'good_username', password: 'goodpassword123'}}, {type: 'json'}),
+					request.post(`/users/register`, {user: {username: 'bad_username', password: 'badpassword123'}}, {type: 'json'})
 				]);
 
 			goodData = JSON.parse(goodResponse.text);
@@ -36,43 +36,28 @@ describe('API DELETE methods', () => {
 
 			// set up some articles to attach
 			const [testShirtResponse, testPantsResponse, testOuterwearResponse1, testOuterwearResponse2] = await Promise.all([
-					request.post('/api/v1/shirts', {
-							shirt: {name: 'Test Shirt'}
-						},
+					request.post('/api/v1/shirts', 
+						{shirt: {name: 'Test Shirt'}},
 						{
-							headers: {
-								"Authorization": `JWT ${goodUser.token}`,
-								"Content-Type": 'application/json'
-							}
+							headers: {"Authorization": `JWT ${goodUser.token}`}
 					}),
-					request.post('/api/v1/pants', {
-							pants: {name: 'Test Pants'}
-						},
+					request.post('/api/v1/pants',
+						{pants: {name: 'Test Pants'}},
 						{
-							headers: {
-								"Authorization": `JWT ${goodUser.token}`,
-								"Content-Type": 'application/json'
-							}
+							headers: {"Authorization": `JWT ${goodUser.token}`}
 					}),
-					request.post('/api/v1/outerwears', {
-							outerwear: {name: 'Good Test Outerwear'}
-						},
+					request.post('/api/v1/outerwears',
+						{outerwear: {name: 'Good Test Outerwear'}},
 						{
-							headers: {
-								"Authorization": `JWT ${goodUser.token}`,
-								"Content-Type": 'application/json'
-							}
+							headers: {"Authorization": `JWT ${goodUser.token}`}
 					}),
-					request.post('/api/v1/outerwears', {
-							outerwear: {name: 'Bad Test Outerwear'}
-						},
+					request.post('/api/v1/outerwears',
+						{outerwear: {name: 'Bad Test Outerwear'}},
 						{
-							headers: {
-								"Authorization": `JWT ${badUser.token}`,
-								"Content-Type": 'application/json'
-							}
+							headers: {"Authorization": `JWT ${badUser.token}`}
 					})
 				]);
+
 			testShirt = JSON.parse(testShirtResponse.text);
 			testPants = JSON.parse(testPantsResponse.text);
 			testOuterwearGood = JSON.parse(testOuterwearResponse1.text);
@@ -97,9 +82,9 @@ describe('API DELETE methods', () => {
 			before(async () => {
 				// set up articles
 				const [ goodResponse1, goodResponse2, badResponse ] = await Promise.all([
-						request.post(endpoint, {[articleName]: {name: goodArticle1Name}}, {headers: {"Authorization": `JWT ${goodUser.token}`, "Content-Type": 'application/json'}}),
-						request.post(endpoint, {[articleName]: {name: goodArticle2Name}}, {headers: {"Authorization": `JWT ${goodUser.token}`, "Content-Type": 'application/json'}}),
-						request.post(endpoint, {[articleName]: {name: badArticleName}}, {headers: {"Authorization": `JWT ${badUser.token}`, "Content-Type": 'application/json'}})
+						request.post(endpoint, {[articleName]: {name: goodArticle1Name}}, {headers: {"Authorization": `JWT ${goodUser.token}`}}),
+						request.post(endpoint, {[articleName]: {name: goodArticle2Name}}, {headers: {"Authorization": `JWT ${goodUser.token}`}}),
+						request.post(endpoint, {[articleName]: {name: badArticleName}}, {headers: {"Authorization": `JWT ${badUser.token}`}})
 					]);
 
 				goodArticle1 = JSON.parse(goodResponse1.text);
@@ -117,10 +102,7 @@ describe('API DELETE methods', () => {
 					endpoint,
 					badArticle._id,
 					{
-						headers: {
-							"Authorization": `JWT ${goodUser.token}`,
-							"Content-Type": 'application/json'
-						}
+						headers: {"Authorization": `JWT ${goodUser.token}`}
 					});
 				assert.strictEqual(response.status, 403);
 			});
@@ -130,10 +112,7 @@ describe('API DELETE methods', () => {
 					endpoint,
 					goodArticle1._id.toString() + '1234',
 					{
-						headers: {
-							"Authorization": `JWT ${goodUser.token}`,
-							"Content-Type": 'application/json'
-						}
+						headers: {"Authorization": `JWT ${goodUser.token}`}
 					});
 				assert.strictEqual(response.status, 404);
 			});
@@ -143,10 +122,7 @@ describe('API DELETE methods', () => {
 					endpoint,
 					goodArticle1._id,
 					{
-						headers: {
-							"Authorization": `JWT ${goodUser.token}`,
-							"Content-Type": 'application/json'
-						}
+						headers: {"Authorization": `JWT ${goodUser.token}`}
 					});
 
 				assert.strictEqual(response.status, 200);
@@ -155,10 +131,7 @@ describe('API DELETE methods', () => {
 					endpoint,
 					goodArticle1._id,
 					{
-						headers: {
-							"Authorization": `JWT ${goodUser.token}`,
-							"Content-Type": 'application/json'
-						}
+						headers: {"Authorization": `JWT ${goodUser.token}`}
 					});
 
 				assert.strictEqual(getResponse.status, 404);
@@ -188,10 +161,7 @@ describe('API DELETE methods', () => {
 				}
 
 				const headers = {
-					headers: {
-						"Authorization": `JWT ${goodUser.token}`,
-						"Content-Type": 'application/json'
-					}
+					headers: {"Authorization": `JWT ${goodUser.token}`}
 				}
 
 				const updateResponse = await request.put(

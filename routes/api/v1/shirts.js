@@ -17,10 +17,10 @@ router.get('/', async (req, res) => {
 	const { user } = req;
 	try {
 		const shirts = await Shirt.find({owner: user._id});
-		const imageFormmatedShirts = shirts.map(shirt => {
+		const imageFormattedShirts = shirts.map(shirt => {
 			shirt = shirt.toObject();
 			// encode image if there is one
-			const { data, contentType } = shirt.image;
+			const { data, contentType } = shirt.image || {};
 			if (data && contentType) {
 				shirt.image = b64encodeImage(data, contentType);
 			} else {
@@ -28,7 +28,7 @@ router.get('/', async (req, res) => {
 			}
 			return shirt;
 		});
-		res.json(imageFormmatedShirts);
+		res.json(imageFormattedShirts);
 	} catch (err) {
 		handleErrors(err, res);
 	}

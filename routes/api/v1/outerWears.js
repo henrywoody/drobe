@@ -20,7 +20,7 @@ router.get('/', async (req, res) => {
 		const imageFormattedouterwears = outerwears.map(outerwear => {
 			outerwear = outerwear.toObject();
 			// encode image if there is one
-			const { data, contentType } = outerwear.image;
+			const { data, contentType } = outerwear.image || {};
 			if (data && contentType) {
 				outerwear.image = b64encodeImage(data, contentType);
 			} else {
@@ -185,13 +185,11 @@ router.put('/:id', async (req, res) => {
 		for (const modelId of outerwearData.shirts) {
 			if (!outerwear.shirts.some(id => id.equals(mongoose.Types.ObjectId(modelId)))) {
 				// newly added references
-				console.log('new ref')
 				await Shirt.findByIdAndUpdate(modelId, { $push: {outerwears: outerwear._id} });
 			}
 		}
 		for (const modelId of outerwear.shirts) {
 			if (!outerwearData.shirts.some(id => mongoose.Types.ObjectId(id).equals(modelId))) {
-				console.log('removed ref')
 				// newly removed references
 				await Shirt.findByIdAndUpdate(modelId, { $pull: {outerwears: outerwear._id} });
 			}

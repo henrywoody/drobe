@@ -25,8 +25,8 @@ describe('API POST methods', () => {
 		} else {
 			// set up users
 			const [ goodResponse, badResponse ] = await Promise.all([
-					request.post(`/users/register`, {username: 'good_username', password: 'goodpassword123'}),
-					request.post(`/users/register`, {username: 'bad_username', password: 'badpassword123'})
+					request.post(`/users/register`, {user: {username: 'good_username', password: 'goodpassword123'}}, {type: 'json'}),
+					request.post(`/users/register`, {user: {username: 'bad_username', password: 'badpassword123'}}, {type: 'json'})
 				]);
 
 			goodData = JSON.parse(goodResponse.text);
@@ -40,37 +40,25 @@ describe('API POST methods', () => {
 							shirt: {name: 'Test Shirt'}
 						},
 						{
-							headers: {
-								"Authorization": `JWT ${goodUser.token}`,
-								"Content-Type": 'application/json'
-							}
+							headers: {"Authorization": `JWT ${goodUser.token}`}
 					}),
 					request.post('/api/v1/pants', {
 							pants: {name: 'Test Pants'}
 						},
 						{
-							headers: {
-								"Authorization": `JWT ${goodUser.token}`,
-								"Content-Type": 'application/json'
-							}
+							headers: {"Authorization": `JWT ${goodUser.token}`}
 					}),
 					request.post('/api/v1/outerwears', {
 							outerwear: {name: 'Good Test Outerwear'}
 						},
 						{
-							headers: {
-								"Authorization": `JWT ${goodUser.token}`,
-								"Content-Type": 'application/json'
-							}
+							headers: {"Authorization": `JWT ${goodUser.token}`}
 					}),
 					request.post('/api/v1/outerwears', {
 							outerwear: {name: 'Bad Test Outerwear'}
 						},
 						{
-							headers: {
-								"Authorization": `JWT ${badUser.token}`,
-								"Content-Type": 'application/json'
-							}
+							headers: {"Authorization": `JWT ${badUser.token}`}
 					})
 				]);
 			testShirt = JSON.parse(testShirtResponse.text);
@@ -102,10 +90,7 @@ describe('API POST methods', () => {
 						}
 					},
 					{
-						headers: {
-							"Authorization": `JWT ${goodUser.token}`,
-							"Content-Type": 'application/json'
-						}
+						headers: {"Authorization": `JWT ${goodUser.token}`}
 					});
 				
 				assert.strictEqual(response.status, 400);
@@ -126,10 +111,7 @@ describe('API POST methods', () => {
 						}
 					},
 					{
-						headers: {
-							"Authorization": `JWT ${goodUser.token}`,
-							"Content-Type": 'application/json'
-						}
+						headers: {"Authorization": `JWT ${goodUser.token}`}
 					});
 				
 				assert.strictEqual(response.status, 400);
@@ -147,8 +129,7 @@ describe('API POST methods', () => {
 					color: 'blue',
 					maxTemp: 100,
 					minTemp: 30,
-					rating: 5,
-					image: 'path/to/an/image'
+					rating: 5
 				};
 
 				const response = await request.post(
@@ -157,10 +138,7 @@ describe('API POST methods', () => {
 						[articleName]: inputData
 					},
 					{
-						headers: {
-							"Authorization": `JWT ${goodUser.token}`,
-							"Content-Type": 'application/json'
-						}
+						headers: {"Authorization": `JWT ${goodUser.token}`}
 					});
 
 				assert.strictEqual(response.status, 200);
@@ -186,10 +164,7 @@ describe('API POST methods', () => {
 						}
 					},
 					{
-						headers: {
-							"Authorization": `JWT ${goodUser.token}`,
-							"Content-Type": 'application/json'
-						}
+						headers: {"Authorization": `JWT ${goodUser.token}`}
 					});
 
 				const response = await request.post(
@@ -200,10 +175,7 @@ describe('API POST methods', () => {
 						}
 					},
 					{
-						headers: {
-							"Authorization": `JWT ${goodUser.token}`,
-							"Content-Type": 'application/json'
-						}
+						headers: {"Authorization": `JWT ${goodUser.token}`}
 					});
 				
 				assert.strictEqual(response.status, 400);
@@ -223,10 +195,7 @@ describe('API POST methods', () => {
 						}
 					},
 					{
-						headers: {
-							"Authorization": `JWT ${goodUser.token}`,
-							"Content-Type": 'application/json'
-						}
+						headers: {"Authorization": `JWT ${goodUser.token}`}
 					});
 
 				const response = await request.post(
@@ -237,10 +206,7 @@ describe('API POST methods', () => {
 						}
 					},
 					{
-						headers: {
-							"Authorization": `JWT ${badUser.token}`,
-							"Content-Type": 'application/json'
-						}
+						headers: {"Authorization": `JWT ${badUser.token}`}
 					});
 				
 				assert.strictEqual(response.status, 200);
@@ -258,10 +224,7 @@ describe('API POST methods', () => {
 						[articleName]: inputData
 					},
 					{
-						headers: {
-							"Authorization": `JWT ${goodUser.token}`,
-							"Content-Type": 'application/json'
-						}
+						headers: {"Authorization": `JWT ${goodUser.token}`}
 					});
 
 				assert.strictEqual(response.status, 400);
@@ -284,10 +247,7 @@ describe('API POST methods', () => {
 						[articleName]: inputData
 					},
 					{
-						headers: {
-							"Authorization": `JWT ${goodUser.token}`,
-							"Content-Type": 'application/json'
-						}
+						headers: {"Authorization": `JWT ${goodUser.token}`}
 					});
 
 				assert.strictEqual(response.status, 403);
@@ -325,10 +285,7 @@ describe('API POST methods', () => {
 						[articleName]: inputData
 					},
 					{
-						headers: {
-							"Authorization": `JWT ${goodUser.token}`,
-							"Content-Type": 'application/json'
-						}
+						headers: {"Authorization": `JWT ${goodUser.token}`}
 					});
 
 				assert.strictEqual(response.status, 200);
@@ -371,8 +328,7 @@ describe('API POST methods', () => {
 
 				const headers = {
 					headers: {
-						"Authorization": `JWT ${goodUser.token}`,
-						"Content-Type": 'application/json'
+						"Authorization": `JWT ${goodUser.token}`
 					}
 				}
 
@@ -428,10 +384,7 @@ describe('API POST methods', () => {
 							[articleName]: inputData
 						},
 						{
-							headers: {
-								"Authorization": `JWT ${badUser.token}`,
-								"Content-Type": 'application/json'
-							}
+							headers: {"Authorization": `JWT ${badUser.token}`}
 						});
 
 					assert.strictEqual(response.status, 400);
@@ -444,7 +397,7 @@ describe('API POST methods', () => {
 
 				it ('should return the newly created outerwear in JSON format when given a valid specificType', async () => {
 					const inputData = {
-						name: 'Invalid Coat',
+						name: 'Valid Jacket',
 						specificType: 'jacket'
 					};
 
@@ -454,10 +407,7 @@ describe('API POST methods', () => {
 							[articleName]: inputData
 						},
 						{
-							headers: {
-								"Authorization": `JWT ${goodUser.token}`,
-								"Content-Type": 'application/json'
-							}
+							headers: {"Authorization": `JWT ${goodUser.token}`}
 						});
 
 					assert.strictEqual(response.status, 200);
