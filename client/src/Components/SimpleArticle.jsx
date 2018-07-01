@@ -10,17 +10,11 @@ export default class SimpleArticle extends Component {
 	render() {
 		const { data } = this.props;
 
-		const img = data.image ? (
-			<img src={ data.image }/>
-		) : (
-			null
-		);
-
 		return (
 			<div onClick={ this.handleClick }>
 				<span>{ data.name }</span>
 
-				{ img }
+				<img src={ data.image } alt='image'/>
 
 				<p>{ data.description }</p>
 			</div>

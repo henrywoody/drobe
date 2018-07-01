@@ -7,8 +7,7 @@ export default class DetailedArticle extends Component {
 	constructor() {
 		super();
 		this.state = {
-			data: {},
-			imgData: null
+			data: {}
 		}
 	}
 
@@ -34,14 +33,6 @@ export default class DetailedArticle extends Component {
 		const { user } = this.props;
 		const data = await callAPI(`${articleKind}/${articleId}`, null, user.token);
 		await this.setState({ data });
-		this.fetchImage();
-	}
-
-	async fetchImage() {
-		const { user } = this.props;
-		const { data } = this.state;
-		const response = await callAPI(`shirts/${data._id}/image`, null, user.token, 'GET', null, { responseImage: true});
-		this.setState({ imgData: response.image });
 	}
 
 	handleDelete = () => {
@@ -61,7 +52,7 @@ export default class DetailedArticle extends Component {
 
 	render() {
 		const { match, existingArticles } = this.props;
-		const { data, imgData } = this.state;
+		const { data } = this.state;
 
 		const { articleKind, articleId } = match.params;
 
@@ -90,7 +81,7 @@ export default class DetailedArticle extends Component {
 				<NavLink exact to={ `/wardrobe/${articleKind}/${articleId}/edit` }>Edit</NavLink>
 				<button onClick={ this.handleDelete }>Delete</button>
 
-				<img src={ imgData ? imgData : '' } alt='image'/>
+				<img src={ data.image } alt='image'/>
 
 				<p>{ data.description }</p>
 

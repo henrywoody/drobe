@@ -11,7 +11,7 @@ export default class SmallArticle extends Component {
 
 		return (
 			<div onClick={ this.handleClick }>
-				<img src={ image }/>
+				<img src={ image } alt='image'/>
 				<span>{ name }</span>
 			</div>
 		)
