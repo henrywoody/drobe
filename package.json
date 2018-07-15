@@ -5,13 +5,16 @@
   "scripts": {
     "start": "nodemon ./bin/www",
     "test-api": "NODE_ENV=test mocha test/api/v1",
-    "test-users": "NODE_ENV=test mocha test/users"
+    "test-users": "NODE_ENV=test mocha test/users",
+    "test-modules": "NODE_ENV=test mocha test/modules"
   },
   "dependencies": {
     "bcrypt": "^3.0.0",
+    "camelcase": "^5.0.0",
     "cookie-parser": "~1.4.3",
     "cors": "^2.8.4",
     "debug": "~2.6.9",
+    "decamelize": "^2.0.0",
     "express": "~4.16.0",
     "express-session": "^1.15.6",
     "fast-deep-equal": "^2.0.1",
