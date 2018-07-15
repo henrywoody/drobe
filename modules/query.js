@@ -1,7 +1,5 @@
 const pg = require('pg');
 
-global.config = require('../config')[process.env.NODE_ENV];
-
 const pgConfig = {
 	user: global.config.dbUser,
 	password: global.config.dbPassword,
@@ -11,7 +9,6 @@ const pgConfig = {
 };
 
 const pool = new pg.Pool(pgConfig);
-
 
 module.exports = async (queryText, queryValues) => {
 	try {

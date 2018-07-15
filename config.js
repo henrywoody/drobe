@@ -3,14 +3,20 @@ const config = {};
 // Dev
 config.dev = {
 	env: 'dev',
-	dbHost: process.env.DB_HOST_DEV,
+	dbName: process.env.DEV_DB_NAME,
+	dbHost: process.env.DB_HOST,
+	dbUser: process.env.DB_USER,
+	dbPassword: process.env.DB_PASSWORD,
 	appSecret: process.env.APP_SECRET
 };
 
 // Test
 config.test = {
 	env: 'test',
-	dbHost: process.env.DB_HOST_TEST,
+	dbName: process.env.TEST_DB_NAME,
+	dbHost: process.env.DB_HOST,
+	dbUser: process.env.DB_USER,
+	dbPassword: process.env.DB_PASSWORD,
 	appSecret: process.env.APP_SECRET
 };
 
