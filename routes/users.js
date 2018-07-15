@@ -1,11 +1,12 @@
 const	express = require('express'),
 		router = express.Router(),
-		mongoose = require('mongoose'),
-		User = require('../models/user'),
 		passport = require('passport'),
 		jwt = require('jsonwebtoken'),
 		tokenAuth = require('../middleware/token-auth'),
-		handleErrors = require('../modules/handle-db-errors');
+		handleErrors = require('../modules/handle-db-errors'),
+		bcrypt = require('bcrypt'),
+		query = require('../modules/query');
+
 
 router.post('/register', async (req, res) => {
 	const { user: userData } = req.body;
@@ -14,47 +15,87 @@ router.post('/register', async (req, res) => {
 		err.name = 'FormatError';
 		return handleErrors(err, res);
 	}
-	const { username, password, location } = userData;
+	const { email, password, locationName, longitude, latitude } = userData;
 
 	// for passport
-	req.body.username = username;
+	req.body.username = email; //it _does_ have to be username (for passport)
 	req.body.password = password;
 
 	try {
-		const user = await User.register(new User({username: username, location: location}), password);
+		const salt = await bcrypt.genSalt(10);
+		let user;
+		try {
+			const hash = await bcrypt.hash(password, salt);
+			const queryText = "INSERT INTO app_user(id, email, password, location_name, longitude, latitude) VALUES (DEFAULT, $1, $2, $3, $4, $5) RETURNING *";
+			const queryValues = [email, hash, locationName, longitude, latitude];
+			const insertResult = await query(queryText, queryValues);
+			const { rows } = insertResult;
+			if (!rows) {
+				const { name, detail } = insertResult;
+				if (name === 'error' && detail.match(/Key \(email\)=\(.*?\) already exists./)) {
+					const err = new Error;
+					err.name = 'UserExistsError';
+					throw err;
+				}
+			} else {
+				user = rows[0];
+			}
+		} catch (err) {
+			return handleErrors(err, res);
+		}
 
-		return passport.authenticate('local', (err, info) => {
-			if (!err) {
+		return passport.authenticate('local', (err, success, info) => {
+			if (!err && success) {
 				return res.json({
+					success,
+					message: info.message,
 					token: info.token,
-					user: info.user
+					user: info.userData
 				})
 			} else {
 				return handleErrors(err, res);
 			}
 		})(req, res);
 	} catch (err) {
-		handleErrors(err, res);
+		return handleErrors(err, res);
 	}
 })
 
 router.put('/:id', tokenAuth, async (req, res) => {
+	// TODO change password functionality
 	const { user } = req;
 	const { id } = req.params;
 
 	try {
-		const userModel = await User.findById(id);
+		const querySelectText = "SELECT * FROM app_user WHERE id = $1";
+		const querySelectValues = [id];
+		const { rows } = await query(querySelectText, querySelectValues);
 
-		if (!userModel)
+		if (!rows.length)
 			res.sendStatus(404);
 
-		if (user._id != id)
+		if (user.id != id)
 			res.sendStatus(403);
 
-		const { user: userData } = req.body;
-		const updatedUser = await User.findByIdAndUpdate(id, userData, {new: true});
+		const {
+			email: newEmail,
+			locationName: newLocationName,
+			longitude: newLongitude,
+			latitude: newLatitude
+		} = req.body.user;
+		const queryUpdateText = `UPDATE app_user
+					SET (email, location_name, longitude, latitude) = ($2, $3, $4, $5)
+					WHERE id = $1
+					RETURNING *`;
+		const queryUpdateValues = [id, newEmail, newLocationName, newLongitude, newLatitude];
+		const { rows: updatedRows } = await query(queryUpdateText, queryUpdateValues);
 
-		res.json(updatedUser);
+		const responseData = {};
+		for (const key in updatedRows[0])
+			if (key !== 'password') 
+				responseData[key] = updatedRows[0][key];
+
+		res.json(responseData);
 	} catch (err) {
 		handleErrors(err, res);
 	}
@@ -67,23 +108,25 @@ router.post('/login', (req, res) => {
 		err.name = 'FormatError';
 		return handleErrors(err, res);
 	}
-	const { username, password } = userData;
+	const { email, password } = userData;
 
 	// for passport
-	req.body.username = username;
+	req.body.username = email;
 	req.body.password = password;
 
-	if (!(username && password)) {
+	if (!(email && password)) {
 		const err = new Error;
 		err.name = 'MissingCredentialsError';
 		return handleErrors(err, res);
 	}
 
-	return passport.authenticate('local', (err, info) => {
-		if (!err) {
+	return passport.authenticate('local', (err, success, info) => {
+		if (!err && success) {
 			return res.json({
+				success,
+				message: info.message,
 				token: info.token,
-				user: info.user
+				user: info.userData
 			})
 		} else {
 			return handleErrors(err, res);

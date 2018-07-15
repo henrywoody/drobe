@@ -28,7 +28,7 @@ module.exports = (err, res) => {
 	if (err.name === 'UserExistsError')
 		return res.status(400).json({error: 'UserExistsError'});
 
-	if (err.name === 'IncorrectUsernameError' || err.name === 'IncorrectPasswordError')
+	if (err.name === 'IncorrectUsernameError' || err.name == 'IncorrectEmailError' || err.name === 'IncorrectPasswordError')
 		return res.status(400).json({error: 'InvalidCredentialsError'});
 
 	if (err.name === 'MissingCredentialsError')

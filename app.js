@@ -4,14 +4,12 @@ const	createError		= require('http-errors'),
 		cookieParser	= require('cookie-parser'),
 		logger			= require('morgan'),
 		expressSession	= require('express-session'),
-		mongoose		= require('mongoose'),
-		User			= require('./models/user'),
 		passport		= require('passport'),
 		localStrategy	= require('passport-local'),
-		passportLocalMongoose = require('passport-local-mongoose'),
 		jwt				= require('jsonwebtoken'),
 		cors			= require('cors'),
-		handleErrors	= require('./modules/handle-db-errors');
+		handleErrors	= require('./modules/handle-db-errors'),
+		bcrypt			= require('bcrypt');
 
 global.config = require('./config')[process.env.NODE_ENV];
 
@@ -35,33 +33,80 @@ app.use(cors());
 // ==============
 // Authentication
 // ==============
-mongoose.connect(global.config.dbHost);
+const query = require('./modules/query');
 
 app.use(expressSession({
 	secret: global.config.appSecret,
 	saveUninitialized: false,
 	resave: false
-}))
-
+}));
 app.use(passport.initialize());
 app.use(passport.session());
 
-passport.use(new localStrategy(async (username, password, done) => {
-	const result = await User.authenticate()(username, password);
-	
-	if (result.error)
-		return done(result.error);
+passport.use(new localStrategy(async (username, password, cb) => {
+	try {
+		const queryText = "SELECT * FROM app_user WHERE email = $1";
+		const queryValues = [username];
+		const { rows } = await query(queryText, queryValues);
+		if (rows.length) {
+			const user = rows[0];
+			try {
+				const cryptResult = await bcrypt.compare(password, user.password);
 
-	const { user } = result;
-	const token = await jwt.sign({sub: user._id}, global.config.appSecret);
+				if (cryptResult) { // passwords match
+					const success = true;
 
-	const info = { user, token };
+					const payload = {
+						sub: user.id
+					};
 
-	return done(null, info);
+					const token = jwt.sign(payload, global.config.appSecret);
+
+					const data = {};
+					for (const key in user) {
+						if (key !== 'password')
+							data[key] = user[key];
+					}
+
+					const info = {
+						message: 'Login Successful',
+						token,
+						userData: data
+					};
+
+					cb(null, success, info);
+				} else {
+					const err = new Error('Incorrect password.')
+					err.name = 'IncorrectPasswordError';
+					cb(err);
+				}
+			} catch (err) {
+				cb(err);
+			}
+		} else {
+			const err = new Error('Incorrect email.');
+			err.name = 'IncorrectEmailError';
+			cb(err);
+		}
+	} catch (err) {
+		cb(err);
+	}
 }));
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
 
+passport.serializeUser((user, cb) => {
+	cb(null, user.id);
+});
+passport.deserializeUser(async (id, cb) => {
+	try {
+		const queryText = "SELECT id, email FROM app_user WHERE id = $1";
+		const queryValues = [id];
+		const result = await query(queryText, queryValues);
+		cb(null, result.rows[0]);
+	} catch (err) {
+		console.log(err);
+	}
+});
+// ==============
 
 
 app.use('/', indexRouter);

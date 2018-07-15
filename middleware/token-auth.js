@@ -1,6 +1,5 @@
 const	jwt = require('jsonwebtoken'),
-		mongoose = require('mongoose'),
-		User = require('../models/user');
+		query = require('../modules/query');
 
 module.exports = async (req, res, next) => {
 	if (req.path.match(/\/v\d+\/data\/coordinates/))
@@ -11,20 +10,23 @@ module.exports = async (req, res, next) => {
 
 	const token = req.headers.authorization.split(' ')[1];
 
-	let decoded;
-	try {
-		decoded = await jwt.verify(token, global.config.appSecret);
-	} catch (err) {
-		return res.sendStatus(401);
-	}
-
-	const { sub: userId } = decoded;
-
-	try {
-		const user = await User.findById(userId);
-		req.user = user;
-	} catch (err) {
-		return res.sendStatus(401);
-	}
-	return next();
+	return jwt.verify(token, global.config.appSecret, async (err, decoded) => {
+		if (!err) {
+			const userId = decoded.sub;
+			try {
+				const queryText = 'SELECT * FROM app_user WHERE id = $1';
+				const queryValues = [userId];
+				const { rows } = await query(queryText, queryValues);
+				if (rows.length) {
+					const user = rows[0];
+					req.user = user;
+					return next();
+				}
+			} catch (err) {
+				return res.sendStatus(500);
+			}
+		} else {
+			return res.sendStatus(401);
+		}
+	});
 }
