@@ -1,5 +1,6 @@
 const	jwt = require('jsonwebtoken'),
-		query = require('../modules/query');
+		query = require('../modules/query'),
+		handleErrors = require('../modules/handle-db-errors');
 
 module.exports = async (req, res, next) => {
 	if (req.path.match(/\/v\d+\/data\/coordinates/))
@@ -26,7 +27,9 @@ module.exports = async (req, res, next) => {
 				return res.sendStatus(500);
 			}
 		} else {
-			return res.sendStatus(401);
+			const err = new Error('User information not found');
+			err.name = 'UserNotFound';
+			return handleErrors(err, res);
 		}
 	});
 }
