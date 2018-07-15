@@ -1,0 +1,7 @@
+CREATE DATABASE drobedev;
+CREATE DATABASE drobetest;
+
+CREATE ROLE drobeboi WITH LOGIN PASSWORD 'dbpassword1';
+
+GRANT ALL PRIVILEGES ON DATABASE drobedev TO drobeboi;
+GRANT ALL PRIVILEGES ON DATABASE drobetest TO drobeboi;

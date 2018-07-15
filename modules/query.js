@@ -1,5 +1,8 @@
 const pg = require('pg');
 
+// needed for running migrations, where the app is not actually running
+global.config = require('../config')[process.env.NODE_ENV];
+
 const pgConfig = {
 	user: global.config.dbUser,
 	password: global.config.dbPassword,
