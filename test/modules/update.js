@@ -30,7 +30,6 @@ describe('Update module', () => {
 
 			const updatedBadUser = await selectUser.byId(badUser.id);
 			assert.strictEqual(updatedBadUser.username, badUser.username);
-			// const updatedDress = await update.tableByIdWithValues('dress', badDress1.id, {name: 'The Bad Dress', ownerId: badUser.id});
 		});
 
 		it('should throw a ValidationError if the given name to update clashes with another article of the same type for the same user', async () => {
