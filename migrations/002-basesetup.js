@@ -2,7 +2,7 @@ const query = require('../modules/query');
 
 queryText = `CREATE TABLE app_user (
 	id SERIAL PRIMARY KEY,
-	email text NOT NULL UNIQUE,
+	username text NOT NULL UNIQUE,
 	password text,
 	location_name text,
 	longitude decimal,

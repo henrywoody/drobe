@@ -7,7 +7,7 @@ const	chai = require('chai'),
 describe('Clean User Data module', () => {
 	it('should keep all the data for valid keys', () => {
 		const data = {
-			email: 'test@example.com',
+			username: 'test@example.com',
 			password: 'goodpassword1',
 			locationName: 'Good Town, USA',
 			longitude: -115.5,
@@ -24,7 +24,7 @@ describe('Clean User Data module', () => {
 	it('should populate missing fields with null', () => {
 		const data = {};
 		const missingFields = [
-			'email',
+			'username',
 			'password',
 			'locationName',
 			'longitude',

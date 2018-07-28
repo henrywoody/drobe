@@ -1,7 +1,7 @@
 const camelCase = require('camelcase');
 
 const fields = [
-	'email',
+	'username',
 	'password',
 	'location_name',
 	'longitude',

@@ -45,7 +45,7 @@ app.use(passport.session());
 
 passport.use(new localStrategy(async (username, password, cb) => {
 	try {
-		const queryText = "SELECT * FROM app_user WHERE email = $1";
+		const queryText = "SELECT * FROM app_user WHERE username = $1";
 		const queryValues = [username];
 		const { rows } = await query(queryText, queryValues);
 		if (rows.length) {
@@ -84,7 +84,7 @@ passport.use(new localStrategy(async (username, password, cb) => {
 				cb(err);
 			}
 		} else {
-			const err = new Error('Incorrect email.');
+			const err = new Error('Incorrect username.');
 			err.name = 'IncorrectEmailError';
 			cb(err);
 		}
@@ -98,7 +98,7 @@ passport.serializeUser((user, cb) => {
 });
 passport.deserializeUser(async (id, cb) => {
 	try {
-		const queryText = "SELECT id, email FROM app_user WHERE id = $1";
+		const queryText = "SELECT id, username FROM app_user WHERE id = $1";
 		const queryValues = [id];
 		const result = await query(queryText, queryValues);
 		cb(null, result.rows[0]);
