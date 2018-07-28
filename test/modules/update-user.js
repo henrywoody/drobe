@@ -43,7 +43,7 @@ describe('Update User module', () => {
 		} catch (err) {
 			if (err.name === 'AssertionError')
 				throw err;
-			assert.throws(() => { throw err });
+			assert.strictEqual(err.name, 'UserExistsError');
 		}
 	});
 

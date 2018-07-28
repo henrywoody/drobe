@@ -16,8 +16,8 @@ module.exports = async (id, data) => {
 
 	const { rows } = updateResult;
 	if (!rows) {
-		const { name, detail } = updateResult;
-		if (name === 'error' && detail.match(/Key \(username\)=\(.*?\) already exists./)) {
+		const { name, constraint } = updateResult;
+		if (name === 'error' && constraint === 'app_user_username_key') {
 			const err = new Error;
 			err.name = 'UserExistsError';
 			throw err;
