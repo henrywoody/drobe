@@ -5,7 +5,9 @@ const	express = require('express'),
 		tokenAuth = require('../middleware/token-auth'),
 		handleErrors = require('../modules/handle-db-errors'),
 		bcrypt = require('bcrypt'),
-		query = require('../modules/query');
+		createUser = require('../modules/create-user'),
+		updateUser = require('../modules/update-user'),
+		selectUser = require('../modules/select-user');
 
 
 router.post('/register', async (req, res) => {
@@ -15,10 +17,10 @@ router.post('/register', async (req, res) => {
 		err.name = 'FormatError';
 		return handleErrors(err, res);
 	}
-	const { email, password, locationName, longitude, latitude } = userData;
 
+	const { username, password } = userData;
 	// for passport
-	req.body.username = email; //it _does_ have to be username (for passport)
+	req.body.username = username;
 	req.body.password = password;
 
 	try {
@@ -26,20 +28,8 @@ router.post('/register', async (req, res) => {
 		let user;
 		try {
 			const hash = await bcrypt.hash(password, salt);
-			const queryText = "INSERT INTO app_user(id, email, password, location_name, longitude, latitude) VALUES (DEFAULT, $1, $2, $3, $4, $5) RETURNING *";
-			const queryValues = [email, hash, locationName, longitude, latitude];
-			const insertResult = await query(queryText, queryValues);
-			const { rows } = insertResult;
-			if (!rows) {
-				const { name, detail } = insertResult;
-				if (name === 'error' && detail.match(/Key \(email\)=\(.*?\) already exists./)) {
-					const err = new Error;
-					err.name = 'UserExistsError';
-					throw err;
-				}
-			} else {
-				user = rows[0];
-			}
+			userData.password = hash;
+			user = await createUser(userData);
 		} catch (err) {
 			return handleErrors(err, res);
 		}
@@ -62,38 +52,28 @@ router.post('/register', async (req, res) => {
 })
 
 router.put('/:id', tokenAuth, async (req, res) => {
-	// TODO change password functionality
 	const { user } = req;
 	const { id } = req.params;
 
 	try {
-		const querySelectText = "SELECT * FROM app_user WHERE id = $1";
-		const querySelectValues = [id];
-		const { rows } = await query(querySelectText, querySelectValues);
-
-		if (!rows.length)
+		const existingUser = await selectUser.byId(id);
+		if (!existingUser)
 			res.sendStatus(404);
 
 		if (user.id != id)
 			res.sendStatus(403);
 
-		const {
-			email: newEmail,
-			locationName: newLocationName,
-			longitude: newLongitude,
-			latitude: newLatitude
-		} = req.body.user;
-		const queryUpdateText = `UPDATE app_user
-					SET (email, location_name, longitude, latitude) = ($2, $3, $4, $5)
-					WHERE id = $1
-					RETURNING *`;
-		const queryUpdateValues = [id, newEmail, newLocationName, newLongitude, newLatitude];
-		const { rows: updatedRows } = await query(queryUpdateText, queryUpdateValues);
+		const { user: userData } = req.body;
+		const salt = await bcrypt.genSalt(10);
+		const hash = await bcrypt.hash(userData.password, salt);
+		userData.password = hash;
+		
+		const updatedUser = await updateUser(id, userData);
 
 		const responseData = {};
-		for (const key in updatedRows[0])
+		for (const key in updatedUser)
 			if (key !== 'password') 
-				responseData[key] = updatedRows[0][key];
+				responseData[key] = updatedUser[key];
 
 		res.json(responseData);
 	} catch (err) {
@@ -108,13 +88,13 @@ router.post('/login', (req, res) => {
 		err.name = 'FormatError';
 		return handleErrors(err, res);
 	}
-	const { email, password } = userData;
+	const { username, password } = userData;
 
 	// for passport
-	req.body.username = email;
+	req.body.username = username;
 	req.body.password = password;
 
-	if (!(email && password)) {
+	if (!(username && password)) {
 		const err = new Error;
 		err.name = 'MissingCredentialsError';
 		return handleErrors(err, res);

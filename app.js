@@ -33,7 +33,7 @@ app.use(cors());
 // ==============
 // Authentication
 // ==============
-const query = require('./modules/query');
+const selectUser = require('./modules/select-user');
 
 app.use(expressSession({
 	secret: global.config.appSecret,
@@ -45,11 +45,8 @@ app.use(passport.session());
 
 passport.use(new localStrategy(async (username, password, cb) => {
 	try {
-		const queryText = "SELECT * FROM app_user WHERE username = $1";
-		const queryValues = [username];
-		const { rows } = await query(queryText, queryValues);
-		if (rows.length) {
-			const user = rows[0];
+		const user = await selectUser.byUsername(username, {includePassword: true});
+		if (user) {
 			try {
 				const cryptResult = await bcrypt.compare(password, user.password);
 
@@ -98,10 +95,8 @@ passport.serializeUser((user, cb) => {
 });
 passport.deserializeUser(async (id, cb) => {
 	try {
-		const queryText = "SELECT id, username FROM app_user WHERE id = $1";
-		const queryValues = [id];
-		const result = await query(queryText, queryValues);
-		cb(null, result.rows[0]);
+		const user = await selectUser.byId(id);
+		cb(null, user);
 	} catch (err) {
 		console.log(err);
 	}

@@ -1,5 +1,5 @@
 const	jwt = require('jsonwebtoken'),
-		query = require('../modules/query'),
+		selectUser = require('../modules/select-user'),
 		handleErrors = require('../modules/handle-db-errors');
 
 module.exports = async (req, res, next) => {
@@ -15,13 +15,10 @@ module.exports = async (req, res, next) => {
 		if (!err) {
 			const userId = decoded.sub;
 			try {
-				const queryText = 'SELECT * FROM app_user WHERE id = $1';
-				const queryValues = [userId];
-				const { rows } = await query(queryText, queryValues);
-				if (rows.length) {
-					const user = rows[0];
+				const user = await selectUser.byId(userId);
+				if (user) {
 					req.user = user;
-					return next();
+					return next()
 				}
 			} catch (err) {
 				return res.sendStatus(500);
