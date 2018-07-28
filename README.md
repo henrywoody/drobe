@@ -35,6 +35,6 @@ After that though, it'll be smooth sailing.
 
 ## Tech
 
-Postgres is the DBMS, the back-end is built with Express and Node, and the front-end is written in React. The database used to be in Mongo, but this project has a lot of many-to-many relations and those are really great with Mongo.
+Postgres is the DBMS, the back-end is built with Express and Node, and the front-end is written in React. The database used to be in Mongo, but this project has a lot of many-to-many relations and those aren't really great with Mongo, but perfect for Postgres.
 
 For weather data, this project uses the [Dark Sky API](https://darksky.net/dev). To get coordinates for users (for use in the Dark Sky API), this project uses the [Google Geocoding API](https://developers.google.com/maps/documentation/geocoding/intro).
