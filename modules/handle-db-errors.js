@@ -40,6 +40,11 @@ module.exports = (err, res) => {
 		return res.status(400).json({error: 'FormatError'});
 
 
+	// External API Stuff
+	if (err.name === 'StatusCodeError')
+		return res.status(err.statusCode).json({error: err.error});
+
+
 	console.log(err);
 	return res.stat(500).json({error: 'There was a problem with the server.'});
 
