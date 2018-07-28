@@ -4,7 +4,18 @@ const	chai = require('chai'),
 		createUser = require('../../modules/create-user');
 
 describe('Create User module', () => {
-	it('should create a new user with given data', async () => {
+	it('should return a new user with given data', async () => {
+		const userData = {username: 'test@example.com', password: 'test', locationName: 'Seattle, WA, USA', latitude: 36.0, longitude: -122.0};
+		newUser = await createUser(userData);
+		
+		assert.strictEqual(newUser.username, userData.username);
+		assert.strictEqual(newUser.locationName, userData.locationName);
+		assert.strictEqual(newUser.password, userData.password);
+		assert.equal(newUser.latitude, userData.latitude);
+		assert.equal(newUser.longitude, userData.longitude);
+	});
+
+	it('should create a new user in the database with given data', async () => {
 		const userData = {username: 'test@example.com', password: 'test', locationName: 'Seattle, WA, USA', latitude: 36.0, longitude: -122.0};
 		await createUser(userData);
 		const { rows } = await query("SELECT * FROM app_user");
