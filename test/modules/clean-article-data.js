@@ -5,8 +5,8 @@ const	chai = require('chai'),
 		decamelize = require('decamelize');
 
 describe('Clean Article Data module', () => {
-	it('should keep all data for valid keys of each table', () => {
-		const data = {
+	it('should keep all data for valid keys of each table and convert camelCase to snake_case', () => {
+		const baseData = {
 			'description': 'A really good article',
 			'color': 'black',
 			'maxTemp': 100,
@@ -21,23 +21,39 @@ describe('Clean Article Data module', () => {
 		};
 		
 		for (const table of ['shirt', 'pants', 'dress', 'outerwear']) {
-			let cleanData;
-			if (table === 'outerwear') {
-				cleanData = cleanArticleData(table, {...data, 'specificType': 'sweater'});
-			} else {
-				cleanData = cleanArticleData(table, data);
+			let data;
+			switch (table) {
+				case 'shirt':
+					data = {...baseData, 'pants': [1,2], 'outerwears': [5,6]};
+					break;
+				case 'pants':
+					data = {...baseData, 'shirts': [1,2], 'outerwears': [5,6]};
+					break;
+				case 'dress':
+					data = {...baseData, 'outerwears': [5,6]};
+					break;
+				case 'outerwear':
+					data = {...baseData, 'specificType': 'sweater', 'shirts': [1,2], 'pants': [1,2,3], 'dresses': [2,3], 'outerwears': [5,7]};
+					break;
 			}
+			const cleanData = cleanArticleData(table, data);
 
 			for (const key in data) {
 				assert.include(Object.keys(cleanData), decamelize(key));
-				assert.strictEqual(cleanData[decamelize(key)], data[key]);
+
+				if (Array.isArray(data[key])) {
+					for (const x of data[key])
+						assert.include(cleanData[decamelize(key)], x);
+				} else {
+					assert.strictEqual(cleanData[decamelize(key)], data[key]);
+				}
 			}
 		}
 	});
 
-	it('should populate missing fields with `null`', () => {
+	it('should populate missing fields with `null` or empty array', () => {
 		const data = {};
-		const missingFields = [
+		const baseMissingFields = [
 			'description',
 			'color',
 			'maxTemp',
@@ -52,11 +68,32 @@ describe('Clean Article Data module', () => {
 		];
 
 		for (const table of ['shirt', 'pants', 'dress', 'outerwear']) {
+			let nestedMissingFields;
+			switch (table) {
+				case 'shirt':
+					nestedMissingFields = ['pants', 'outerwears'];
+					break;
+				case 'pants':
+					nestedMissingFields = ['shirts', 'outerwears'];
+					break;
+				case 'dress':
+					nestedMissingFields = ['outerwears'];
+					break;
+				case 'outerwear':
+					nestedMissingFields = ['shirts', 'pants', 'dresses', 'outerwears'];
+					break;
+			}
+
 			const cleanData = cleanArticleData(table, data);
 
-			for (const missingField of missingFields) {
+			for (const missingField of baseMissingFields) {
 				assert.include(Object.keys(cleanData), decamelize(missingField));
 				assert.isNull(cleanData[decamelize(missingField)]);
+			}
+
+			for (const nestedMissingField of nestedMissingFields) {
+				assert.include(Object.keys(cleanData), decamelize(nestedMissingField));
+				assert.isEmpty(cleanData[decamelize(nestedMissingField)]);
 			}
 
 			if (table === 'outerwear') {

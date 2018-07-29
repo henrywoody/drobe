@@ -15,12 +15,27 @@ const articleFields = [
 ];
 
 const fieldsForTable = {
-	shirt: articleFields,
-	pants: articleFields,
-	dress: articleFields,
+	shirt: [
+		...articleFields,
+		'pants',
+		'outerwears'
+	],
+	pants: [
+		...articleFields,
+		'shirts',
+		'outerwears'
+	],
+	dress: [
+		...articleFields,
+		'outerwears'
+	],
 	outerwear: [
 		...articleFields,
-		'specific_type'
+		'specific_type',
+		'shirts',
+		'pants',
+		'dresses',
+		'outerwears'
 	]
 }
 
@@ -29,6 +44,8 @@ module.exports = (table, data) => {
 	for (const key of fieldsForTable[table])
 		if (Object.keys(data).includes(camelCase(key))) {
 			cleanData[key] = data[camelCase(key)];
+		} else if (['shirts', 'pants', 'dresses', 'outerwears'].includes(key)) {
+			cleanData[key] = [];
 		} else {
 			cleanData[key] = null;
 		}

@@ -2,12 +2,16 @@ const	query = require('./query'),
 		checkTableIsAllowed = require('./check-table-is-allowed'),
 		cleanArticleData = require('./clean-article-data'),
 		dataToSQL = require('./data-to-sql-format'),
-		camelCaseKeys = require('./camel-case-keys');
+		camelCaseKeys = require('./camel-case-keys'),
+		separateNestedFields = require('./separate-nested-fields'),
+		join = require('./join'),
+		select = require('./select');
 
 async function intoTableValues (table, data) {
 	checkTableIsAllowed(table);
 
-	cleanData = cleanArticleData(table, data);
+	nestedCleanData = cleanArticleData(table, data);
+	const {cleanData, nestedData} = separateNestedFields(nestedCleanData);
 	
 	const { columns, queryValueSQLVars, queryValues } = dataToSQL(cleanData);
 	const queryText = `INSERT INTO ${table}(${columns}) VALUES(${queryValueSQLVars}) RETURNING *`;
@@ -31,7 +35,9 @@ async function intoTableValues (table, data) {
 			throw err;
 		}
 	} else {
-		return camelCaseKeys(rows[0]);
+		const newId = rows[0].id;
+		await join.tableByIdToMany(table, newId, nestedData);
+		return select.fromTableByIdWithJoins(table, newId);
 	}
 }
 

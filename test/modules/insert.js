@@ -1,9 +1,11 @@
 const	chai = require('chai'),
 		assert = chai.assert,
+		clearArticlesAndJoins = require('../helpers/clear-articles-and-joins'),
 		insert = require('../../modules/insert'),
 		query = require('../../modules/query'),
 		createUser = require('../../modules/create-user'),
-		camelCaseKeys = require('../../modules/camel-case-keys');
+		camelCaseKeys = require('../../modules/camel-case-keys'),
+		join = require('../../modules/join');
 
 
 describe('Insert module', () => {
@@ -107,14 +109,53 @@ describe('Insert module', () => {
 			}
 		});
 
-		afterEach(async () => {
-			await query('DELETE FROM shirt *');
-			await query('DELETE FROM pants *');
-			await query('DELETE FROM outerwear *');
+		it('should create joins between given objects and return the nested objects', async () => {
+			const shirt1 = await insert.intoTableValues('shirt', {name: 'shirt1', ownerId: goodUser.id});
+			const shirt2 = await insert.intoTableValues('shirt', {name: 'shirt2', ownerId: goodUser.id});
+			const pants1 = await insert.intoTableValues('pants', {name: 'pants1', ownerId: goodUser.id});
+			const pants2 = await insert.intoTableValues('pants', {name: 'pants2', ownerId: goodUser.id});
+			const dress1 = await insert.intoTableValues('dress', {name: 'dress1', ownerId: goodUser.id});
+			const dress2 = await insert.intoTableValues('dress', {name: 'dress2', ownerId: goodUser.id});
+			const outerwear1 = await insert.intoTableValues('outerwear', {name: 'outerwear1', ownerId: goodUser.id});
+			const outerwear2 = await insert.intoTableValues('outerwear', {name: 'outerwear2', ownerId: goodUser.id});
+
+			const sweaterData = {
+				name: 'sweater',
+				ownerId: goodUser.id,
+				shirts: [shirt1.id, shirt2.id],
+				pants: [pants1.id, pants2.id],
+				dresses: [dress1.id, dress2.id],
+				outerwears: [outerwear1.id, outerwear2.id]
+			}
+			const newSweater = await insert.intoTableValues('outerwear', sweaterData);
+
+			assert.include(Object.keys(newSweater), 'shirts');
+			shirtIds = newSweater.shirts.map(e => e.id);
+			assert.include(shirtIds, shirt1.id);
+			assert.include(shirtIds, shirt2.id);
+
+			assert.include(Object.keys(newSweater), 'pants');
+			pantsIds = newSweater.pants.map(e => e.id);
+			assert.include(pantsIds, pants1.id);
+			assert.include(pantsIds, pants2.id);
+
+			assert.include(Object.keys(newSweater), 'dresses');
+			dressIds = newSweater.dresses.map(e => e.id);
+			assert.include(dressIds, dress1.id);
+			assert.include(dressIds, dress2.id);
+
+			assert.include(Object.keys(newSweater), 'outerwears');
+			outerwearIds = newSweater.outerwears.map(e => e.id);
+			assert.include(outerwearIds, outerwear1.id);
+			assert.include(outerwearIds, outerwear2.id);
 		});
 	});
 
+	afterEach(async () => {
+		await clearArticlesAndJoins();
+	});
+
 	after(async () => {
-		await query('DELETE FROM app_user *');
+		await query("DELETE FROM app_user *");
 	});
 });

@@ -1,5 +1,6 @@
 const	chai = require('chai'),
 		assert = chai.assert,
+		clearArticlesAndJoins = require('../helpers/clear-articles-and-joins'),
 		update = require('../../modules/update'),
 		select = require('../../modules/select'),
 		insert = require('../../modules/insert'),
@@ -17,13 +18,13 @@ describe('Update module', () => {
 		badUser = await createUser({username: 'badUser', password: 'badpassword123'});
 	});
 
-	describe('tableByIdWithValues method', () => {
-		beforeEach(async () => {
-			goodDress = await insert.intoTableValues('dress', {name: 'Good Dress', ownerId: goodUser.id});
-			badDress1 = await insert.intoTableValues('dress', {name: 'Bad Dress', ownerId: badUser.id});
-			badDress2 = await insert.intoTableValues('dress', {name: 'Worse Dress', ownerId: badUser.id});
-		});
+	beforeEach(async () => {
+		goodDress = await insert.intoTableValues('dress', {name: 'Good Dress', ownerId: goodUser.id});
+		badDress1 = await insert.intoTableValues('dress', {name: 'Bad Dress', ownerId: badUser.id});
+		badDress2 = await insert.intoTableValues('dress', {name: 'Worse Dress', ownerId: badUser.id});
+	});
 
+	describe('tableByIdWithValues method', () => {
 		it('should throw a ForbiddenError and perform no further actions if table is not allowed', async () => {
 			try {
 				await update.tableByIdWithValues('app_user', badUser.id, {username: 'worstUser', password: 'worstpassword123'});
@@ -74,9 +75,54 @@ describe('Update module', () => {
 			assert.notInclude(Object.keys(updatedGoodDress), 'rain_ok');
 		});
 
-		afterEach(async () => {
-			await query("DELETE FROM dress *");
+		it('should remove any joins for ids that have been removed', async () => {
+			const outerwear1 = await insert.intoTableValues('outerwear', {name: 'outerwear1', ownerId: goodUser.id});
+			const outerwear2 = await insert.intoTableValues('outerwear', {name: 'outerwear2', ownerId: goodUser.id});
+			await join.tableByIdToMany('dress', goodDress.id, {outerwears: [outerwear1.id, outerwear2.id]});
+
+			const updatedGoodDress = await update.tableByIdWithValues('dress', goodDress.id, {name: 'Updated Dress', ownerId: goodUser.id, outerwears: []});
+
+			assert.include(Object.keys(updatedGoodDress), 'outerwears');
+			assert.isEmpty(updatedGoodDress.outerwears);
+
+			const { rows: checkRows } = await query("SELECT * FROM dress_outerwear_join");
+			assert.isEmpty(checkRows);
 		});
+
+		it('should add any joins for ids added', async () => {
+			const outerwear1 = await insert.intoTableValues('outerwear', {name: 'outerwear1', ownerId: goodUser.id});
+			const outerwear2 = await insert.intoTableValues('outerwear', {name: 'outerwear2', ownerId: goodUser.id});
+
+			const updatedGoodDress = await update.tableByIdWithValues('dress', goodDress.id, {name: 'Updated Dress', ownerId: goodUser.id, outerwears: [outerwear1.id, outerwear2.id]});
+
+			assert.include(Object.keys(updatedGoodDress), 'outerwears');
+			outwearIds = updatedGoodDress.outerwears.map(e => e.id);
+			assert.include(outwearIds, outerwear1.id);
+			assert.include(outwearIds, outerwear2.id);
+
+			const { rows: checkRows } = await query("SELECT * FROM dress_outerwear_join");
+			assert.strictEqual(checkRows.length, 2);
+		});
+
+		it('should handle a mix of removed and added ids', async () => {
+			const outerwear1 = await insert.intoTableValues('outerwear', {name: 'outerwear1', ownerId: goodUser.id});
+			const outerwear2 = await insert.intoTableValues('outerwear', {name: 'outerwear2', ownerId: goodUser.id});
+			await join.tableByIdToTableById('dress', goodDress.id, 'outerwear', outerwear1.id);
+
+			const updatedGoodDress = await update.tableByIdWithValues('dress', goodDress.id, {name: 'Updated Dress', ownerId: goodUser.id, outerwears: [outerwear2.id]});
+
+			assert.include(Object.keys(updatedGoodDress), 'outerwears');
+			outwearIds = updatedGoodDress.outerwears.map(e => e.id);
+			assert.notInclude(outwearIds, outerwear1.id);
+			assert.include(outwearIds, outerwear2.id);
+
+			const { rows: checkRows } = await query("SELECT * FROM dress_outerwear_join");
+			assert.strictEqual(checkRows.length, 1);
+		});
+	});
+
+	afterEach(async () => {
+		await clearArticlesAndJoins();
 	});
 
 	after(async () => {

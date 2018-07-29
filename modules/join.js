@@ -1,15 +1,42 @@
 const 	query = require('./query'),
 		select = require('./select'),
 		camelCaseKeys = require('./camel-case-keys'),
-		getJoinTable = require('./get-join-table');
+		getJoinTables = require('./get-join-tables'),
+		singularize = require('./singularize');
 
-async function tableIdToTableId(table1, id1, table2, id2) {
-	const joinTable = getJoinTable(table1, table2);
+async function tableByIdToTableById(table1, id1, table2, id2) {
+	const joinTable = getJoinTables.forPair(table1, table2);
 	await checkHaveSameOwner(table1, id1, table2, id2);
-	alreadyJoined = await joinAlreadyExists(joinTable, table1, id1, table2, id2);
+	const alreadyJoined = await joinAlreadyExists(joinTable, table1, id1, table2, id2);
 	if (alreadyJoined)
 		return null;
 
+	const { queryText, queryValues } = getQueryTextAndValues(joinTable, table1, id1, table2, id2);
+	
+	const { rows } = await query(queryText, queryValues);
+	return camelCaseKeys(rows[0]);
+}
+
+async function tableByIdToMany(table, id, tableIdLists) {
+	for (const otherTable in tableIdLists) // to check all are valid
+		getJoinTables.forPair(table, singularize(otherTable));
+	await checkAllHaveSameOwner(table, id, tableIdLists);
+
+	for (const pluralOtherTable in tableIdLists) {
+		const otherTable = singularize(pluralOtherTable);
+		const joinTable = getJoinTables.forPair(table, otherTable);
+		for (const otherId of tableIdLists[pluralOtherTable]) {
+			const alreadyJoined = await joinAlreadyExists(joinTable, table, id, otherTable, otherId);
+			if (!alreadyJoined) {
+				const { queryText, queryValues } = getQueryTextAndValues(joinTable, table, id, otherTable, otherId);
+				await query(queryText, queryValues);
+			}
+		}
+	}
+	return tableIdLists;
+}
+
+function getQueryTextAndValues(joinTable, table1, id1, table2, id2) {
 	let queryText, queryValues;
 	switch (joinTable) {
 		case 'shirt_pants_join':
@@ -32,23 +59,41 @@ async function tableIdToTableId(table1, id1, table2, id2) {
 			queryText = "INSERT INTO dress_outerwear_join(dress_id, outerwear_id) VALUES ($1, $2) RETURNING *";
 			queryValues = table1 === 'dress' ? [id1, id2] : [id2, id1];
 			break;
-		default:
-			console.log('WHAT THE FUCK')
 	}
-	
-	const { rows } = await query(queryText, queryValues);
-	return camelCaseKeys(rows[0]);
+	return { queryText, queryValues };
 }
 
 async function checkHaveSameOwner(table1, id1, table2, id2) {
-	const object1 = await select.fromTableById(table1, id1);
-	const object2 = await select.fromTableById(table2, id2);
+	const ownerId1 = await getOwnerId(table1, id1);
+	const ownerId2 = await getOwnerId(table2, id2);
 
-	if (object1.ownerId !== object2.ownerId) {
-		const err = new Error('Articles are not owned by the same owner');
-		err.name = 'ValidationError';
-		throw err;
+	if (ownerId1 !== ownerId2)
+		throwDifferentOwnersError();
+}
+
+async function checkAllHaveSameOwner(table, id, tableIdLists) {
+	const mainOwnerId = await getOwnerId(table, id);
+	const otherOwnerIds = [];
+
+	for (const pluralOtherTable in tableIdLists) {
+		const otherTable = singularize(pluralOtherTable);
+		ownerIdsForTable = await Promise.all(tableIdLists[pluralOtherTable].map(id => getOwnerId(otherTable, id)));
+		otherOwnerIds.push(...ownerIdsForTable)
 	}
+
+	if (!otherOwnerIds.every(ownerId => ownerId === mainOwnerId))
+		throwDifferentOwnersError();
+}
+
+async function getOwnerId(table, id) {
+	const object = await select.fromTableById(table, id);
+	return object.ownerId;
+}
+
+function throwDifferentOwnersError() {
+	const err = new Error('Articles are not owned by the same owner');
+	err.name = 'ValidationError';
+	throw err;
 }
 
 async function joinAlreadyExists(joinTable, column1, id1, column2, id2) {
@@ -66,5 +111,6 @@ async function joinAlreadyExists(joinTable, column1, id1, column2, id2) {
 }
 
 module.exports = {
-	tableIdToTableId: tableIdToTableId
+	tableByIdToTableById: tableByIdToTableById,
+	tableByIdToMany: tableByIdToMany
 }

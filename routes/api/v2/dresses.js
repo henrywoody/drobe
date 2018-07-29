@@ -24,7 +24,7 @@ router.get('/:id', async (req, res) => {
 	const { user } = req.user;
 	const { id } = req.params;
 	try {
-		const dress = await select.fromTableById('dress', id);
+		const dress = await select.fromTableByIdWithJoins('dress', id);
 
 		if (dress.ownerId !== user.id)
 			return res.sendStatus(403);
