@@ -1,12 +1,11 @@
 const	query = require('./query'),
-		tableIsAllowed = require('./table-is-allowed'),
+		checkTableIsAllowed = require('./check-table-is-allowed'),
 		cleanArticleData = require('./clean-article-data'),
 		dataToSQL = require('./data-to-sql-format'),
 		camelCaseKeys = require('./camel-case-keys');
 
 async function intoTableValues (table, data) {
-	if (!tableIsAllowed(table))
-		return null;
+	checkTableIsAllowed(table);
 
 	cleanData = cleanArticleData(table, data);
 	

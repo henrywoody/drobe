@@ -8,12 +8,6 @@ const	express = require('express'),
 		sqlDelete = require('../../../modules/delete');
 
 
-function throwNotFoundError() {
-	const err = new Error('Outerwear Not Found.');
-	err.name = 'NotFound';
-	throw err;
-}
-
 // Index
 router.get('/', async (req, res) => {
 	const { user } = req;
@@ -32,8 +26,6 @@ router.get('/:id', async (req, res) => {
 	try {
 		const outerwear = await select.fromTableById('outerwear', id);
 		
-		if (!outerwear)
-			throwNotFoundError();
 		if (outerwear.ownerId !== user.id)
 			return res.sendStatus(403);
 
@@ -64,8 +56,6 @@ router.put('/:id', async (req, res) => {
 		const { outerwear: outerwearData } = req.body;
 		const outerwear = await select.fromTableById('outerwear', id);
 
-		if (!outerwear)
-			throwNotFoundError();
 		if (outerwear.ownerId !== user.id)
 			return res.sendStatus(403);
 
@@ -84,8 +74,6 @@ router.delete('/:id', async (req, res) => {
 	try {
 		const outerwear = await select.fromTableById('outerwear', id);
 
-		if (!outerwear)
-			throwNotFoundError();
 		if (outerwear.ownerId !== user.id)
 			return res.sendStatus(403);
 

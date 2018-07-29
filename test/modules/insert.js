@@ -5,6 +5,7 @@ const	chai = require('chai'),
 		createUser = require('../../modules/create-user'),
 		camelCaseKeys = require('../../modules/camel-case-keys');
 
+
 describe('Insert module', () => {
 	let goodUser, badUser;
 
@@ -14,6 +15,17 @@ describe('Insert module', () => {
 	});
 
 	describe('intoTableValues method', () => {
+		it('should throw a ForbiddenError if the given table is not valid', async () => {
+			try {
+				await insert.intoTableValues('app_user', {username: 'fakeuser', password: 'fakepass'});
+				assert.fail(0, 1, 'Error not thrown');
+			} catch (err) {
+				if (err.name === 'AssertionError')
+					throw err;
+				assert.strictEqual(err.name, 'ForbiddenError');
+			}
+		});
+
 		it('should throw a ValidationError if the given article has no name', async () => {
 			try {
 				await insert.intoTableValues('shirt', {ownerId: badUser.id});
@@ -90,7 +102,6 @@ describe('Insert module', () => {
 			const coatData = {name: 'Favorite', ownerId: goodUser.id, description: 'the best', rating: 5, color: 'red', maxTemp: 100, minTemp: 70, rainOk: false, snowOk: false, specificType: 'jacket'};
 			const newCoat = await insert.intoTableValues('outerwear', coatData);
 
-			console.log(newCoat)
 			for (const key in coatData) {
 				assert.strictEqual(newCoat[key], coatData[key]);
 			}

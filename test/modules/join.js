@@ -48,14 +48,14 @@ describe ('Join module', () => {
 			}
 		});
 
-		it('should throw a NotFound error if either of the object ids is invalid', async () => {
+		it('should throw a NotFoundError if either of the object ids is invalid', async () => {
 			try {
 				await join.tableIdToTableId('shirt', shirt.id + 100, 'pants', badPants.id);
 				assert.fail(0, 1, 'No error was thrown');
 			} catch (err) {
 				if (err.name === 'AssertionError')
 					throw err;
-				assert.strictEqual(err.name, 'NotFound');
+				assert.strictEqual(err.name, 'NotFoundError');
 			}
 		});
 

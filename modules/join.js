@@ -57,12 +57,6 @@ async function checkHaveSameOwner(table1, id1, table2, id2) {
 	const object1 = await select.fromTableById(table1, id1);
 	const object2 = await select.fromTableById(table2, id2);
 
-	if (!object1 || !object2) {
-		const err = new Error('Article not found');
-		err.name = 'NotFound';
-		throw err;
-	}
-
 	if (object1.ownerId !== object2.ownerId) {
 		const err = new Error('Articles are not owned by the same owner');
 		err.name = 'ValidationError';

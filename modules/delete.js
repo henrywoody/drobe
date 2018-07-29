@@ -1,9 +1,8 @@
 const	query = require('./query'),
-		tableIsAllowed = require('./table-is-allowed');
+		checkTableIsAllowed = require('./check-table-is-allowed');
 
 async function fromTableById(table, id) {
-	if (!tableIsAllowed(table))
-		return null;
+	checkTableIsAllowed(table);
 
 	const queryText = `DELETE FROM ${table} * WHERE id = $1`;
 	const queryValues = [id];

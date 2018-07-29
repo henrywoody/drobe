@@ -24,9 +24,15 @@ describe('Update module', () => {
 			badDress2 = await insert.intoTableValues('dress', {name: 'Worse Dress', ownerId: badUser.id});
 		});
 
-		it('should return null if table is not allowed and not perform any other actions', async () => {
-			const response = await update.tableByIdWithValues('app_user', badUser.id, {username: 'worstUser', password: 'worstpassword123'});
-			assert.isNull(response);
+		it('should throw a ForbiddenError and perform no further actions if table is not allowed', async () => {
+			try {
+				await update.tableByIdWithValues('app_user', badUser.id, {username: 'worstUser', password: 'worstpassword123'});
+				assert.fail(0, 1, 'Error not thrown');
+			} catch (err) {
+				if (err.name === 'AssertionError')
+					throw err;
+				assert.strictEqual(err.name, 'ForbiddenError');
+			}
 
 			const updatedBadUser = await selectUser.byId(badUser.id);
 			assert.strictEqual(updatedBadUser.username, badUser.username);

@@ -22,9 +22,15 @@ describe('Delete module', () => {
 			coat = await insert.intoTableValues('outerwear', {name: 'Coat', ownerId: user.id});
 		});
 
-		it('should return null and perform no further action if table is not allowed', async () => {
-			const response = await sqlDelete.fromTableById('app_user', user.id);
-			
+		it('should return throw a ForbiddenError and perform no further action if table is not allowed', async () => {
+			try {
+				await sqlDelete.fromTableById('app_user', user.id);
+				assert.fail(0, 1, 'Error not thrown');
+			} catch (err) {
+				if (err.name === 'AssertionError')
+					throw err;
+				assert.strictEqual(err.name, 'ForbiddenError');
+			}
 			const userCheck = await selectUser.byId(user.id);
 			assert.isNotNull(userCheck);
 		});
@@ -40,8 +46,13 @@ describe('Delete module', () => {
 		it('should delete the specified object if the table and id are valid', async () => {
 			await sqlDelete.fromTableById('outerwear', coat.id);
 
-			const coatCheck = await select.fromTableById('outerwear', coat.id);
-			assert.isNull(coatCheck);
+			try {
+				await select.fromTableById('outerwear', coat.id);
+				assert.fail(0, 1, 'Object not deleted');
+			} catch (err) {
+				if (err.name === 'AssertionError')
+					throw err;
+			}
 		})
 
 		afterEach(async () => {

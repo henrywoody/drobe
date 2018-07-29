@@ -1,10 +1,10 @@
 const	query = require('./query'),
-		tableIsAllowed = require('./table-is-allowed'),
+		checkTableIsAllowed = require('./check-table-is-allowed'),
 		camelCaseKeys = require('./camel-case-keys');
 
 async function fromTableByUser(table, userId) {
-	if (!tableIsAllowed(table))
-		return null;
+	checkTableIsAllowed(table);
+	
 	const queryText = `SELECT * FROM ${table} WHERE owner_id = $1`;
 	const queryValues = [userId];
 	const { rows } = await query(queryText, queryValues);
@@ -14,14 +14,17 @@ async function fromTableByUser(table, userId) {
 }
 
 async function fromTableById(table, id) {
-	if (!tableIsAllowed(table))
-		return null;
+	checkTableIsAllowed(table);
+
 	const queryText = `SELECT * FROM ${table} WHERE id = $1`;
 	const queryValues = [id];
 	const { rows } = await query(queryText, queryValues);
 	if (rows.length)
 		return camelCaseKeys(rows[0]);
-	return null;
+	
+	const err = new Error(`${table} with id ${id} not found`);
+	err.name = 'NotFoundError';
+	throw err;
 }
 
 

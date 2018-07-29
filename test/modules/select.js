@@ -5,6 +5,7 @@ const	chai = require('chai'),
 		query = require('../../modules/query'),
 		createUser = require('../../modules/create-user');
 
+
 describe('Select module', () => {
 	let goodUser, badUser;
 	let goodShirt1, goodShirt2, goodShirt3, goodPants, badShirt;
@@ -22,19 +23,27 @@ describe('Select module', () => {
 	});
 	
 	describe('fromTableByUser method', () => {
-		it ('should return null if the given table is not allowed', async () => {
-			const users = await select.fromTableByUser('app_user', goodUser.id);
-			
-			assert.isNull(users);
+		it ('should throw a ForbiddenError if the given table is not allowed', async () => {
+			try {
+				await select.fromTableByUser('app_user', goodUser.id);
+				assert.fail(0, 1, 'Error not thrown');
+			} catch (err) {
+				if (err.name === 'AssertionError')
+					throw err;
+				assert.strictEqual(err.name, 'ForbiddenError');
+			}
 		});
 
 		it('should return all articles in the table owned by the user and only articles in that table owned by that user', async () => {
 			const shirts = await select.fromTableByUser('shirt', goodUser.id);
-
-			assert.strictEqual(shirts.length, 3);
-			assert.deepEqual(shirts, [goodShirt1, goodShirt2, goodShirt3]);
-			assert.notInclude(shirts, badShirt);
-			assert.notInclude(shirts, goodPants);
+			const shirtIds = shirts.map(e => e.id);
+			
+			assert.strictEqual(shirtIds.length, 3);
+			assert.include(shirtIds, goodShirt1.id);
+			assert.include(shirtIds, goodShirt2.id);
+			assert.include(shirtIds, goodShirt3.id);
+			assert.notInclude(shirtIds, badShirt.id);
+			assert.notInclude(shirtIds, goodPants.id);
 		});
 
 		it('should camelCase the keys of the returned objects', async () => {
@@ -58,10 +67,15 @@ describe('Select module', () => {
 	});
 
 	describe('fromTableById method', () => {
-		it ('should return null if the given table is not allowed', async () => {
-			const user = await select.fromTableById('app_user', goodUser.id);
-			
-			assert.isNull(user);
+		it ('should throw a ForbiddenError if the given table is not allowed', async () => {
+			try {
+				await select.fromTableById('app_user', goodUser.id);
+				assert.fail(0, 1, 'Error not thrown');
+			} catch (err) {
+				if (err.name === 'AssertionError')
+					throw err;
+				assert.strictEqual(err.name, 'ForbiddenError');
+			}
 		});
 
 		it('should return the requested item', async () => {
@@ -84,9 +98,15 @@ describe('Select module', () => {
 			assert.notInclude(keys, 'rain_ok');
 		});
 
-		it('should return null if no item with id in table is found', async () => {
-			const response = await select.fromTableById('dress', 1);
-			assert.isNull(response);
+		it('should throw a NotFoundError if no item with id in table is found', async () => {
+			try {
+				await select.fromTableById('shirt', goodShirt1.id + 100);
+				assert.fail(0, 1, 'Error not thrown');
+			} catch (err) {
+				if (err.name === 'AssertionError')
+					throw err;
+				assert.strictEqual(err.name, 'NotFoundError');
+			}
 		});
 	});
 

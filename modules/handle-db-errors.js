@@ -1,6 +1,6 @@
 module.exports = (err, res) => {
 	// Not Found: no item with id or id is not valid
-	if (err.name === 'CastError' || err.name === 'NotFound')
+	if (err.name === 'CastError' || err.name === 'NotFound' || err.name === 'NotFoundError')
 		return res.status(404).json({error: 'NotFoundError'});
 
 	if (err.name === 'UserNotFound')
@@ -17,7 +17,10 @@ module.exports = (err, res) => {
 		return res.status(400).json({error: 'DuplicateError'});
 
 	if (err.name === 'ValidationError')
-		return res.status(400).json({error: 'ValidationError'});
+		return res.status(400).json({error: err.name, message: err.message});
+
+	if (err.name === 'ForbiddenError')
+		return res.status(403).json({error: err.name, message: err.message});
 
 
 	// User Stuff
@@ -38,7 +41,6 @@ module.exports = (err, res) => {
 
 	if (err.name === 'FormatError')
 		return res.status(400).json({error: 'FormatError'});
-
 
 	// External API Stuff
 	if (err.name === 'StatusCodeError')
