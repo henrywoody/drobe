@@ -1,6 +1,7 @@
 const 	query = require('./query'),
 		select = require('./select'),
-		camelCaseKeys = require('./camel-case-keys');
+		camelCaseKeys = require('./camel-case-keys'),
+		getJoinTable = require('./get-join-table');
 
 async function tableIdToTableId(table1, id1, table2, id2) {
 	const joinTable = getJoinTable(table1, table2);
@@ -31,26 +32,12 @@ async function tableIdToTableId(table1, id1, table2, id2) {
 			queryText = "INSERT INTO dress_outerwear_join(dress_id, outerwear_id) VALUES ($1, $2) RETURNING *";
 			queryValues = table1 === 'dress' ? [id1, id2] : [id2, id1];
 			break;
+		default:
+			console.log('WHAT THE FUCK')
 	}
 	
 	const { rows } = await query(queryText, queryValues);
 	return camelCaseKeys(rows[0]);
-}
-
-function getJoinTable(...tablePair) {
-	const validJoins = [
-		['pants', 'shirt', 'shirt_pants_join'], ['outerwear', 'shirt', 'shirt_outerwear_join'],
-		['outerwear', 'pants', 'pants_outerwear_join'], ['outerwear', 'outerwear', 'outerwear_outerwear_join'],
-		['dress', 'outerwear', 'dress_outerwear_join']
-	];
-
-	for (const validJoin of validJoins) {
-		if (validJoin[0] === tablePair[0] && validJoin[1] === tablePair[1] || validJoin[0] === tablePair[1] && validJoin[1] === tablePair[0])
-			return validJoin[2];
-	}
-	const err = new Error('Table pair is not valid for join');
-	err.name = 'ValidationError';
-	throw err;
 }
 
 async function checkHaveSameOwner(table1, id1, table2, id2) {
