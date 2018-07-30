@@ -41,7 +41,7 @@ const fieldsForTable = {
 
 module.exports = (table, data) => {
 	const cleanData = {};
-	for (const key of fieldsForTable[table])
+	for (const key of fieldsForTable[table]) {
 		if (Object.keys(data).includes(camelCase(key))) {
 			cleanData[key] = data[camelCase(key)];
 		} else if (['shirts', 'pants', 'dresses', 'outerwears'].includes(key)) {
@@ -49,5 +49,12 @@ module.exports = (table, data) => {
 		} else {
 			cleanData[key] = null;
 		}
+	}
+
+	if (!cleanData.rating)
+		cleanData.rating = 1;
+	if (!cleanData.last_worn)
+		delete cleanData.last_worn;
+
 	return cleanData;
 }

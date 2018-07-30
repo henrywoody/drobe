@@ -61,11 +61,9 @@ describe('Clean Article Data module', () => {
 			'rainOk',
 			'snowOk',
 			'imageUrl',
-			'rating',
-			'lastWorn',
 			'name',
 			'ownerId'
-		];
+		]; // rating and lastWorn excluded for later tests
 
 		for (const table of ['shirt', 'pants', 'dress', 'outerwear']) {
 			let nestedMissingFields;
@@ -113,6 +111,22 @@ describe('Clean Article Data module', () => {
 			assert.notInclude(Object.keys(cleanData), 'otherField');
 			assert.notInclude(Object.keys(cleanData), decamelize('otherField'));
 		}
+	});
+
+	it('should set rating to 1 if not given but not override if given', () => {
+		const cleanData1 = cleanArticleData('shirt', {});
+		assert.strictEqual(cleanData1.rating, 1);
+
+		const cleanData2 = cleanArticleData('shirt', {rating: 5});
+		assert.strictEqual(cleanData2.rating, 5);
+	});
+
+	it('should remove the lastWorn field if left empty but leave if given', () => {
+		const cleanData1 = cleanArticleData('pants', {});
+		assert.notInclude(Object.keys(cleanData1), 'last_worn');
+
+		const cleanData2 = cleanArticleData('pants', {lastWorn: new Date()});
+		assert.include(Object.keys(cleanData2), 'last_worn');
 	});
 });
 
