@@ -12,6 +12,8 @@ async function intoTableValues (table, data) {
 
 	nestedCleanData = cleanArticleData(table, data);
 	const {cleanData, nestedData} = separateNestedFields(nestedCleanData);
+
+	delete cleanData.last_worn;
 	
 	const { columns, queryValueSQLVars, queryValues } = dataToSQL(cleanData);
 	const queryText = `INSERT INTO ${table}(${columns}) VALUES(${queryValueSQLVars}) RETURNING *`;

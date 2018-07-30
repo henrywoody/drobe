@@ -19,7 +19,7 @@ CREATE TABLE article (
 	snow_ok boolean,
 	image_url text,
 	rating integer CHECK (rating > 0 AND rating < 6),
-	last_worn date
+	last_worn date DEFAULT NOW()
 );
 
 CREATE TABLE wear_date (
