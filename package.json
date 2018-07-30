@@ -34,7 +34,8 @@
     "query-string": "^6.1.0",
     "react-router-dom": "^4.3.1",
     "request": "^2.87.0",
-    "request-promise-native": "^1.0.5"
+    "request-promise-native": "^1.0.5",
+    "sinon": "^6.1.4"
   },
   "description": "Automated outfit picking.",
   "main": "app.js",
