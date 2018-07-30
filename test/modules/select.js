@@ -16,7 +16,9 @@ describe('Select module', () => {
 		// set up users
 		goodUser = await createUser({username: 'good_username', password: 'goodpassword123'});
 		badUser = await createUser({username: 'bad_username', password: 'badpassword123'});
+	});
 
+	beforeEach(async () => {
 		goodShirt1 = await insert.intoTableValues('shirt', {name: 'Good Shirt', ownerId: goodUser.id});
 		goodShirt2 = await insert.intoTableValues('shirt', {name: 'Better Shirt', ownerId: goodUser.id});
 		goodShirt3 = await insert.intoTableValues('shirt', {name: 'Best Shirt', ownerId: goodUser.id});
@@ -227,10 +229,82 @@ describe('Select module', () => {
 		});
 	});
 
+	describe('fromTableForUserAndTemp method', () => {
+		it ('should throw a ForbiddenError if the given table is not allowed', async () => {
+			try {
+				await select.fromTableForUserAndTemp('app_user', goodUser.id, 100);
+				assert.fail(0, 1, 'Error not thrown');
+			} catch (err) {
+				if (err.name === 'AssertionError')
+					throw err;
+				assert.strictEqual(err.name, 'ForbiddenError');
+			}
+		});
+		
+		it('should return all and only articles from that table owned by the user whose minTemp is below the given temp and maxTemp', async () => {
+			hotShirt = await insert.intoTableValues('shirt', {name: 'Hot Shirt', ownerId: goodUser.id, maxTemp: 120, minTemp: 80});
+			midShirt = await insert.intoTableValues('shirt', {name: 'Mid Shirt', ownerId: goodUser.id, maxTemp: 90, minTemp: 50});
+			coldShirt = await insert.intoTableValues('shirt', {name: 'Cold Shirt', ownerId: goodUser.id, maxTemp: 60, minTemp:0});
 
+			const hotResults = await select.fromTableForUserAndTemp('shirt', goodUser.id, 85);
+			const hotIds = hotResults.map(e => e.id);
+			assert.include(hotIds, hotShirt.id);
+			assert.include(hotIds, midShirt.id);
+			assert.notInclude(hotIds, coldShirt.id);
+
+			const midResults = await select.fromTableForUserAndTemp('shirt', goodUser.id, 70);
+			const midIds = midResults.map(e => e.id);
+			assert.notInclude(midIds, hotShirt.id);
+			assert.include(midIds, midShirt.id);
+			assert.notInclude(midIds, coldShirt.id);
+
+			const coldResults = await select.fromTableForUserAndTemp('shirt', goodUser.id, 55);
+			const coldIds = coldResults.map(e => e.id);
+			assert.notInclude(coldIds, hotShirt.id);
+			assert.include(coldIds, midShirt.id);
+			assert.include(coldIds, coldShirt.id);
+
+			// other users
+			assert.notInclude(hotIds, badShirt.id);
+			assert.notInclude(midIds, badShirt.id);
+			assert.notInclude(coldIds, badShirt.id);
+		});
+
+		it('should interpret missing minTemp as -inf and missing maxTemp as inf', async () => {
+			hotShirt = await insert.intoTableValues('shirt', {name: 'Hot Shirt', ownerId: goodUser.id, minTemp: 80});
+			anyShirt = await insert.intoTableValues('shirt', {name: 'Any Shirt', ownerId: goodUser.id});
+			coldShirt = await insert.intoTableValues('shirt', {name: 'Cold Shirt', ownerId: goodUser.id, maxTemp: 60});
+
+			const hotResults = await select.fromTableForUserAndTemp('shirt', goodUser.id, 150);
+			const hotIds = hotResults.map(e => e.id);
+			assert.include(hotIds, hotShirt.id);
+			assert.include(hotIds, anyShirt.id);
+			assert.notInclude(hotIds, coldShirt.id);
+
+			const midResults = await select.fromTableForUserAndTemp('shirt', goodUser.id, 70);
+			const midIds = midResults.map(e => e.id);
+			assert.notInclude(midIds, hotShirt.id);
+			assert.include(midIds, anyShirt.id);
+			assert.notInclude(midIds, coldShirt.id);
+
+			const coldResults = await select.fromTableForUserAndTemp('shirt', goodUser.id, -20);
+			const coldIds = coldResults.map(e => e.id);
+			assert.notInclude(coldIds, hotShirt.id);
+			assert.include(coldIds, anyShirt.id);
+			assert.include(coldIds, coldShirt.id);
+
+			// other users
+			assert.notInclude(hotIds, badShirt.id);
+			assert.notInclude(midIds, badShirt.id);
+			assert.notInclude(coldIds, badShirt.id);
+		});
+	});
+
+	afterEach(async () => {
+		await clearArticlesAndJoins();
+	});
 
 	after(async () => {
-		await clearArticlesAndJoins();
 		await query("DELETE FROM app_user *");
-	})
+	});
 });

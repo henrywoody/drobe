@@ -58,6 +58,16 @@ async function fromTablesByIds(tableIdLists) {
 	return results;
 }
 
+async function fromTableForUserAndTemp(table, ownerId, temp) {
+	checkTableIsAllowed(table);
+
+	const queryText = `SELECT * FROM ${table} WHERE owner_id = $1 AND (min_temp <= $2 OR min_temp IS NULL) AND (max_temp >= $2 OR max_temp IS NULL)`;
+	const queryValues = [ownerId, temp];
+	const { rows } = await query(queryText, queryValues);
+
+	return rows.map(e => camelCaseKeys(e));
+}
+
 function throwNotFoundError(table, id) {
 	const err = new Error(`${table} with id ${id} not found`);
 	err.name = 'NotFoundError';
@@ -68,5 +78,6 @@ module.exports = {
 	fromTableByUser: fromTableByUser,
 	fromTableByIdWithJoins: fromTableByIdWithJoins,
 	fromTableById: fromTableById,
-	fromTablesByIds: fromTablesByIds
+	fromTablesByIds: fromTablesByIds,
+	fromTableForUserAndTemp: fromTableForUserAndTemp
 };
