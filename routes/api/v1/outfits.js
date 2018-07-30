@@ -3,7 +3,7 @@ const	express = require('express'),
 		Shirt = require('../../../models/shirt'),
 		Pants = require('../../../models/pants'),
 		Outerwear = require('../../../models/outerwear'),
-		generateAllOutfits = require('../../../modules/generate-all-outfits'),
+		// generateAllOutfits = require('../../../modules/generate-all-outfits'),
 		generateOutfit = require('../../../modules/generate-outfit'),
 		handleErrors = require('../../../modules/handle-db-errors');
 
