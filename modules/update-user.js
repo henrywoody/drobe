@@ -3,8 +3,11 @@ const	query = require('./query'),
 		dataToSQL = require('./data-to-sql-format'),
 		camelCaseKeys = require('./camel-case-keys');
 
-module.exports = async (id, data) => {
+module.exports = async (id, data, {includePassword=false}={}) => {
 	cleanData = cleanUserData(data);
+
+	if (!includePassword)
+		delete cleanData.password;
 
 	const { columns, queryValueSQLVars, queryValues } = dataToSQL(cleanData);
 	const idSQLVar = queryValues.length + 1;
