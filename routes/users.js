@@ -49,7 +49,32 @@ router.post('/register', async (req, res) => {
 	} catch (err) {
 		return handleErrors(err, res);
 	}
-})
+});
+
+router.put('/:id/password', tokenAuth, async (req, res) => {
+	const { user } = req;
+	const { id } = req.params;
+
+	try {
+		const existingUser = await selectUser.byId(id);
+		if (!existingUser)
+			res.sendStatus(404);
+
+		if (user.id != id)
+			res.sendStatus(403);
+
+		const { password: newPassword } = req.body;
+
+		const salt = await bcrypt.genSalt(10);
+		const hash = await bcrypt.hash(newPassword, salt);
+
+		const updatedUser = await updateUser(id, {...user, password: hash}, {includePassword: true});
+		
+		res.json({'message': 'Successfully updated password.'})		
+	} catch (err) {
+		handleErrors(err, res)
+	}
+});
 
 router.put('/:id', tokenAuth, async (req, res) => {
 	const { user } = req;
@@ -64,9 +89,6 @@ router.put('/:id', tokenAuth, async (req, res) => {
 			res.sendStatus(403);
 
 		const { user: userData } = req.body;
-		const salt = await bcrypt.genSalt(10);
-		const hash = await bcrypt.hash(userData.password, salt);
-		userData.password = hash;
 		
 		const updatedUser = await updateUser(id, userData);
 
