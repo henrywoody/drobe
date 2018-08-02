@@ -1,4 +1,4 @@
-export default async function callAPI(id, token, body) {
+export default async function updateUser(id, token, body) {
 	let fullUrl = `/users/${id}`;
 
 	const additionalInfo = {
@@ -9,8 +9,6 @@ export default async function callAPI(id, token, body) {
 		},
 		body: JSON.stringify(body)
 	};
-
 	const result = await fetch(fullUrl, additionalInfo);
-
 	return result.json();
 }

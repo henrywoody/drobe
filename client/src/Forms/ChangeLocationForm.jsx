@@ -5,30 +5,21 @@ export default class ChangeLocationForm extends Component {
 	constructor() {
 		super();
 		this.state = {
-			location: {
-				name: '',
-				latitude: '',
-				longitude: ''
-			},
+			locationName: '',
+			longitude: '',
+			latitude: '',
 			message: ''
 		};
 	}
 
 	componentWillMount() {
 		const { user } = this.props;
-		if (user.location && Object.keys(user.location).length)
-			this.setState({ location: user.location });
+		const { locationName, longitude, latitude } = user;
+		this.setState({ locationName, longitude, latitude });
 	}
 
 	handleChange = (event) => {
-		const { location } = this.state;
-
-		this.setState({
-			location: {
-				...location,
-				name: event.target.value
-			}
-		})
+		this.setState({ locationName: event.target.value });
 	}
 
 	handleSubmit = async (event) => {
@@ -39,26 +30,28 @@ export default class ChangeLocationForm extends Component {
 			return;
 
 		const { didSubmit, updateUser, user } = this.props;
-		const { location } = this.state;
-		updateUser({...user, location});
+		const { locationName, longitude, latitude } = this.state;
+		updateUser({...user, locationName, longitude, latitude});
 		didSubmit();
 	}
 
 	findCoordinates = async (event) => {
 		if (event) event.preventDefault();
 
-		const { location, message } = this.state;
-		const locationMessage = 'Location not recognized.'
+		const { locationName, message } = this.state;
+		const locationNotRecognized = 'Location not recognized.'
 
-		const locationData = await callAPI('data/coordinates', {address: location.name});
+		const locationData = await callAPI('data/coordinates', {address: locationName});
 		if (locationData.error) {
-			this.setState({message: locationMessage});
+			this.setState({message: locationNotRecognized});
 		} else {
-			const { location: name, latitude, longitude } = locationData;
+			const { location: newLocationName, longitude, latitude } = locationData;
 			const updatedState = {
-				location: { name, latitude, longitude }
+				locationName: newLocationName,
+				longitude,
+				latitude
 			}
-			if (message === locationMessage)
+			if (message === locationNotRecognized)
 				updatedState.message = '';
 
 			await this.setState(updatedState);
@@ -67,13 +60,13 @@ export default class ChangeLocationForm extends Component {
 	}
 
 	render() {
-		const { location, message } = this.state;
+		const { locationName, message } = this.state;
 
 		return (
 			<form onSubmit={ this.handleSubmit }>
 				{ message }
 				<label htmlFor='location-name'>Location</label>
-				<input name='location-name' type='text' placeholder='location' value={ location.name } onChange={ this.handleChange }/>
+				<input name='location-name' type='text' placeholder='location' value={ locationName } onChange={ this.handleChange }/>
 				<button onClick={ this.findCoordinates }>Validate</button>
 				<input type='submit'/>
 			</form>

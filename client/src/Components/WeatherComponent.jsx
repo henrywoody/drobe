@@ -18,19 +18,19 @@ export default class WeatherComponent extends Component {
 
 	componentDidUpdate(prevProps) {
 		const { user } = this.props;
-		if (!user.location) return;
-		if (user.location && !prevProps.user.location || user.location.latitude !== prevProps.user.location.latitude || user.location.longitude !== prevProps.user.location.longitude)
+		if (!(user.longitude && user.latitude)) return;
+		if ((user.longitude && user.latitude) && !(prevProps.user.longitude && prevProps.user.latitude) || user.longitude !== prevProps.user.longitude || user.latitude !== prevProps.user.latitude)
 			this.refreshWeather();
 	}
 
 	async refreshWeather() {
 		const { user } = this.props;
 
-		if (!user.location) return;
+		if (!(user.longitude && user.latitude)) return;
 
 		const location = {
-			latitude: user.location.latitude,
-			longitude: user.location.longitude
+			latitude: user.latitude,
+			longitude: user.longitude
 		}
 
 		const weather = await callAPI('data/weather', location, user.token);
@@ -47,8 +47,7 @@ export default class WeatherComponent extends Component {
 		const { weather, showLocationForm } = this.state;
 
 		let content;
-		if (user.location && !showLocationForm) {
-			const location = user.location.name;
+		if (user.longitude && user.latitude && !showLocationForm) {
 			const weatherBlocks = [];
 			for (const weatherKey in weather) {
 				weatherBlocks.push(<PieceOfWeatherData key={ weatherKey } name={ weatherKey } value={ weather[weatherKey] }/>)
@@ -56,7 +55,7 @@ export default class WeatherComponent extends Component {
 
 			content = (
 				<div>
-					<p>In { location }</p>
+					<p>In { user.locationName }</p>
 					<button onClick={ this.toggleLocationForm }>Change Location</button>
 					{ weatherBlocks }
 				</div>

@@ -53,7 +53,7 @@ export default class App extends Component {
 	}
 
 	updateUser = async (user) => {
-		const updatedUser = await updateUser(user._id, user.token, { user });
+		const updatedUser = await updateUser(user.id, user.token, { user });
 		this.storeUserInfo({...updatedUser, token: user.token});
 		this.setState({ user: {...updatedUser, token: user.token} });
 	}
