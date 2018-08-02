@@ -28,7 +28,7 @@ async function tableByIdWithValues(table, id, data) {
 		const { name, constraint } = updateResult;
 		if (name === 'error') {
 			let err;
-			if (constraint === 'dress_name_owner_id_key') {
+			if (constraint === 'dress_name_user_id_key') {
 				err = new Error('Name is taken');
 				err.name = 'ValidationError';
 			} else {

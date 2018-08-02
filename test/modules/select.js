@@ -19,11 +19,11 @@ describe('Select module', () => {
 	});
 
 	beforeEach(async () => {
-		goodShirt1 = await insert.intoTableValues('shirt', {name: 'Good Shirt', ownerId: goodUser.id});
-		goodShirt2 = await insert.intoTableValues('shirt', {name: 'Better Shirt', ownerId: goodUser.id});
-		goodShirt3 = await insert.intoTableValues('shirt', {name: 'Best Shirt', ownerId: goodUser.id});
-		goodPants = await insert.intoTableValues('pants', {name: 'Good Pants', ownerId: goodUser.id});
-		badShirt = await insert.intoTableValues('shirt', {name: 'Bad Shirt', ownerId: badUser.id});
+		goodShirt1 = await insert.intoTableValues('shirt', {name: 'Good Shirt', userId: goodUser.id});
+		goodShirt2 = await insert.intoTableValues('shirt', {name: 'Better Shirt', userId: goodUser.id});
+		goodShirt3 = await insert.intoTableValues('shirt', {name: 'Best Shirt', userId: goodUser.id});
+		goodPants = await insert.intoTableValues('pants', {name: 'Good Pants', userId: goodUser.id});
+		badShirt = await insert.intoTableValues('shirt', {name: 'Bad Shirt', userId: badUser.id});
 
 		await join.tableByIdToMany('pants', goodPants.id, {shirts: [goodShirt1.id, goodShirt2.id, goodShirt3.id]});
 	});
@@ -58,8 +58,8 @@ describe('Select module', () => {
 			
 			assert.include(exampleKeys, 'maxTemp');
 			assert.notInclude(exampleKeys, 'max_temp');
-			assert.include(exampleKeys, 'ownerId');
-			assert.notInclude(exampleKeys, 'owner_id');
+			assert.include(exampleKeys, 'userId');
+			assert.notInclude(exampleKeys, 'user_id');
 			assert.include(exampleKeys, 'rainOk');
 			assert.notInclude(exampleKeys, 'rain_ok');
 		});
@@ -100,7 +100,7 @@ describe('Select module', () => {
 
 			assert.strictEqual(shirt.id, goodShirt1.id);
 			assert.strictEqual(shirt.name, goodShirt1.name);
-			assert.strictEqual(shirt.ownerId, goodShirt1.ownerId);
+			assert.strictEqual(shirt.userId, goodShirt1.userId);
 		});
 
 		it('should camelCase the keys of the returned object', async () => {
@@ -109,8 +109,8 @@ describe('Select module', () => {
 			
 			assert.include(keys, 'maxTemp');
 			assert.notInclude(keys, 'max_temp');
-			assert.include(keys, 'ownerId');
-			assert.notInclude(keys, 'owner_id');
+			assert.include(keys, 'userId');
+			assert.notInclude(keys, 'user_id');
 			assert.include(keys, 'rainOk');
 			assert.notInclude(keys, 'rain_ok');
 		});
@@ -144,7 +144,7 @@ describe('Select module', () => {
 
 			assert.strictEqual(pants.id, goodPants.id);
 			assert.strictEqual(pants.name, goodPants.name);
-			assert.strictEqual(pants.ownerId, goodPants.ownerId);
+			assert.strictEqual(pants.userId, goodPants.userId);
 
 			assert.include(Object.keys(pants), 'shirts');
 			assert.strictEqual(pants.shirts.length, 3);
@@ -167,8 +167,8 @@ describe('Select module', () => {
 			
 			assert.include(keys, 'maxTemp');
 			assert.notInclude(keys, 'max_temp');
-			assert.include(keys, 'ownerId');
-			assert.notInclude(keys, 'owner_id');
+			assert.include(keys, 'userId');
+			assert.notInclude(keys, 'user_id');
 			assert.include(keys, 'rainOk');
 			assert.notInclude(keys, 'rain_ok');
 		});
@@ -242,9 +242,9 @@ describe('Select module', () => {
 		});
 		
 		it('should return all and only articles from that table owned by the user whose minTemp is below the given temp and maxTemp', async () => {
-			hotShirt = await insert.intoTableValues('shirt', {name: 'Hot Shirt', ownerId: goodUser.id, maxTemp: 120, minTemp: 80});
-			midShirt = await insert.intoTableValues('shirt', {name: 'Mid Shirt', ownerId: goodUser.id, maxTemp: 90, minTemp: 50});
-			coldShirt = await insert.intoTableValues('shirt', {name: 'Cold Shirt', ownerId: goodUser.id, maxTemp: 60, minTemp:0});
+			hotShirt = await insert.intoTableValues('shirt', {name: 'Hot Shirt', userId: goodUser.id, maxTemp: 120, minTemp: 80});
+			midShirt = await insert.intoTableValues('shirt', {name: 'Mid Shirt', userId: goodUser.id, maxTemp: 90, minTemp: 50});
+			coldShirt = await insert.intoTableValues('shirt', {name: 'Cold Shirt', userId: goodUser.id, maxTemp: 60, minTemp:0});
 
 			const hotResults = await select.fromTableForUserAndTemp('shirt', goodUser.id, 85);
 			const hotIds = hotResults.map(e => e.id);
@@ -271,9 +271,9 @@ describe('Select module', () => {
 		});
 
 		it('should interpret missing minTemp as -inf and missing maxTemp as inf', async () => {
-			hotShirt = await insert.intoTableValues('shirt', {name: 'Hot Shirt', ownerId: goodUser.id, minTemp: 80});
-			anyShirt = await insert.intoTableValues('shirt', {name: 'Any Shirt', ownerId: goodUser.id});
-			coldShirt = await insert.intoTableValues('shirt', {name: 'Cold Shirt', ownerId: goodUser.id, maxTemp: 60});
+			hotShirt = await insert.intoTableValues('shirt', {name: 'Hot Shirt', userId: goodUser.id, minTemp: 80});
+			anyShirt = await insert.intoTableValues('shirt', {name: 'Any Shirt', userId: goodUser.id});
+			coldShirt = await insert.intoTableValues('shirt', {name: 'Cold Shirt', userId: goodUser.id, maxTemp: 60});
 
 			const hotResults = await select.fromTableForUserAndTemp('shirt', goodUser.id, 150);
 			const hotIds = hotResults.map(e => e.id);

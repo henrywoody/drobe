@@ -15,13 +15,13 @@ describe('Get All Joins module', () => {
 	});
 
 	beforeEach(async () => {
-		shirt = await insert.intoTableValues('shirt', {name: 'good shirt', ownerId: user.id});
-		pants1 = await insert.intoTableValues('pants', {name: 'good pants', ownerId: user.id});
-		pants2 = await insert.intoTableValues('pants', {name: 'better pants', ownerId: user.id});
-		pants3 = await insert.intoTableValues('pants', {name: 'best pants', ownerId: user.id});
-		dress = await insert.intoTableValues('dress', {name: 'good dress', ownerId: user.id});
-		jacket = await insert.intoTableValues('outerwear', {name: 'good jacket', ownerId: user.id});
-		sweater = await insert.intoTableValues('outerwear', {name: 'good sweater', ownerId: user.id});
+		shirt = await insert.intoTableValues('shirt', {name: 'good shirt', userId: user.id});
+		pants1 = await insert.intoTableValues('pants', {name: 'good pants', userId: user.id});
+		pants2 = await insert.intoTableValues('pants', {name: 'better pants', userId: user.id});
+		pants3 = await insert.intoTableValues('pants', {name: 'best pants', userId: user.id});
+		dress = await insert.intoTableValues('dress', {name: 'good dress', userId: user.id});
+		jacket = await insert.intoTableValues('outerwear', {name: 'good jacket', userId: user.id});
+		sweater = await insert.intoTableValues('outerwear', {name: 'good sweater', userId: user.id});
 
 		await Promise.all([
 			join.tableByIdToTableById('shirt', shirt.id, 'pants', pants1.id),
@@ -47,7 +47,7 @@ describe('Get All Joins module', () => {
 		});
 
 		it('should return an object with the correct keys and empty arrays as values if the object has no joins', async () => {
-			otherShirt = await insert.intoTableValues('shirt', {name: 'another shirt', ownerId: user.id});
+			otherShirt = await insert.intoTableValues('shirt', {name: 'another shirt', userId: user.id});
 			const allJoins = await getAllJoins.forTableById('shirt', otherShirt.id);
 
 			assert.include(Object.keys(allJoins), 'pants');

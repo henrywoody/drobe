@@ -11,7 +11,7 @@ const articleFields = [
 	'rating',
 	'last_worn',
 	'name',
-	'owner_id'
+	'user_id'
 ];
 
 const fieldsForTable = {

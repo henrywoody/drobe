@@ -22,7 +22,7 @@ async function intoTableValues (table, data) {
 		const { name, constraint, column, routine } = insertResult;
 		if (name === 'error') {
 			let err;
-			if (constraint === 'shirt_name_owner_id_key') {
+			if (constraint === 'shirt_name_user_id_key') {
 				err = new Error('Name is taken.');
 			} else if (column === 'name') {
 				err = new Error('Name cannot be empty.');

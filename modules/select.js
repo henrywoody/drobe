@@ -7,7 +7,7 @@ const	query = require('./query'),
 async function fromTableByUser(table, userId) {
 	checkTableIsAllowed(table);
 	
-	const queryText = `SELECT * FROM ${table} WHERE owner_id = $1`;
+	const queryText = `SELECT * FROM ${table} WHERE user_id = $1`;
 	const queryValues = [userId];
 	const { rows } = await query(queryText, queryValues);
 	return rows.map(e => {
@@ -58,11 +58,11 @@ async function fromTablesByIds(tableIdLists) {
 	return results;
 }
 
-async function fromTableForUserAndTemp(table, ownerId, temp) {
+async function fromTableForUserAndTemp(table, userId, temp) {
 	checkTableIsAllowed(table);
 
-	const queryText = `SELECT * FROM ${table} WHERE owner_id = $1 AND (min_temp <= $2 OR min_temp IS NULL) AND (max_temp >= $2 OR max_temp IS NULL)`;
-	const queryValues = [ownerId, temp];
+	const queryText = `SELECT * FROM ${table} WHERE user_id = $1 AND (min_temp <= $2 OR min_temp IS NULL) AND (max_temp >= $2 OR max_temp IS NULL)`;
+	const queryValues = [userId, temp];
 	const { rows } = await query(queryText, queryValues);
 
 	return rows.map(e => camelCaseKeys(e));

@@ -16,11 +16,11 @@ describe('Unjoin module', () => {
 	});
 
 	beforeEach(async () => {
-		shirt = await insert.intoTableValues('shirt', {name: 'good shirt', ownerId: user.id});
-		pants = await insert.intoTableValues('pants', {name: 'good pants', ownerId: user.id});
-		dress = await insert.intoTableValues('dress', {name: 'good dress', ownerId: user.id});
-		jacket = await insert.intoTableValues('outerwear', {name: 'good jacket', ownerId: user.id});
-		sweater = await insert.intoTableValues('outerwear', {name: 'good sweater', ownerId: user.id});
+		shirt = await insert.intoTableValues('shirt', {name: 'good shirt', userId: user.id});
+		pants = await insert.intoTableValues('pants', {name: 'good pants', userId: user.id});
+		dress = await insert.intoTableValues('dress', {name: 'good dress', userId: user.id});
+		jacket = await insert.intoTableValues('outerwear', {name: 'good jacket', userId: user.id});
+		sweater = await insert.intoTableValues('outerwear', {name: 'good sweater', userId: user.id});
 
 		await Promise.all([
 			join.tableByIdToTableById('shirt', shirt.id, 'pants', pants.id),
@@ -122,7 +122,7 @@ describe('Unjoin module', () => {
 
 	describe('allForTableById method', () => {
 		it('should not throw an error if the given object has no joins', async () => {
-			otherShirt = await insert.intoTableValues('shirt', {name: 'another shirt', ownerId: user.id});
+			otherShirt = await insert.intoTableValues('shirt', {name: 'another shirt', userId: user.id});
 			try {
 				await unjoin.allForTableById('shirt', otherShirt.id);
 			} catch (err) {

@@ -19,7 +19,7 @@ describe('Delete module', () => {
 	});
 
 	beforeEach(async () => {
-		coat = await insert.intoTableValues('outerwear', {name: 'Coat', ownerId: user.id});
+		coat = await insert.intoTableValues('outerwear', {name: 'Coat', userId: user.id});
 	});
 
 	describe('fromTableById method', () => {
@@ -57,14 +57,14 @@ describe('Delete module', () => {
 		});
 
 		it('should delete all joins fo the specified object', async () => {
-			const shirt1 = await insert.intoTableValues('shirt', {name: 'shirt1', ownerId: user.id});
-			const shirt2 = await insert.intoTableValues('shirt', {name: 'shirt2', ownerId: user.id});
-			const pants1 = await insert.intoTableValues('pants', {name: 'pants1', ownerId: user.id});
-			const pants2 = await insert.intoTableValues('pants', {name: 'pants2', ownerId: user.id});
-			const dress1 = await insert.intoTableValues('dress', {name: 'dress1', ownerId: user.id});
-			const dress2 = await insert.intoTableValues('dress', {name: 'dress2', ownerId: user.id});
-			const outerwear1 = await insert.intoTableValues('outerwear', {name: 'outerwear1', ownerId: user.id});
-			const outerwear2 = await insert.intoTableValues('outerwear', {name: 'outerwear2', ownerId: user.id});
+			const shirt1 = await insert.intoTableValues('shirt', {name: 'shirt1', userId: user.id});
+			const shirt2 = await insert.intoTableValues('shirt', {name: 'shirt2', userId: user.id});
+			const pants1 = await insert.intoTableValues('pants', {name: 'pants1', userId: user.id});
+			const pants2 = await insert.intoTableValues('pants', {name: 'pants2', userId: user.id});
+			const dress1 = await insert.intoTableValues('dress', {name: 'dress1', userId: user.id});
+			const dress2 = await insert.intoTableValues('dress', {name: 'dress2', userId: user.id});
+			const outerwear1 = await insert.intoTableValues('outerwear', {name: 'outerwear1', userId: user.id});
+			const outerwear2 = await insert.intoTableValues('outerwear', {name: 'outerwear2', userId: user.id});
 
 			await join.tableByIdToMany('outerwear', coat.id, {shirts: [shirt1.id, shirt2.id], pants: [pants1.id, pants2.id], dresses: [dress1.id, dress2.id], outerwears: [outerwear1.id, outerwear2.id]});
 

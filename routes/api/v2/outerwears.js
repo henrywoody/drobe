@@ -26,7 +26,7 @@ router.get('/:id', async (req, res) => {
 	try {
 		const outerwear = await select.fromTableByIdWithJoins('outerwear', id);
 		
-		if (outerwear.ownerId !== user.id)
+		if (outerwear.userId !== user.id)
 			return res.sendStatus(403);
 
 		res.json(outerwear);
@@ -40,7 +40,7 @@ router.post('/', async (req, res) => {
 	const { user } = req;
 	try {
 		const { outerwear: outerwearData } = req.body;
-		outerwearData.ownerId = user.id;
+		outerwearData.userId = user.id;
 		const newOuterwear = await insert.intoTableValues('outerwear', outerwearData);
 		res.json(newOuterwear);
 	} catch (err) {
@@ -56,10 +56,10 @@ router.put('/:id', async (req, res) => {
 		const { outerwear: outerwearData } = req.body;
 		const outerwear = await select.fromTableById('outerwear', id);
 
-		if (outerwear.ownerId !== user.id)
+		if (outerwear.userId !== user.id)
 			return res.sendStatus(403);
 
-		outerwearData.ownerId = user.id;
+		outerwearData.userId = user.id;
 		const updatedOuterwear = await update.tableByIdWithValues('outerwear', id, outerwearData);
 		res.json(updatedOuterwear);
 	} catch (err) {
@@ -74,7 +74,7 @@ router.delete('/:id', async (req, res) => {
 	try {
 		const outerwear = await select.fromTableById('outerwear', id);
 
-		if (outerwear.ownerId !== user.id)
+		if (outerwear.userId !== user.id)
 			return res.sendStatus(403);
 
 		await sqlDelete.fromTableById('outerwear', id);

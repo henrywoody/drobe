@@ -22,15 +22,15 @@ describe('Generate Outfit module', () => {
 	beforeEach(async () => {
 		sandbox = sinon.createSandbox();
 
-		shirt1 = await insert.intoTableValues('shirt', {name: 'shirt1', ownerId: user.id});
-		shirt2 = await insert.intoTableValues('shirt', {name: 'shirt2', ownerId: user.id});
-		pants1 = await insert.intoTableValues('pants', {name: 'pants1', ownerId: user.id});
-		pants2 = await insert.intoTableValues('pants', {name: 'pants2', ownerId: user.id});
-		dress1 = await insert.intoTableValues('dress', {name: 'dress1', ownerId: user.id});
-		dress2 = await insert.intoTableValues('dress', {name: 'dress2', ownerId: user.id});
-		outerwear1 = await insert.intoTableValues('outerwear', {name: 'outerwear1', ownerId: user.id});
-		outerwear2 = await insert.intoTableValues('outerwear', {name: 'outerwear2', ownerId: user.id});
-		raincoat = await insert.intoTableValues('outerwear', {name: 'raincoat', ownerId: user.id, specificType: 'raincoat'});
+		shirt1 = await insert.intoTableValues('shirt', {name: 'shirt1', userId: user.id});
+		shirt2 = await insert.intoTableValues('shirt', {name: 'shirt2', userId: user.id});
+		pants1 = await insert.intoTableValues('pants', {name: 'pants1', userId: user.id});
+		pants2 = await insert.intoTableValues('pants', {name: 'pants2', userId: user.id});
+		dress1 = await insert.intoTableValues('dress', {name: 'dress1', userId: user.id});
+		dress2 = await insert.intoTableValues('dress', {name: 'dress2', userId: user.id});
+		outerwear1 = await insert.intoTableValues('outerwear', {name: 'outerwear1', userId: user.id});
+		outerwear2 = await insert.intoTableValues('outerwear', {name: 'outerwear2', userId: user.id});
+		raincoat = await insert.intoTableValues('outerwear', {name: 'raincoat', userId: user.id, specificType: 'raincoat'});
 
 
 		await Promise.all([

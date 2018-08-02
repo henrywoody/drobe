@@ -26,7 +26,7 @@ router.get('/:id', async (req, res) => {
 	try {
 		const shirt = await select.fromTableByIdWithJoins('shirt', id);
 
-		if (shirt.ownerId !== user.id)
+		if (shirt.userId !== user.id)
 			return res.sendStatus(403);
 
 		res.json(shirt);
@@ -40,7 +40,7 @@ router.post('/', async (req, res) => {
 	const { user } = req;
 	try {
 		const { shirt: shirtData } = req.body;
-		shirtData.ownerId = user.id;
+		shirtData.userId = user.id;
 		const newShirt = await insert.intoTableValues('shirt', shirtData);
 		res.json(newShirt);
 	} catch (err) {
@@ -56,10 +56,10 @@ router.put('/:id', async (req, res) => {
 		const { shirt: shirtData } = req.body;
 		const shirt = await select.fromTableById('shirt', id);
 
-		if (shirt.ownerId !== user.id)
+		if (shirt.userId !== user.id)
 			return res.sendStatus(403);
 
-		shirtData.ownerId = user.id;
+		shirtData.userId = user.id;
 		const updatedShirt = await update.tableByIdWithValues('shirt', id, shirtData);
 		res.json(updatedShirt);
 	} catch (err) {
@@ -74,7 +74,7 @@ router.delete('/:id', async (req, res) => {
 	try {
 		const shirt = await select.fromTableById('shirt', id);
 
-		if (shirt.ownerId !== user.id)
+		if (shirt.userId !== user.id)
 			return res.sendStatus(403);
 
 		await sqlDelete.fromTableById('shirt', id);

@@ -16,12 +16,12 @@ describe ('Join module', () => {
 	});
 
 	beforeEach(async () => {
-		shirt = await insert.intoTableValues('shirt', {name: 'good shirt', ownerId: goodUser.id});
-		pants = await insert.intoTableValues('pants', {name: 'good pants', ownerId: goodUser.id});
-		jacket = await insert.intoTableValues('outerwear', {name: 'good jacket', ownerId: goodUser.id});
-		sweater = await insert.intoTableValues('outerwear', {name: 'good sweater', ownerId: goodUser.id});
-		dress = await insert.intoTableValues('dress', {name: 'good dress', ownerId: goodUser.id});
-		badPants = await insert.intoTableValues('pants', {name: 'bad pants', ownerId: badUser.id});
+		shirt = await insert.intoTableValues('shirt', {name: 'good shirt', userId: goodUser.id});
+		pants = await insert.intoTableValues('pants', {name: 'good pants', userId: goodUser.id});
+		jacket = await insert.intoTableValues('outerwear', {name: 'good jacket', userId: goodUser.id});
+		sweater = await insert.intoTableValues('outerwear', {name: 'good sweater', userId: goodUser.id});
+		dress = await insert.intoTableValues('dress', {name: 'good dress', userId: goodUser.id});
+		badPants = await insert.intoTableValues('pants', {name: 'bad pants', userId: badUser.id});
 	});
 
 	describe('tableByIdToTableById method', () => {

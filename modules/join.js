@@ -64,10 +64,10 @@ function getQueryTextAndValues(joinTable, table1, id1, table2, id2) {
 }
 
 async function checkHaveSameOwner(table1, id1, table2, id2) {
-	const ownerId1 = await getOwnerId(table1, id1);
-	const ownerId2 = await getOwnerId(table2, id2);
+	const userId1 = await getOwnerId(table1, id1);
+	const userId2 = await getOwnerId(table2, id2);
 
-	if (ownerId1 !== ownerId2)
+	if (userId1 !== userId2)
 		throwDifferentOwnersError();
 }
 
@@ -77,21 +77,21 @@ async function checkAllHaveSameOwner(table, id, tableIdLists) {
 
 	for (const pluralOtherTable in tableIdLists) {
 		const otherTable = singularize(pluralOtherTable);
-		ownerIdsForTable = await Promise.all(tableIdLists[pluralOtherTable].map(id => getOwnerId(otherTable, id)));
-		otherOwnerIds.push(...ownerIdsForTable)
+		userIdsForTable = await Promise.all(tableIdLists[pluralOtherTable].map(id => getOwnerId(otherTable, id)));
+		otherOwnerIds.push(...userIdsForTable)
 	}
 
-	if (!otherOwnerIds.every(ownerId => ownerId === mainOwnerId))
+	if (!otherOwnerIds.every(userId => userId === mainOwnerId))
 		throwDifferentOwnersError();
 }
 
 async function getOwnerId(table, id) {
 	const object = await select.fromTableById(table, id);
-	return object.ownerId;
+	return object.userId;
 }
 
 function throwDifferentOwnersError() {
-	const err = new Error('Articles are not owned by the same owner');
+	const err = new Error('Articles are not owned by the same user');
 	err.name = 'ValidationError';
 	throw err;
 }

@@ -19,9 +19,9 @@ describe('Update module', () => {
 	});
 
 	beforeEach(async () => {
-		goodDress = await insert.intoTableValues('dress', {name: 'Good Dress', ownerId: goodUser.id});
-		badDress1 = await insert.intoTableValues('dress', {name: 'Bad Dress', ownerId: badUser.id});
-		badDress2 = await insert.intoTableValues('dress', {name: 'Worse Dress', ownerId: badUser.id});
+		goodDress = await insert.intoTableValues('dress', {name: 'Good Dress', userId: goodUser.id});
+		badDress1 = await insert.intoTableValues('dress', {name: 'Bad Dress', userId: badUser.id});
+		badDress2 = await insert.intoTableValues('dress', {name: 'Worse Dress', userId: badUser.id});
 	});
 
 	describe('tableByIdWithValues method', () => {
@@ -41,7 +41,7 @@ describe('Update module', () => {
 
 		it('should throw a ValidationError if the given name to update clashes with another article of the same type for the same user', async () => {
 			try {
-				await update.tableByIdWithValues('dress', badDress1.id, {name: badDress2.name, ownerId: badUser.id});
+				await update.tableByIdWithValues('dress', badDress1.id, {name: badDress2.name, userId: badUser.id});
 				assert.fail(0, 1, 'ValidationError was not thrown');
 			} catch (err) {
 				if (err.name === 'AssertionError')
@@ -52,7 +52,7 @@ describe('Update module', () => {
 
 		it('should not throw an error if the given name to update matches another article of the same type owned by a different user', async () => {
 			try {
-				await update.tableByIdWithValues('dress', goodDress.id, {name: badDress1.name, ownerId: goodUser.id});
+				await update.tableByIdWithValues('dress', goodDress.id, {name: badDress1.name, userId: goodUser.id});
 			} catch (err) {
 				assert.fail(0, 1, 'Threw an error');
 			}
@@ -60,27 +60,27 @@ describe('Update module', () => {
 
 		it('should return the updated version of the specified object', async () => {
 			const newName = 'Updated Dress';
-			const updatedGoodDress = await update.tableByIdWithValues('dress', goodDress.id, {name: newName, ownerId: goodUser.id});
+			const updatedGoodDress = await update.tableByIdWithValues('dress', goodDress.id, {name: newName, userId: goodUser.id});
 			assert.strictEqual(updatedGoodDress.name, newName);
 		});
 
 		it('should return the updated object with camelCased keys', async () => {
-			const updatedGoodDress = await update.tableByIdWithValues('dress', goodDress.id, {name: 'Updated Dress', ownerId: goodUser.id});
+			const updatedGoodDress = await update.tableByIdWithValues('dress', goodDress.id, {name: 'Updated Dress', userId: goodUser.id});
 
 			assert.include(Object.keys(updatedGoodDress), 'maxTemp');
 			assert.notInclude(Object.keys(updatedGoodDress), 'max_temp');
-			assert.include(Object.keys(updatedGoodDress), 'ownerId');
-			assert.notInclude(Object.keys(updatedGoodDress), 'owner_id');
+			assert.include(Object.keys(updatedGoodDress), 'userId');
+			assert.notInclude(Object.keys(updatedGoodDress), 'user_id');
 			assert.include(Object.keys(updatedGoodDress), 'rainOk');
 			assert.notInclude(Object.keys(updatedGoodDress), 'rain_ok');
 		});
 
 		it('should remove any joins for ids that have been removed', async () => {
-			const outerwear1 = await insert.intoTableValues('outerwear', {name: 'outerwear1', ownerId: goodUser.id});
-			const outerwear2 = await insert.intoTableValues('outerwear', {name: 'outerwear2', ownerId: goodUser.id});
+			const outerwear1 = await insert.intoTableValues('outerwear', {name: 'outerwear1', userId: goodUser.id});
+			const outerwear2 = await insert.intoTableValues('outerwear', {name: 'outerwear2', userId: goodUser.id});
 			await join.tableByIdToMany('dress', goodDress.id, {outerwears: [outerwear1.id, outerwear2.id]});
 
-			const updatedGoodDress = await update.tableByIdWithValues('dress', goodDress.id, {name: 'Updated Dress', ownerId: goodUser.id, outerwears: []});
+			const updatedGoodDress = await update.tableByIdWithValues('dress', goodDress.id, {name: 'Updated Dress', userId: goodUser.id, outerwears: []});
 
 			assert.include(Object.keys(updatedGoodDress), 'outerwears');
 			assert.isEmpty(updatedGoodDress.outerwears);
@@ -90,10 +90,10 @@ describe('Update module', () => {
 		});
 
 		it('should add any joins for ids added', async () => {
-			const outerwear1 = await insert.intoTableValues('outerwear', {name: 'outerwear1', ownerId: goodUser.id});
-			const outerwear2 = await insert.intoTableValues('outerwear', {name: 'outerwear2', ownerId: goodUser.id});
+			const outerwear1 = await insert.intoTableValues('outerwear', {name: 'outerwear1', userId: goodUser.id});
+			const outerwear2 = await insert.intoTableValues('outerwear', {name: 'outerwear2', userId: goodUser.id});
 
-			const updatedGoodDress = await update.tableByIdWithValues('dress', goodDress.id, {name: 'Updated Dress', ownerId: goodUser.id, outerwears: [outerwear1.id, outerwear2.id]});
+			const updatedGoodDress = await update.tableByIdWithValues('dress', goodDress.id, {name: 'Updated Dress', userId: goodUser.id, outerwears: [outerwear1.id, outerwear2.id]});
 
 			assert.include(Object.keys(updatedGoodDress), 'outerwears');
 			outwearIds = updatedGoodDress.outerwears.map(e => e.id);
@@ -105,11 +105,11 @@ describe('Update module', () => {
 		});
 
 		it('should handle a mix of removed and added ids', async () => {
-			const outerwear1 = await insert.intoTableValues('outerwear', {name: 'outerwear1', ownerId: goodUser.id});
-			const outerwear2 = await insert.intoTableValues('outerwear', {name: 'outerwear2', ownerId: goodUser.id});
+			const outerwear1 = await insert.intoTableValues('outerwear', {name: 'outerwear1', userId: goodUser.id});
+			const outerwear2 = await insert.intoTableValues('outerwear', {name: 'outerwear2', userId: goodUser.id});
 			await join.tableByIdToTableById('dress', goodDress.id, 'outerwear', outerwear1.id);
 
-			const updatedGoodDress = await update.tableByIdWithValues('dress', goodDress.id, {name: 'Updated Dress', ownerId: goodUser.id, outerwears: [outerwear2.id]});
+			const updatedGoodDress = await update.tableByIdWithValues('dress', goodDress.id, {name: 'Updated Dress', userId: goodUser.id, outerwears: [outerwear2.id]});
 
 			assert.include(Object.keys(updatedGoodDress), 'outerwears');
 			outwearIds = updatedGoodDress.outerwears.map(e => e.id);

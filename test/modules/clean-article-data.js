@@ -17,7 +17,7 @@ describe('Clean Article Data module', () => {
 			'rating': 4,
 			'lastWorn': '2018-07-15',
 			'name': 'Good Article',
-			'ownerId': 1
+			'userId': 1
 		};
 		
 		for (const table of ['shirt', 'pants', 'dress', 'outerwear']) {
@@ -62,7 +62,7 @@ describe('Clean Article Data module', () => {
 			'snowOk',
 			'imageUrl',
 			'name',
-			'ownerId'
+			'userId'
 		]; // rating and lastWorn excluded for later tests
 
 		for (const table of ['shirt', 'pants', 'dress', 'outerwear']) {
