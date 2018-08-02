@@ -3,7 +3,7 @@ module.exports = (err, res) => {
 	if (err.name === 'CastError' || err.name === 'NotFound' || err.name === 'NotFoundError')
 		return res.status(404).json({error: 'NotFoundError'});
 
-	if (err.name === 'UserNotFound')
+	if (err.name === 'UserNotFoundError')
 		return res.status(400).json({error: err.name, message: err.message});
 	// Invalid Id for attached id to article (wrong model or article with id does not exist)
 	if (err.name === 'InvalidIdForModel')

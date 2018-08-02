@@ -11,7 +11,8 @@ async function byId(id, {includePassword=false}={}) {
 	const { rows } = await query(queryText, queryValues);
 	
 	if (!rows.length)
-		return null;
+		throwUserNotFoundError();
+
 	return camelCaseKeys(rows[0]);
 }
 
@@ -25,8 +26,16 @@ async function byUsername(username, {includePassword=false}={}) {
 	const { rows } = await query(queryText, queryValues);
 
 	if (!rows.length)
-		return null;
+		throwUserNotFoundError();
+
 	return camelCaseKeys(rows[0]);
+}
+
+
+function throwUserNotFoundError() {
+	const err = Error('User not found');
+	err.name = 'UserNotFoundError';
+	throw err;
 }
 
 module.exports = {

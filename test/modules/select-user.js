@@ -12,10 +12,15 @@ describe('Select User module', () => {
 	});
 
 	describe('byId method', () => {
-		it('should return null if no user with id is found', async () => {
-			const noUser = await selectUser.byId(user.id + 1);
-
-			assert.isNull(noUser);
+		it('should throw a UserNotFoundError if no user with id is found', async () => {
+			try {
+				await selectUser.byId(user.id + 1);
+				assert.fail(0, 1, 'No error was raised');
+			} catch (err) {
+				if (err.name === 'AssertionError')
+					throw err;
+				assert.strictEqual(err.name, 'UserNotFoundError');
+			}
 		});
 		
 		it('should return the requested user if it exists', async () => {
@@ -47,10 +52,15 @@ describe('Select User module', () => {
 	});
 
 	describe('byUsername method', () => {
-		it('should return null if no user with username is found', async () => {
-			const noUser = await selectUser.byUsername('some other name');
-
-			assert.isNull(noUser);
+		it('should throw a UserNotFoundError if no user with username is found', async () => {
+			try {
+				await selectUser.byUsername('some other name');
+				assert.fail(0, 1, 'No error was raised');
+			} catch (err) {
+				if (err.name === 'AssertionError')
+					throw err;
+				assert.strictEqual(err.name, 'UserNotFoundError');
+			}
 		});
 		
 		it('should return the requested user if it exists', async () => {

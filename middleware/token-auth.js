@@ -16,12 +16,13 @@ module.exports = async (req, res, next) => {
 			const userId = decoded.sub;
 			try {
 				const user = await selectUser.byId(userId);
+
 				if (user) {
 					req.user = user;
 					return next()
 				}
 			} catch (err) {
-				return res.sendStatus(500);
+				return handleErrors(err, res);
 			}
 		} else {
 			const err = new Error('User information not found');
