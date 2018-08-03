@@ -102,7 +102,7 @@ export default class App extends Component {
 	removeArticle = (article) => {
 		const { articles } = this.state;
 		this.setState({
-			articles: articles.filter(a => a._id != article._id)
+			articles: articles.filter(a => a.id != article.id)
 		})
 	}
 

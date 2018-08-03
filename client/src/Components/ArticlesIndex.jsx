@@ -26,19 +26,19 @@ export default class ArticlesIndex extends Component {
 
 	async setup(articles) {
 		const activeArticles = [...articles]; // all are active to start
-		const categories = ['All', ...new Set(articles.map(a => a.kind))];
+		const categories = ['All', ...new Set(articles.map(a => a.articleKind))];
 		this.setState({ articles, activeArticles, categories });
 	}
 
 	filterArticles = (event) => {
 		const { articles } = this.state;
-		const kind = event.currentTarget.innerHTML;
+		const articleKind = event.currentTarget.innerHTML;
 
 		let activeArticles;
-		if (kind === 'All') {
+		if (articleKind === 'All') {
 			activeArticles = articles;
 		} else {
-			activeArticles = articles.filter(a => a.kind === kind);			
+			activeArticles = articles.filter(a => a.articleKind === articleKind);			
 		}
 
 		this.setState({ activeArticles });
@@ -47,7 +47,7 @@ export default class ArticlesIndex extends Component {
 	render() {
 		const { history } = this.props;
 		const { categories, activeArticles } = this.state;
-		const articleComponents = activeArticles.map(a => <SimpleArticle key={ a._id } data={ a } history={ history }/>);
+		const articleComponents = activeArticles.map(a => <SimpleArticle key={ a.id } data={ a } history={ history }/>);
 
 		return (
 			<div>

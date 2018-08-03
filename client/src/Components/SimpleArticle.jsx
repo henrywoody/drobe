@@ -3,8 +3,8 @@ import React, { Component } from 'react';
 export default class SimpleArticle extends Component {
 	handleClick = () => {
 		const { data, history } = this.props;
-		const kind = data.kind.toLowerCase() + (data.kind === 'Pants' ? '' : 's');
-		history.replace(`/wardrobe/${kind}/${data._id}`);
+		const pluralArticleKind = data.articleKind + (data.articleKind === 'pants' ? '' : 's');
+		history.replace(`/wardrobe/${pluralArticleKind}/${data.id}`);
 	}
 
 	render() {

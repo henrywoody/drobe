@@ -28,7 +28,7 @@ export default class OutfitGenerator extends Component {
 
 		if (outfit.outerwears && outfit.outerwears.length) {
 			for (const outerwear of outfit.outerwears) {
-				const endpoint = `outerwears/${outerwear._id}`;
+				const endpoint = `outerwears/${outerwear.id}`;
 				callAPI(endpoint, null, user.token, 'PUT', {
 					outerwear: {
 								...outerwear,
@@ -41,7 +41,7 @@ export default class OutfitGenerator extends Component {
 		}
 
 		if (outfit.shirt) {
-			const endpoint = `shirts/${outfit.shirt._id}`;
+			const endpoint = `shirts/${outfit.shirt.id}`;
 			callAPI(endpoint, null, user.token, 'PUT', {
 				shirt: {
 					...outfit.shirt,
@@ -52,7 +52,7 @@ export default class OutfitGenerator extends Component {
 		}
 
 		if (outfit.pants) {
-			const endpoint = `pants/${outfit.pants._id}`;
+			const endpoint = `pants/${outfit.pants.id}`;
 			callAPI(endpoint, null, user.token, 'PUT', {
 				pants: {
 					...outfit.pants,
@@ -76,17 +76,17 @@ export default class OutfitGenerator extends Component {
 			if (outfit.outerwears && outfit.outerwears.length) {
 				outfitDisplay.push(<h3 key={ `outerwear-${Math.random()}` }>Outerwear</h3>);
 				outfitDisplay.push(...outfit.outerwears.map(o => {
-					return <SimpleArticle key={ o._id } data={ o } history={ history }/>;
+					return <SimpleArticle key={ o.id } data={ o } history={ history }/>;
 				}));
 			}
 
 			if (outfit.shirt) {
 				outfitDisplay.push(<h3 key='shirt'>Shirt</h3>);
-				outfitDisplay.push(<SimpleArticle key={ outfit.shirt._id } data={ outfit.shirt } history={ history }/>);
+				outfitDisplay.push(<SimpleArticle key={ outfit.shirt.id } data={ outfit.shirt } history={ history }/>);
 			}
 			if (outfit.pants){
 				outfitDisplay.push(<h3 key='pants'>Pants</h3>);
-				outfitDisplay.push(<SimpleArticle key={ outfit.pants._id } data={ outfit.pants } history={ history }/>);
+				outfitDisplay.push(<SimpleArticle key={ outfit.pants.id } data={ outfit.pants } history={ history }/>);
 			}
 
 			if (outfit.shirt || outfit.pants)

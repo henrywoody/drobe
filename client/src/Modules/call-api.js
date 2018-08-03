@@ -1,7 +1,7 @@
 import queryString from 'query-string';
 
-export default async function callAPI(url, query, token, method, body, { includesImage=false }={}) {
-	let fullUrl = `/api/v1/${url}`;
+export default async function callAPI(url, query, token, method, body) {
+	let fullUrl = `/api/v2/${url}`;
 
 	if (query)
 		fullUrl += `?${queryString.stringify(query)}`;
@@ -14,12 +14,8 @@ export default async function callAPI(url, query, token, method, body, { include
 	};
 
 	if (body) {
-		if (includesImage) {
-			additionalInfo.body = body;	
-		} else {
-			additionalInfo.headers['Content-Type'] = 'application/json';
-			additionalInfo.body = JSON.stringify(body);
-		}
+		additionalInfo.headers['Content-Type'] = 'application/json';
+		additionalInfo.body = JSON.stringify(body);
 	}
 
 	const result = await fetch(fullUrl, additionalInfo);

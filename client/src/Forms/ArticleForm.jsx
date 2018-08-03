@@ -6,14 +6,14 @@ export default class ArticleForm extends Component {
 	constructor() {
 		super();
 		this.state = {
-			articleKinds: ['Shirt', 'Pants', 'Outerwear'],
+			articleKinds: ['shirt', 'pants', 'outerwear'],
 			articleSearchOptions: {
 				shirts: '',
 				pants: '',
 				outerwears: ''
 			},
 			formOptions: {
-				kind: 'Shirt',
+				articleKind: 'shirt',
 				name: '',
 				description: '',
 				image: {
@@ -40,8 +40,8 @@ export default class ArticleForm extends Component {
 		const { match, user } = this.props;
 		const { formOptions } = this.state;
 		if (match.path !== '/wardrobe/new') {
-			const { articleKind, articleId } = match.params;
-			const data = await callAPI(`${articleKind}/${articleId}`, null, user.token);
+			const { pluralArticleKind, articleId } = match.params;
+			const data = await callAPI(`${pluralArticleKind}/${articleId}`, null, user.token);
 
 			for (const option in data) {
 				if (option in formOptions) {
@@ -114,20 +114,19 @@ export default class ArticleForm extends Component {
 		const { match, user, history } = this.props;
 		const { formOptions } = this.state;
 
-		let endpoint, method;
+		let endpoint, method, articleKind;
 		if (match.path === '/wardrobe/new') {
-			endpoint = formOptions.kind.toLowerCase() + (formOptions.kind === 'Pants' ? '' : 's');
+			endpoint = formOptions.articleKind + (formOptions.articleKind === 'pants' ? '' : 's');
 			method = 'POST';
+			articleKind = formOptions.articleKind;
 		} else {
-			const { articleKind, articleId } = match.params;
-			endpoint = `${articleKind}/${articleId}`;
+			const { pluralArticleKind, articleId } = match.params;
+			articleKind = pluralArticleKind === 'pants' ? pluralArticleKind : pluralArticleKind.slice(0, -1);
+			endpoint = `${pluralArticleKind}/${articleId}`;
 			method = 'PUT';
 		}
 
-		const formData = new FormData();
-		formData.append('image', formOptions.image.data);
-		formData.append(formOptions.kind.toLowerCase(), JSON.stringify(formOptions));
-		const response = await callAPI(endpoint, null, user.token, method, formData, {includesImage: true});
+		const response = await callAPI(endpoint, null, user.token, method, {[articleKind]: formOptions});
 
 		if (response.error) {
 			this.handleError(response.error);
@@ -138,10 +137,10 @@ export default class ArticleForm extends Component {
 			} else {
 				updateWardrobe.update(response);
 			}
-			
-			const { _id } = response;
-			const kind = response.kind.toLowerCase() + (response.kind === 'Pants' ? '' : 's');
-			history.replace(`/wardrobe/${kind}/${_id}`);
+
+			const { id } = response;
+			const pluralArticleKind = response.articleKind + (response.articleKind === 'pants' ? '' : 's');
+			history.replace(`/wardrobe/${pluralArticleKind}/${id}`);
 		}
 	}
 
@@ -151,12 +150,12 @@ export default class ArticleForm extends Component {
 
 	handleCancel = () => {
 		const { match, history } = this.props;
-		const { articleKind, articleId } = match.params;
+		const { pluralArticleKind, articleId } = match.params;
 
 		if (match.path === '/wardrobe/new') {
 			history.replace('/wardrobe');
 		} else {
-			history.replace(`/wardrobe/${articleKind}/${articleId}`);
+			history.replace(`/wardrobe/${pluralArticleKind}/${articleId}`);
 		}
 	}
 
@@ -184,22 +183,22 @@ export default class ArticleForm extends Component {
 	render() {
 		const { existingArticles, match } = this.props;
 		const { articleKinds, articleSearchOptions, formOptions, message } = this.state;
-		console.log(formOptions)
-		const articleKindOptions = articleKinds.map(kind => {
-			return <option key={ kind } value={ kind }>{ kind }</option>
+		
+		const articleKindOptions = articleKinds.map(articleKind => {
+			return <option key={ articleKind } value={ articleKind }>{ articleKind }</option>
 		});
 
 		const articleKindField = match.path === '/wardrobe/new' ? (
 			<div>
-				<label htmlFor='kind'>Kind</label>
-				<select name='kind' value={ formOptions.kind } onChange={ this.handleChange }>
+				<label htmlFor='articleKind'>Kind</label>
+				<select name='articleKind' value={ formOptions.articleKind } onChange={ this.handleChange }>
 					{ articleKindOptions }
 				</select>
 			</div>
 		) : ( null )
 
 		let additionalFields = {};
-		if (formOptions.kind === 'Outerwear') {
+		if (formOptions.articleKind === 'outerwear') {
 			additionalFields.specificType = (
 				<div>
 					<label htmlFor='specificType'>Specific Kind</label>
@@ -222,46 +221,46 @@ export default class ArticleForm extends Component {
 
 		// Added Articles
 		const addedShirts = existingArticles.filter(a => {
-			return formOptions.shirts.includes(a._id);
+			return formOptions.shirts.includes(a.id);
 		}).map(s => {
-			return <SmallArticle key={ s._id } field={ 'shirts' } id={ s._id } name={ s.name } image={ s.image } onClick={ this.removeAssociatedArticle }/>
+			return <SmallArticle key={ s.id } field={ 'shirts' } id={ s.id } name={ s.name } image={ s.image } onClick={ this.removeAssociatedArticle }/>
 		});
 
 		const addedPants = existingArticles.filter(a => {
-			return formOptions.pants.includes(a._id);
+			return formOptions.pants.includes(a.id);
 		}).map(s => {
-			return <SmallArticle key={ s._id } field={ 'pants' } id={ s._id } name={ s.name } image={ s.image } onClick={ this.removeAssociatedArticle }/>
+			return <SmallArticle key={ s.id } field={ 'pants' } id={ s.id } name={ s.name } image={ s.image } onClick={ this.removeAssociatedArticle }/>
 		});
 
 		const addedOuterwears = existingArticles.filter(a => {
-			return formOptions.outerwears.includes(a._id);
+			return formOptions.outerwears.includes(a.id);
 		}).map(s => {
-			return <SmallArticle key={ s._id } field={ 'outerwears' } id={ s._id } name={ s.name } image={ s.image } onClick={ this.removeAssociatedArticle }/>
+			return <SmallArticle key={ s.id } field={ 'outerwears' } id={ s.id } name={ s.name } image={ s.image } onClick={ this.removeAssociatedArticle }/>
 		})
 
 
 		// Suggested (not yet added) Articles
 		const shirtSuggestions = existingArticles.filter(a => {
-			return a.kind === 'Shirt' && !formOptions.shirts.includes(a._id) && a.name.match(new RegExp(`^${articleSearchOptions.shirts}`, 'i'));
+			return a.articleKind === 'shirt' && !formOptions.shirts.includes(a.id) && a.name.match(new RegExp(`^${articleSearchOptions.shirts}`, 'i'));
 		}).map(s => {
-			return <SmallArticle key={ s._id } field={ 'shirts' } id={ s._id } name={ s.name } image={ s.image } onClick={ this.addAssociatedArticle }/>
+			return <SmallArticle key={ s.id } field={ 'shirts' } id={ s.id } name={ s.name } image={ s.image } onClick={ this.addAssociatedArticle }/>
 		});
 
 		const pantsSuggestions = existingArticles.filter(a => {
-			return a.kind === 'Pants' && !formOptions.pants.includes(a._id) && a.name.match(new RegExp(`^${articleSearchOptions.pants}`, 'i'));
+			return a.articleKind === 'pants' && !formOptions.pants.includes(a.id) && a.name.match(new RegExp(`^${articleSearchOptions.pants}`, 'i'));
 		}).map(p => {
-			return <SmallArticle key={ p._id } field={ 'pants' } id={ p._id } name={ p.name } image={ p.image } onClick={ this.addAssociatedArticle }/>
+			return <SmallArticle key={ p.id } field={ 'pants' } id={ p.id } name={ p.name } image={ p.image } onClick={ this.addAssociatedArticle }/>
 		});
 
 		const outerwearSuggestions = existingArticles.filter(a => {
-			return a.kind === 'Outerwear' && !formOptions.outerwears.includes(a._id) && a.name.match(new RegExp(`^${articleSearchOptions.outerwears}`, 'i'));
+			return a.articleKind === 'outerwear' && !formOptions.outerwears.includes(a.id) && a.name.match(new RegExp(`^${articleSearchOptions.outerwears}`, 'i'));
 		}).map(p => {
-			return <SmallArticle key={ p._id } field={ 'outerwears' } id={ p._id } name={ p.name } image={ p.image } onClick={ this.addAssociatedArticle }/>
+			return <SmallArticle key={ p.id } field={ 'outerwears' } id={ p.id } name={ p.name } image={ p.image } onClick={ this.addAssociatedArticle }/>
 		});
 
 		// Form Fields for Associat(ing/ed) Articles
 		let associatedArticleFields = [];
-		if (['Pants', 'Outerwear'].includes(formOptions.kind)) {
+		if (['pants', 'outerwear'].includes(formOptions.articleKind)) {
 			associatedArticleFields.push(
 				<div key='shirtsField'>
 
@@ -275,7 +274,7 @@ export default class ArticleForm extends Component {
 				</div>
 			);
 		}
-		if (['Shirt', 'Outerwear'].includes(formOptions.kind)) {
+		if (['shirt', 'outerwear'].includes(formOptions.articleKind)) {
 			associatedArticleFields.push(
 				<div key='pantsField'>
 
@@ -289,7 +288,7 @@ export default class ArticleForm extends Component {
 				</div>
 			);
 		}
-		if (['Shirt', 'Pants', 'Outerwear'].includes(formOptions.kind)) {
+		if (['shirt', 'pants', 'outerwear'].includes(formOptions.articleKind)) {
 			associatedArticleFields.push(
 				<div key='outerwearsField'>
 

@@ -13,14 +13,14 @@ export default class DetailedArticle extends Component {
 
 	componentWillMount() {
 		const { match, history } = this.props;
-		const { articleKind, articleId } = match.params;
+		const { pluralArticleKind, articleId } = match.params;
 
-		this.setupData(articleKind, articleId);
+		this.setupData(pluralArticleKind, articleId);
 
 		this.unlisten = history.listen((location, action) => {
 			if (location.pathname.match(/wardrobe\/\w*?\/\w*?$/)) {
-				const [_, kind, id] = location.pathname.match(/wardrobe\/(\w*?)\/(\w*?)$/);
-				this.setupData(kind, id);
+				const [_, pluralArticleKind, id] = location.pathname.match(/wardrobe\/(\w*?)\/(\w*?)$/);
+				this.setupData(pluralArticleKind, id);
 			}
 		})
 	}
@@ -29,36 +29,36 @@ export default class DetailedArticle extends Component {
 		this.unlisten();
 	}
 
-	async setupData(articleKind, articleId) {
+	async setupData(pluralArticleKind, articleId) {
 		const { user } = this.props;
-		const data = await callAPI(`${articleKind}/${articleId}`, null, user.token);
+		const data = await callAPI(`${pluralArticleKind}/${articleId}`, null, user.token);
 		await this.setState({ data });
 	}
 
 	handleDelete = () => {
 		const { match, history, user, updateWardrobe } = this.props;
-		const { articleKind, articleId } = match.params;
+		const { pluralArticleKind, articleId } = match.params;
 		const { data } = this.state;
 		
-		callAPI(`${articleKind}/${articleId}`, null, user.token, 'DELETE');
+		callAPI(`${pluralArticleKind}/${articleId}`, null, user.token, 'DELETE');
 		updateWardrobe.remove(data);
 		history.replace('/wardrobe');
 	}
 
-	routeToArticle = async (kind, id) => {
+	routeToArticle = async (pluralArticleKind, id) => {
 		const { history } = this.props;
-		history.replace(`/wardrobe/${kind}/${id}`);
+		history.replace(`/wardrobe/${pluralArticleKind}/${id}`);
 	}
 
 	render() {
 		const { match, existingArticles } = this.props;
 		const { data } = this.state;
 
-		const { articleKind, articleId } = match.params;
+		const { pluralArticleKind, articleId } = match.params;
 
 		const additionalBits = [];
 		for (const key in data) {
-			if (data[key] && !['_id', 'owner', 'name', 'image', 'description', 'kind', 'shirts', 'pants', 'outerwears'].includes(key)) {
+			if (data[key] && !['id', 'owner', 'name', 'image', 'description', 'articleKind', 'shirts', 'pants', 'outerwears'].includes(key)) {
 				additionalBits.push(
 					<li key={ key }><strong>{ key }</strong>: { data[key] }</li>
 				);
@@ -66,8 +66,8 @@ export default class DetailedArticle extends Component {
 				additionalBits.push(
 					<div key={ key }>
 						{ data[key].map(id => {
-							const a = existingArticles.filter(a => a._id === id)[0];
-							return <SmallArticle key={ a._id } field={ key } id={ a._id } name={ a.name } image={ a.image } onClick={ this.routeToArticle }/>;
+							const a = existingArticles.filter(a => a.id === id)[0];
+							return <SmallArticle key={ a.id } field={ key } id={ a.id } name={ a.name } image={ a.image } onClick={ this.routeToArticle }/>;
 						}) }
 					</div>
 				);
@@ -78,7 +78,7 @@ export default class DetailedArticle extends Component {
 			<div>
 				<h3>{ data.name }</h3>
 
-				<NavLink exact to={ `/wardrobe/${articleKind}/${articleId}/edit` }>Edit</NavLink>
+				<NavLink exact to={ `/wardrobe/${pluralArticleKind}/${articleId}/edit` }>Edit</NavLink>
 				<button onClick={ this.handleDelete }>Delete</button>
 
 				<img src={ data.image } alt='image'/>
