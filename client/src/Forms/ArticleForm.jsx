@@ -20,7 +20,7 @@ export default class ArticleForm extends Component {
 					path: '',
 					data: null
 				},
-				rating: '0',
+				rating: '1',
 				color: '',
 				minTemp: 50,
 				maxTemp: 100,
@@ -46,7 +46,11 @@ export default class ArticleForm extends Component {
 			for (const option in data) {
 				if (option in formOptions) {
 					if (option === 'image') continue;
-					formOptions[option] = data[option];
+					if (['shirts', 'pants', 'outerwears'].includes(option)) {
+						formOptions[option] = data[option].map(e => e.id);
+					} else {
+						formOptions[option] = data[option];
+					}
 				}
 			}
 		}
@@ -183,7 +187,8 @@ export default class ArticleForm extends Component {
 	render() {
 		const { existingArticles, match } = this.props;
 		const { articleKinds, articleSearchOptions, formOptions, message } = this.state;
-		
+		const { articleId } = match.params;
+
 		const articleKindOptions = articleKinds.map(articleKind => {
 			return <option key={ articleKind } value={ articleKind }>{ articleKind }</option>
 		});
@@ -220,42 +225,42 @@ export default class ArticleForm extends Component {
 
 
 		// Added Articles
-		const addedShirts = existingArticles.filter(a => {
-			return formOptions.shirts.includes(a.id);
-		}).map(s => {
-			return <SmallArticle key={ s.id } field={ 'shirts' } id={ s.id } name={ s.name } image={ s.image } onClick={ this.removeAssociatedArticle }/>
+		const addedShirts = existingArticles.filter(e => {
+			return formOptions.shirts.includes(e.id) && e.articleKind === 'shirt';
+		}).map(e => {
+			return <SmallArticle key={ e.id } field={ 'shirts' } id={ e.id } name={ e.name } image={ e.image } onClick={ this.removeAssociatedArticle }/>
 		});
 
-		const addedPants = existingArticles.filter(a => {
-			return formOptions.pants.includes(a.id);
-		}).map(s => {
-			return <SmallArticle key={ s.id } field={ 'pants' } id={ s.id } name={ s.name } image={ s.image } onClick={ this.removeAssociatedArticle }/>
+		const addedPants = existingArticles.filter(e => {
+			return formOptions.pants.includes(e.id) && e.articleKind === 'pants';
+		}).map(e => {
+			return <SmallArticle key={ e.id } field={ 'pants' } id={ e.id } name={ e.name } image={ e.image } onClick={ this.removeAssociatedArticle }/>
 		});
 
-		const addedOuterwears = existingArticles.filter(a => {
-			return formOptions.outerwears.includes(a.id);
-		}).map(s => {
-			return <SmallArticle key={ s.id } field={ 'outerwears' } id={ s.id } name={ s.name } image={ s.image } onClick={ this.removeAssociatedArticle }/>
+		const addedOuterwears = existingArticles.filter(e => {
+			return formOptions.outerwears.includes(e.id) && e.articleKind === 'outerwear';
+		}).map(e => {
+			return <SmallArticle key={ e.id } field={ 'outerwears' } id={ e.id } name={ e.name } image={ e.image } onClick={ this.removeAssociatedArticle }/>
 		})
 
 
 		// Suggested (not yet added) Articles
-		const shirtSuggestions = existingArticles.filter(a => {
-			return a.articleKind === 'shirt' && !formOptions.shirts.includes(a.id) && a.name.match(new RegExp(`^${articleSearchOptions.shirts}`, 'i'));
-		}).map(s => {
-			return <SmallArticle key={ s.id } field={ 'shirts' } id={ s.id } name={ s.name } image={ s.image } onClick={ this.addAssociatedArticle }/>
+		const shirtSuggestions = existingArticles.filter(e => {
+			return e.articleKind === 'shirt' && !formOptions.shirts.includes(e.id) && e.name.match(new RegExp(`^${articleSearchOptions.shirts}`, 'i'));
+		}).map(e => {
+			return <SmallArticle key={ e.id } field={ 'shirts' } id={ e.id } name={ e.name } image={ e.image } onClick={ this.addAssociatedArticle }/>
 		});
 
-		const pantsSuggestions = existingArticles.filter(a => {
-			return a.articleKind === 'pants' && !formOptions.pants.includes(a.id) && a.name.match(new RegExp(`^${articleSearchOptions.pants}`, 'i'));
-		}).map(p => {
-			return <SmallArticle key={ p.id } field={ 'pants' } id={ p.id } name={ p.name } image={ p.image } onClick={ this.addAssociatedArticle }/>
+		const pantsSuggestions = existingArticles.filter(e => {
+			return e.articleKind === 'pants' && !formOptions.pants.includes(e.id) && e.name.match(new RegExp(`^${articleSearchOptions.pants}`, 'i'));
+		}).map(e => {
+			return <SmallArticle key={ e.id } field={ 'pants' } id={ e.id } name={ e.name } image={ e.image } onClick={ this.addAssociatedArticle }/>
 		});
 
-		const outerwearSuggestions = existingArticles.filter(a => {
-			return a.articleKind === 'outerwear' && !formOptions.outerwears.includes(a.id) && a.name.match(new RegExp(`^${articleSearchOptions.outerwears}`, 'i'));
-		}).map(p => {
-			return <SmallArticle key={ p.id } field={ 'outerwears' } id={ p.id } name={ p.name } image={ p.image } onClick={ this.addAssociatedArticle }/>
+		const outerwearSuggestions = existingArticles.filter(e => {
+			return e.articleKind === 'outerwear' && !formOptions.outerwears.includes(e.id) && e.id !== Number(articleId) && e.name.match(new RegExp(`^${articleSearchOptions.outerwears}`, 'i'));
+		}).map(e => {
+			return <SmallArticle key={ e.id } field={ 'outerwears' } id={ e.id } name={ e.name } image={ e.image } onClick={ this.addAssociatedArticle }/>
 		});
 
 		// Form Fields for Associat(ing/ed) Articles
@@ -321,7 +326,7 @@ export default class ArticleForm extends Component {
 				<input name='image' type='file' value={ formOptions.image.path } onChange={ this.handleChange }/>
 
 				<label htmlFor='rating'>Rating</label>
-				<input name='rating' type='range' min='0' max='5' value={ formOptions.rating } onChange={ this.handleChange }/>
+				<input name='rating' type='range' min='1' max='5' value={ formOptions.rating } onChange={ this.handleChange }/>
 
 				<label htmlFor='color'>Color</label>
 				<input name='color' type='text' value={ formOptions.color } placeholder='color' onChange={ this.handleChange }/>

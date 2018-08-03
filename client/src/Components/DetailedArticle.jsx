@@ -58,6 +58,7 @@ export default class DetailedArticle extends Component {
 
 		const additionalBits = [];
 		for (const key in data) {
+			console.log(key, data[key])
 			if (data[key] && !['id', 'owner', 'name', 'image', 'description', 'articleKind', 'shirts', 'pants', 'outerwears'].includes(key)) {
 				additionalBits.push(
 					<li key={ key }><strong>{ key }</strong>: { data[key] }</li>
@@ -65,9 +66,8 @@ export default class DetailedArticle extends Component {
 			} else if (['shirts', 'pants', 'outerwears'].includes(key)) {
 				additionalBits.push(
 					<div key={ key }>
-						{ data[key].map(id => {
-							const a = existingArticles.filter(a => a.id === id)[0];
-							return <SmallArticle key={ a.id } field={ key } id={ a.id } name={ a.name } image={ a.image } onClick={ this.routeToArticle }/>;
+						{ data[key].map(e => {
+							return <SmallArticle key={ e.id } field={ key } id={ e.id } name={ e.name } image={ e.image } onClick={ this.routeToArticle }/>;
 						}) }
 					</div>
 				);
