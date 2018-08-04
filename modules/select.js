@@ -61,6 +61,8 @@ async function fromTablesByIds(tableIdLists) {
 async function fromTableForUserAndTemp(table, userId, temp) {
 	checkTableIsAllowed(table);
 
+	temp = Math.round(temp);
+	
 	const queryText = `SELECT * FROM ${table} WHERE user_id = $1 AND (min_temp <= $2 OR min_temp IS NULL) AND (max_temp >= $2 OR max_temp IS NULL)`;
 	const queryValues = [userId, temp];
 	const { rows } = await query(queryText, queryValues);

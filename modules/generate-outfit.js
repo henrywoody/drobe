@@ -38,7 +38,8 @@ async function forUser(user) {
 	}
 
 	const { longitude, latitude } = user;
-	const weather = weatherAPI.getWeather(longitude, latitude);
+	const weather = await weatherAPI.getWeather(longitude, latitude);
+	weather.aveTemp = Math.round(weather.aveTemp);
 
 	const outfit = {shirt: null, pants: null, dress: null, outerwear: []};
 
@@ -170,7 +171,6 @@ async function forUser(user) {
 				pantsQueryValues.push(associatedPantsRows3.map(e => e.pants_id));
 			}
 		}
-
 		const { rows: possiblePants } = await query(pantsQueryText, pantsQueryValues);
 		outfit.pants = selectRandom(possiblePants);
 	}

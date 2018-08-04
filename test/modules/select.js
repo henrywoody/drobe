@@ -240,6 +240,10 @@ describe('Select module', () => {
 				assert.strictEqual(err.name, 'ForbiddenError');
 			}
 		});
+
+		it('should not throw an error if given a float', async () => {
+			await select.fromTableForUserAndTemp('shirt', goodUser.id, 68.75);
+		})
 		
 		it('should return all and only articles from that table owned by the user whose minTemp is below the given temp and maxTemp', async () => {
 			hotShirt = await insert.intoTableValues('shirt', {name: 'Hot Shirt', userId: goodUser.id, maxTemp: 120, minTemp: 80});
