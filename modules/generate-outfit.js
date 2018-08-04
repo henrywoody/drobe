@@ -1,6 +1,7 @@
 const 	weatherAPI = require('./weather-api'),
 		select = require('./select'),
-		query = require('./query');
+		query = require('./query'),
+		camelCaseKeys = require('./camel-case-keys');
 
 function selectRandom(articles) {
 	const weightedArray = articles.map((e, i) => {
@@ -96,7 +97,7 @@ async function forUser(user) {
 		const { rows: possibleOuterwear } = await query(queryText, queryValues);
 
 		if (possibleOuterwear.length)
-			outfit.outerwear.push(selectRandom(possibleOuterwear));
+			outfit.outerwear.push(camelCaseKeys(selectRandom(possibleOuterwear)));
 	}
 
 	// ==============
@@ -136,11 +137,11 @@ async function forUser(user) {
 		possibleDresses = await select.fromTableForUserAndTemp('dress', user.id, weather.aveTemp);
 	}
 	
-	const topChoices = possibleShirts.map(e => { return {...e, articleType: 'shirt'} }).concat(possibleDresses.map(e => { return {...e, articleType: 'dress'} }));
+	const topChoices = possibleShirts.concat(possibleDresses);
 	if (topChoices.length) {
-		const selectedTop = selectRandom(topChoices);
+		const selectedTop = camelCaseKeys(selectRandom(topChoices));
 
-		if (selectedTop.articleType === 'shirt') {
+		if (selectedTop.articleKind === 'shirt') {
 			delete selectedTop.articleType;
 			outfit.shirt = selectedTop;
 		} else {
@@ -172,7 +173,7 @@ async function forUser(user) {
 			}
 		}
 		const { rows: possiblePants } = await query(pantsQueryText, pantsQueryValues);
-		outfit.pants = selectRandom(possiblePants);
+		outfit.pants = camelCaseKeys(selectRandom(possiblePants));
 	}
 
 	return outfit;

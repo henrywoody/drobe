@@ -61,12 +61,39 @@ describe('Generate Outfit module', () => {
 			stub.returns({
 				aveTemp: 70,
 				rainProb: 0.5
-			})
+			});
 
 			await generateOutfit.forUser(user);
 
 			assert.strictEqual(stub.getCall(0).args[0], user.longitude);
 			assert.strictEqual(stub.getCall(0).args[1], user.latitude);
+		});
+
+		it('should return an outfit where all the keys of all the articles are camelCased', async () => {
+			const stub = sandbox.stub(weatherAPI, 'getWeather');
+			stub.returns({
+				aveTemp: 70,
+				rainProb: 0.5
+			});
+
+			const outfit = await generateOutfit.forUser(user);
+
+			for (const articleType in outfit) {
+				if (Array.isArray(outfit[articleType])) {
+					for (const article of outfit[articleType]) {
+						assert.include(Object.keys(article), 'userId');
+						assert.notInclude(Object.keys(article), 'user_id');
+						assert.include(Object.keys(article), 'maxTemp');
+						assert.notInclude(Object.keys(article), 'max_temp');
+					}
+				} else if (outfit[articleType]) {
+					const article = outfit[articleType];
+					assert.include(Object.keys(article), 'userId');
+					assert.notInclude(Object.keys(article), 'user_id');
+					assert.include(Object.keys(article), 'maxTemp');
+					assert.notInclude(Object.keys(article), 'max_temp');
+				}
+			}
 		});
 
 		it('should generate an outfit where all articles are allowed for the temperature', async () => {
