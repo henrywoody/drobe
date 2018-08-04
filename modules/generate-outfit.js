@@ -136,6 +136,17 @@ async function forUser(user) {
 		possibleShirts = await select.fromTableForUserAndTemp('shirt', user.id, weather.aveTemp);
 		possibleDresses = await select.fromTableForUserAndTemp('dress', user.id, weather.aveTemp);
 	}
+
+	const hasPants = await Promise.all(possibleShirts.map(async e => {
+		const queryText = "SELECT pants_id FROM shirt_pants_join WHERE shirt_id = $1";
+		const queryValues = [e.id];
+		const { rows } = await query(queryText, queryValues);
+		return rows.length;
+	}));
+	
+	possibleShirts = possibleShirts.filter((e,i) => {
+		return hasPants[i];
+	});
 	
 	const topChoices = possibleShirts.concat(possibleDresses);
 	if (topChoices.length) {
