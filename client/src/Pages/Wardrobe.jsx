@@ -7,17 +7,17 @@ import ArticleForm from '../Forms/ArticleForm.jsx';
 
 class Wardrobe extends Component {
 	render() {
-		const { user, articles, updateWardrobe } = this.props;
+		const { user, articles } = this.props;
 
 		return (
 			<main>
 				<h1>Wardrobe</h1>
 
 				<Switch>
-					<Route exact path='/wardrobe' render={ props => <ArticlesIndex { ...props } articles={ articles }/> }/>
-					<Route exact path={ `/wardrobe/:pluralArticleKind/:articleId` } render={ props => <DetailedArticle { ...props } existingArticles={ articles } updateWardrobe={ {remove: updateWardrobe.remove} }/> }/>
-					<Route exact path={ `/wardrobe/:pluralArticleKind/:articleId/edit` } render={ props => <ArticleForm { ...props } existingArticles={ articles } updateWardrobe={ {update: updateWardrobe.update} }/> }/>
-					<Route exact path='/wardrobe/new' render={ props => <ArticleForm { ...props } existingArticles={ articles } updateWardrobe={ {add: updateWardrobe.add} }/> } />
+					<Route exact path='/wardrobe' render={ props => <ArticlesIndex { ...props }/> }/>
+					<Route exact path={ `/wardrobe/:pluralArticleKind/:articleId` } render={ props => <DetailedArticle { ...props }/> }/>
+					<Route exact path={ `/wardrobe/:pluralArticleKind/:articleId/edit` } render={ props => <ArticleForm { ...props }/> }/>
+					<Route exact path='/wardrobe/new' render={ props => <ArticleForm { ...props }/> } />
 				</Switch>
 				
 			</main>

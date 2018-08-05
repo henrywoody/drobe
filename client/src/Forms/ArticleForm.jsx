@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import callAPI from '../Modules/call-api';
+import fetchAllArticles from '../Modules/fetch-all-articles';
 import SmallArticle from '../Components/SmallArticle.jsx';
 
 class ArticleForm extends Component {
@@ -14,6 +15,7 @@ class ArticleForm extends Component {
 				pants: '',
 				outerwears: ''
 			},
+			articles: [],
 			formOptions: {
 				articleKind: 'shirt',
 				name: '',
@@ -57,6 +59,9 @@ class ArticleForm extends Component {
 			}
 		}
 		this.setState({ formOptions });
+
+		const articles = await fetchAllArticles(user.token);
+		this.setState({ articles });
 	}
 
 	handleChange = async (event) => {
@@ -137,13 +142,6 @@ class ArticleForm extends Component {
 		if (response.error) {
 			this.handleError(response.error);
 		} else {
-			const { updateWardrobe } = this.props;
-			if (match.path === '/wardrobe/new') {
-				updateWardrobe.add(response);
-			} else {
-				updateWardrobe.update(response);
-			}
-
 			const { id } = response;
 			const pluralArticleKind = response.articleKind + (response.articleKind === 'pants' ? '' : 's');
 			history.replace(`/wardrobe/${pluralArticleKind}/${id}`);
@@ -187,8 +185,8 @@ class ArticleForm extends Component {
 	}
 
 	render() {
-		const { existingArticles, match } = this.props;
-		const { articleKinds, articleSearchOptions, formOptions, message } = this.state;
+		const { match } = this.props;
+		const { articles, articleKinds, articleSearchOptions, formOptions, message } = this.state;
 		const { articleId } = match.params;
 
 		const articleKindOptions = articleKinds.map(articleKind => {
@@ -227,19 +225,19 @@ class ArticleForm extends Component {
 
 
 		// Added Articles
-		const addedShirts = existingArticles.filter(e => {
+		const addedShirts = articles.filter(e => {
 			return formOptions.shirts.includes(e.id) && e.articleKind === 'shirt';
 		}).map(e => {
 			return <SmallArticle key={ e.id } field={ 'shirts' } id={ e.id } name={ e.name } image={ e.image } onClick={ this.removeAssociatedArticle }/>
 		});
 
-		const addedPants = existingArticles.filter(e => {
+		const addedPants = articles.filter(e => {
 			return formOptions.pants.includes(e.id) && e.articleKind === 'pants';
 		}).map(e => {
 			return <SmallArticle key={ e.id } field={ 'pants' } id={ e.id } name={ e.name } image={ e.image } onClick={ this.removeAssociatedArticle }/>
 		});
 
-		const addedOuterwears = existingArticles.filter(e => {
+		const addedOuterwears = articles.filter(e => {
 			return formOptions.outerwears.includes(e.id) && e.articleKind === 'outerwear';
 		}).map(e => {
 			return <SmallArticle key={ e.id } field={ 'outerwears' } id={ e.id } name={ e.name } image={ e.image } onClick={ this.removeAssociatedArticle }/>
@@ -247,19 +245,19 @@ class ArticleForm extends Component {
 
 
 		// Suggested (not yet added) Articles
-		const shirtSuggestions = existingArticles.filter(e => {
+		const shirtSuggestions = articles.filter(e => {
 			return e.articleKind === 'shirt' && !formOptions.shirts.includes(e.id) && e.name.match(new RegExp(`^${articleSearchOptions.shirts}`, 'i'));
 		}).map(e => {
 			return <SmallArticle key={ e.id } field={ 'shirts' } id={ e.id } name={ e.name } image={ e.image } onClick={ this.addAssociatedArticle }/>
 		});
 
-		const pantsSuggestions = existingArticles.filter(e => {
+		const pantsSuggestions = articles.filter(e => {
 			return e.articleKind === 'pants' && !formOptions.pants.includes(e.id) && e.name.match(new RegExp(`^${articleSearchOptions.pants}`, 'i'));
 		}).map(e => {
 			return <SmallArticle key={ e.id } field={ 'pants' } id={ e.id } name={ e.name } image={ e.image } onClick={ this.addAssociatedArticle }/>
 		});
 
-		const outerwearSuggestions = existingArticles.filter(e => {
+		const outerwearSuggestions = articles.filter(e => {
 			return e.articleKind === 'outerwear' && !formOptions.outerwears.includes(e.id) && e.id !== Number(articleId) && e.name.match(new RegExp(`^${articleSearchOptions.outerwears}`, 'i'));
 		}).map(e => {
 			return <SmallArticle key={ e.id } field={ 'outerwears' } id={ e.id } name={ e.name } image={ e.image } onClick={ this.addAssociatedArticle }/>

@@ -89,33 +89,9 @@ class App extends Component {
 		this.setState({ articles });
 	}
 
-	addArticle = (article) => {
-		const { articles } = this.state;
-		articles.push(article);
-		this.setState({ articles });
-	}
-
-	updateArticle = (article) => {
-		this.removeArticle(article);
-		this.addArticle(article);
-	}
-
-	removeArticle = (article) => {
-		const { articles } = this.state;
-		this.setState({
-			articles: articles.filter(a => a.id != article.id)
-		})
-	}
-
 	render() {
 		const { user, isAuthenticated } = this.props;
 		const { articles } = this.state;
-		
-		const updateWardrobe = {
-			add: this.addArticle,
-			update: this.updateArticle,
-			remove: this.removeArticle
-		}
 
 		const links = isAuthenticated ? (
 			[
@@ -133,7 +109,7 @@ class App extends Component {
 		const content = isAuthenticated ? (
 			<Switch>
 				<Route exact path='/' render={ props => <Home { ...props } userHasClothes={ !!articles.length } updateUser={ this.updateUser }/> }/>
-				<Route path='/wardrobe' render={ props => <Wardrobe { ...props } articles={ articles } updateWardrobe={ updateWardrobe }/> }/>
+				<Route path='/wardrobe' render={ props => <Wardrobe { ...props } articles={ articles }/> }/>
 				<Route exact path='/logout' render={ props => <Logout { ...props} logUserOut={ this.logUserOut }/> }/>
 				<Route component={ NotFound }/>
 			</Switch>

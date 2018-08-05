@@ -1,7 +1,7 @@
 import queryString from 'query-string';
 
-export default async function callAPI(url, query, token, method, body) {
-	let fullUrl = `/api/v2/${url}`;
+export default async function callAPI(endpoint, query, token, method, body) {
+	let fullUrl = `/api/v2/${endpoint}`;
 
 	if (query)
 		fullUrl += `?${queryString.stringify(query)}`;

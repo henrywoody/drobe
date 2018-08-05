@@ -8,7 +8,7 @@ class DetailedArticle extends Component {
 	constructor() {
 		super();
 		this.state = {
-			data: {}
+			articleData: {}
 		}
 	}
 
@@ -32,17 +32,16 @@ class DetailedArticle extends Component {
 
 	async setupData(pluralArticleKind, articleId) {
 		const { user } = this.props;
-		const data = await callAPI(`${pluralArticleKind}/${articleId}`, null, user.token);
-		await this.setState({ data });
+		const articleData = await callAPI(`${pluralArticleKind}/${articleId}`, null, user.token);
+		await this.setState({ articleData });
 	}
 
-	handleDelete = () => {
-		const { match, history, user, updateWardrobe } = this.props;
+	handleDelete = async () => {
+		const { match, history, user } = this.props;
 		const { pluralArticleKind, articleId } = match.params;
-		const { data } = this.state;
+		const { articleData } = this.state;
 		
-		callAPI(`${pluralArticleKind}/${articleId}`, null, user.token, 'DELETE');
-		updateWardrobe.remove(data);
+		await callAPI(`${pluralArticleKind}/${articleId}`, null, user.token, 'DELETE');
 		history.replace('/wardrobe');
 	}
 
@@ -52,22 +51,22 @@ class DetailedArticle extends Component {
 	}
 
 	render() {
-		const { match, existingArticles } = this.props;
-		const { data } = this.state;
+		const { match } = this.props;
+		const { articleData } = this.state;
 
 		const { pluralArticleKind, articleId } = match.params;
 
 		const additionalBits = [];
-		for (const key in data) {
-			console.log(key, data[key])
-			if (data[key] && !['id', 'owner', 'name', 'image', 'description', 'articleKind', 'shirts', 'pants', 'outerwears'].includes(key)) {
+		for (const key in articleData) {
+			console.log(key, articleData[key])
+			if (articleData[key] && !['id', 'owner', 'name', 'image', 'description', 'articleKind', 'shirts', 'pants', 'outerwears', 'dresses'].includes(key)) {
 				additionalBits.push(
-					<li key={ key }><strong>{ key }</strong>: { data[key] }</li>
+					<li key={ key }><strong>{ key }</strong>: { articleData[key] }</li>
 				);
 			} else if (['shirts', 'pants', 'outerwears'].includes(key)) {
 				additionalBits.push(
 					<div key={ key }>
-						{ data[key].map(e => {
+						{ articleData[key].map(e => {
 							return <SmallArticle key={ e.id } field={ key } id={ e.id } name={ e.name } image={ e.image } onClick={ this.routeToArticle }/>;
 						}) }
 					</div>
@@ -77,14 +76,14 @@ class DetailedArticle extends Component {
 
 		return (
 			<div>
-				<h3>{ data.name }</h3>
+				<h3>{ articleData.name }</h3>
 
 				<NavLink exact to={ `/wardrobe/${pluralArticleKind}/${articleId}/edit` }>Edit</NavLink>
 				<button onClick={ this.handleDelete }>Delete</button>
 
-				<img src={ data.image } alt='image'/>
+				<img src={ articleData.image } alt='image'/>
 
-				<p>{ data.description }</p>
+				<p>{ articleData.description }</p>
 
 				<ul>
 					{ additionalBits }

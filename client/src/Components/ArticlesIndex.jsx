@@ -1,30 +1,27 @@
 import React, { Component } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, withRouter } from 'react-router-dom';
+import { connect } from 'react-redux';
 import SubNav from './SubNav.jsx';
 import SimpleArticle from './SimpleArticle.jsx';
 import equal from 'fast-deep-equal';
+import callAPI from '../Modules/call-api';
+import fetchAllArticles from '../Modules/fetch-all-articles';
 
-export default class ArticlesIndex extends Component {
+class ArticlesIndex extends Component {
 	constructor() {
 		super();
 		this.state = {
 			categories: [],
+			articles: [],
 			activeArticles: []
 		}
 	}
 
-	componentWillMount() {
-		const { articles } = this.props;
-		this.setup(articles)
-	}
+	async componentWillMount() {
+		const { user } = this.props
+		
+		const articles = await fetchAllArticles(user.token);
 
-	componentDidUpdate(prevProps) {
-		const { articles } = this.props;
-		if (!equal(prevProps.articles, articles))
-			this.setup(articles)
-	}
-
-	async setup(articles) {
 		const activeArticles = [...articles]; // all are active to start
 		const categories = ['All', ...new Set(articles.map(a => a.articleKind))];
 		this.setState({ articles, activeArticles, categories });
@@ -47,7 +44,7 @@ export default class ArticlesIndex extends Component {
 	render() {
 		const { history } = this.props;
 		const { categories, activeArticles } = this.state;
-		const articleComponents = activeArticles.map(a => <SimpleArticle key={ a.id } data={ a } history={ history }/>);
+		const articleComponents = activeArticles.map(a => <SimpleArticle key={ `${a.articleKind}-${a.id}` } data={ a } history={ history }/>);
 
 		return (
 			<div>
@@ -59,3 +56,11 @@ export default class ArticlesIndex extends Component {
 		);
 	}
 }
+
+const mapStateToProps = state => {
+	return {
+		user: state.user
+	}
+}
+
+export default withRouter(connect(mapStateToProps)(ArticlesIndex));
