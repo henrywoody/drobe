@@ -51,54 +51,29 @@ describe('Clean Article Data module', () => {
 		}
 	});
 
-	it('should populate missing fields with `null` or empty array', () => {
-		const data = {};
-		const baseMissingFields = [
-			'description',
-			'color',
-			'maxTemp',
-			'minTemp',
-			'rainOk',
-			'snowOk',
-			'imageUrl',
-			'name',
-			'userId'
-		]; // rating and lastWorn excluded for later tests
+	it('should exclude any missing fields but include nested fields (those for other models)', () => {
+		const data = {}
 
-		for (const table of ['shirt', 'pants', 'dress', 'outerwear']) {
-			let nestedMissingFields;
-			switch (table) {
-				case 'shirt':
-					nestedMissingFields = ['pants', 'outerwears'];
-					break;
-				case 'pants':
-					nestedMissingFields = ['shirts', 'outerwears'];
-					break;
-				case 'dress':
-					nestedMissingFields = ['outerwears'];
-					break;
-				case 'outerwear':
-					nestedMissingFields = ['shirts', 'pants', 'dresses', 'outerwears'];
-					break;
-			}
+		const cleanShirtData = cleanArticleData('shirt', data);
+		assert.strictEqual(Object.keys(cleanShirtData).length, 2);
+		assert.include(Object.keys(cleanShirtData), 'pants');
+		assert.include(Object.keys(cleanShirtData), 'outerwears');
 
-			const cleanData = cleanArticleData(table, data);
+		const cleanPantsData = cleanArticleData('pants', data);
+		assert.strictEqual(Object.keys(cleanPantsData).length, 2);
+		assert.include(Object.keys(cleanPantsData), 'shirts');
+		assert.include(Object.keys(cleanPantsData), 'outerwears');
 
-			for (const missingField of baseMissingFields) {
-				assert.include(Object.keys(cleanData), decamelize(missingField));
-				assert.isNull(cleanData[decamelize(missingField)]);
-			}
+		const cleanDressData = cleanArticleData('dress', data);
+		assert.strictEqual(Object.keys(cleanDressData).length, 1);
+		assert.include(Object.keys(cleanDressData), 'outerwears');
 
-			for (const nestedMissingField of nestedMissingFields) {
-				assert.include(Object.keys(cleanData), decamelize(nestedMissingField));
-				assert.isEmpty(cleanData[decamelize(nestedMissingField)]);
-			}
-
-			if (table === 'outerwear') {
-				assert.include(Object.keys(cleanData), decamelize('specificType'));
-				assert.isNull(cleanData[decamelize('specificType')]);
-			}
-		}
+		const cleanOuterwearData = cleanArticleData('outerwear', data);
+		assert.strictEqual(Object.keys(cleanOuterwearData).length, 4);
+		assert.include(Object.keys(cleanOuterwearData), 'shirts');
+		assert.include(Object.keys(cleanOuterwearData), 'pants');
+		assert.include(Object.keys(cleanOuterwearData), 'dresses');
+		assert.include(Object.keys(cleanOuterwearData), 'outerwears');
 	});
 
 	it('should remove invalid fields', () => {
@@ -111,22 +86,6 @@ describe('Clean Article Data module', () => {
 			assert.notInclude(Object.keys(cleanData), 'otherField');
 			assert.notInclude(Object.keys(cleanData), decamelize('otherField'));
 		}
-	});
-
-	it('should set rating to 1 if not given but not override if given', () => {
-		const cleanData1 = cleanArticleData('shirt', {});
-		assert.strictEqual(cleanData1.rating, 1);
-
-		const cleanData2 = cleanArticleData('shirt', {rating: 5});
-		assert.strictEqual(cleanData2.rating, 5);
-	});
-
-	it('should remove the lastWorn field if left empty but leave if given', () => {
-		const cleanData1 = cleanArticleData('pants', {});
-		assert.notInclude(Object.keys(cleanData1), 'last_worn');
-
-		const cleanData2 = cleanArticleData('pants', {lastWorn: new Date()});
-		assert.include(Object.keys(cleanData2), 'last_worn');
 	});
 });
 

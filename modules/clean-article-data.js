@@ -46,15 +46,7 @@ module.exports = (table, data) => {
 			cleanData[key] = data[camelCase(key)];
 		} else if (['shirts', 'pants', 'dresses', 'outerwears'].includes(key)) {
 			cleanData[key] = [];
-		} else {
-			cleanData[key] = null;
 		}
 	}
-
-	if (!cleanData.rating)
-		cleanData.rating = 1;
-	if (!cleanData.last_worn)
-		delete cleanData.last_worn;
-
 	return cleanData;
 }
