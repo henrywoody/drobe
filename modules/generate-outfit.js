@@ -34,7 +34,7 @@ function selectRandom(articles) {
 async function forUser(user) {
 	const weatherRef = {
 		rainOKRainProb: 0.5,
-		raincoatMinRainRate: 1, // moderate drizzle
+		raincoatMinRainRate: 0.0025, // moderate drizzle
 		outerwearMaxTemp: 70,
 		doubleLayerOuterwearMaxTemp: 50
 	}
@@ -50,37 +50,200 @@ async function forUser(user) {
 	// ==========
 	if (weather.rainProb > weatherRef.rainOKRainProb) {
 		// if it's likely to rain
-		let possibleOuterwear = await select.fromTableForUserAndTemp('outerwear', user.id, weather.aveTemp);
-
 		if (weather.rainRate >= weatherRef.raincoatMinRainRate) {
 			// if rainRate above moderate drizzle
 			// first try for a raincoat
-			const raincoats = possibleOuterwear.filter(e => e.specificType === 'raincoat');
-			if (raincoats.length) {
-				possibleOuterwear = raincoats;
+			const queryText = `
+				SELECT
+					valid_outerwear.*
+				FROM
+					(SELECT
+						*
+					FROM
+						outerwear
+					WHERE
+						outerwear.specific_type = 'raincoat' AND outerwear.user_id = $1 AND (outerwear.min_temp <= $2 OR outerwear.min_temp IS NULL) AND (outerwear.max_temp >= $2 OR outerwear.max_temp IS NULL)
+					) AS valid_outerwear
+				INNER JOIN
+					(SELECT
+						COALESCE(shirt_pants_joined_outerwear.outerwear_id, dress_joined_outerwear.outerwear_id) AS outerwear_id
+					FROM
+						(SELECT
+							DISTINCT shirt_outerwear_join.outerwear_id
+						FROM
+							shirt_outerwear_join
+						FULL OUTER JOIN
+							pants_outerwear_join
+						ON
+							shirt_outerwear_join.outerwear_id = pants_outerwear_join.outerwear_id
+						INNER JOIN
+							shirt_pants_join
+						ON
+							shirt_outerwear_join.shirt_id = shirt_pants_join.shirt_id AND pants_outerwear_join.pants_id = shirt_pants_join.pants_id
+						) AS shirt_pants_joined_outerwear
+					FULL OUTER JOIN
+						(SELECT
+							DISTINCT outerwear_id
+						FROM
+							dress_outerwear_join
+						) AS dress_joined_outerwear
+					ON
+						shirt_pants_joined_outerwear.outerwear_id = dress_joined_outerwear.outerwear_id
+					) AS joined_outerwear
+				ON
+					valid_outerwear.id = joined_outerwear.outerwear_id
+			`;
+			const queryValues = [user.id, weather.aveTemp];
+			const { rows } = await query(queryText, queryValues);
+
+			if (rows.length)
+				outfit.outerwear.push(camelCaseKeys(selectRandom(rows)));
+		}
+
+		if (!outfit.outerwear.length) {
+			// if not raining enough or no raincoats found
+			const queryText = `
+				SELECT
+					valid_outerwear.*
+				FROM
+					(SELECT
+						*
+					FROM
+						outerwear
+					WHERE
+						outerwear.rain_ok AND outerwear.user_id = $1 AND (outerwear.min_temp <= $2 OR outerwear.min_temp IS NULL) AND (outerwear.max_temp >= $2 OR outerwear.max_temp IS NULL)
+					) AS valid_outerwear
+				INNER JOIN
+					(SELECT
+						COALESCE(shirt_pants_joined_outerwear.outerwear_id, dress_joined_outerwear.outerwear_id) AS outerwear_id
+					FROM
+						(SELECT
+							DISTINCT shirt_outerwear_join.outerwear_id
+						FROM
+							shirt_outerwear_join
+						FULL OUTER JOIN
+							pants_outerwear_join
+						ON
+							shirt_outerwear_join.outerwear_id = pants_outerwear_join.outerwear_id
+						INNER JOIN
+							shirt_pants_join
+						ON
+							shirt_outerwear_join.shirt_id = shirt_pants_join.shirt_id AND pants_outerwear_join.pants_id = shirt_pants_join.pants_id
+						) AS shirt_pants_joined_outerwear
+					FULL OUTER JOIN
+						(SELECT
+							DISTINCT outerwear_id
+						FROM
+							dress_outerwear_join
+						) AS dress_joined_outerwear
+					ON
+						shirt_pants_joined_outerwear.outerwear_id = dress_joined_outerwear.outerwear_id
+					) AS joined_outerwear
+				ON
+					valid_outerwear.id = joined_outerwear.outerwear_id
+			`;
+			const queryValues = [user.id, weather.aveTemp];
+			const { rows } = await query(queryText, queryValues);
+
+			if (rows.length) {
+				outfit.outerwear.push(camelCaseKeys(selectRandom(rows)));
 			} else {
-				// otherwise look for rainOk outerwear
-				const rainOk = possibleOuterwear.filter(e => e.rainOk);
-				if (rainOk.length) {
-					possibleOuterwear = rainOk;
-				}
-			}
-		} else {
-			// if it's gonna rain, but not that much, look for rainOk stuff
-			const rainOk = possibleOuterwear.filter(e => e.rainOk);
-			if (rainOk) {
-				possibleOuterwear = rainOk;
+				const queryText = `
+					SELECT
+						valid_outerwear.*
+					FROM
+						(SELECT
+							*
+						FROM
+							outerwear
+						WHERE
+							outerwear.user_id = $1 AND (outerwear.min_temp <= $2 OR outerwear.min_temp IS NULL) AND (outerwear.max_temp >= $2 OR outerwear.max_temp IS NULL)
+						) AS valid_outerwear
+					INNER JOIN
+						(SELECT
+							COALESCE(shirt_pants_joined_outerwear.outerwear_id, dress_joined_outerwear.outerwear_id) AS outerwear_id
+						FROM
+							(SELECT
+								DISTINCT shirt_outerwear_join.outerwear_id
+							FROM
+								shirt_outerwear_join
+							FULL OUTER JOIN
+								pants_outerwear_join
+							ON
+								shirt_outerwear_join.outerwear_id = pants_outerwear_join.outerwear_id
+							INNER JOIN
+								shirt_pants_join
+							ON
+								shirt_outerwear_join.shirt_id = shirt_pants_join.shirt_id AND pants_outerwear_join.pants_id = shirt_pants_join.pants_id
+							) AS shirt_pants_joined_outerwear
+						FULL OUTER JOIN
+							(SELECT
+								DISTINCT outerwear_id
+							FROM
+								dress_outerwear_join
+							) AS dress_joined_outerwear
+						ON
+							shirt_pants_joined_outerwear.outerwear_id = dress_joined_outerwear.outerwear_id
+						) AS joined_outerwear
+					ON
+						valid_outerwear.id = joined_outerwear.outerwear_id
+				`;
+				const queryValues = [user.id, weather.aveTemp];
+				const { rows } = await query(queryText, queryValues);
+
+				if (rows.length)
+					outfit.outerwear.push(camelCaseKeys(selectRandom(rows)));
 			}
 		}
 
-		if (possibleOuterwear.length)
-			outfit.outerwear.push(selectRandom(possibleOuterwear));
-
 	} else if (weather.aveTemp <= weatherRef.outerwearMaxTemp) {
 		// if not raining, but cool
-		const possibleOuterwear = await select.fromTableForUserAndTemp('outerwear', user.id, weather.aveTemp);
-		if (possibleOuterwear.length)
-			outfit.outerwear.push(selectRandom(possibleOuterwear));
+		// select outerwears for user & temp that are joined with at least one shirt/pants (where shirt & pants are joined) or dress
+		const queryText = `
+		SELECT
+			valid_outerwear.*
+		FROM
+			(SELECT
+				*
+			FROM
+				outerwear
+			WHERE
+				outerwear.user_id = $1 AND (outerwear.min_temp <= $2 OR outerwear.min_temp IS NULL) AND (outerwear.max_temp >= $2 OR outerwear.max_temp IS NULL)
+			) AS valid_outerwear
+		INNER JOIN
+			(SELECT
+				COALESCE(shirt_pants_joined_outerwear.outerwear_id, dress_joined_outerwear.outerwear_id) AS outerwear_id
+			FROM
+				(SELECT
+					DISTINCT shirt_outerwear_join.outerwear_id
+				FROM
+					shirt_outerwear_join
+				FULL OUTER JOIN
+					pants_outerwear_join
+				ON
+					shirt_outerwear_join.outerwear_id = pants_outerwear_join.outerwear_id
+				INNER JOIN
+					shirt_pants_join
+				ON
+					shirt_outerwear_join.shirt_id = shirt_pants_join.shirt_id AND pants_outerwear_join.pants_id = shirt_pants_join.pants_id
+				) AS shirt_pants_joined_outerwear
+			FULL OUTER JOIN
+				(SELECT
+					DISTINCT outerwear_id
+				FROM
+					dress_outerwear_join
+				) AS dress_joined_outerwear
+			ON
+				shirt_pants_joined_outerwear.outerwear_id = dress_joined_outerwear.outerwear_id
+			) AS joined_outerwear
+		ON
+			valid_outerwear.id = joined_outerwear.outerwear_id
+		`;
+		const queryValues = [user.id, weather.aveTemp];
+		const { rows } = await query(queryText, queryValues);
+
+		if (rows.length)
+			outfit.outerwear.push(camelCaseKeys(selectRandom(rows)));
 	}
 
 	if (weather.aveTemp <= weatherRef.doubleLayerOuterwearMaxTemp) {
@@ -117,9 +280,15 @@ async function forUser(user) {
 		// get ids of shirts that have pants in common with (both) outerwear and that are joined directly with those outerwear
 		const shirtQueryText = `
 			SELECT
-				shirt.*
+				valid_shirt.*
 			FROM
-				shirt
+				(SELECT
+					*
+				FROM
+					shirt
+				WHERE
+					shirt.user_id = $1 AND (shirt.min_temp <= $2 OR shirt.min_temp IS NULL) AND (shirt.max_temp >= $2 OR shirt.max_temp IS NULL)
+				) AS valid_shirt
 			INNER JOIN
 				(SELECT
 					joined_shirt.shirt_id
@@ -137,27 +306,31 @@ async function forUser(user) {
 					ON
 						shirt_pants_join.shirt_id = shirt_outerwear_join.shirt_id AND pants_outerwear_join.outerwear_id = shirt_outerwear_join.outerwear_id
 					WHERE
-						pants_outerwear_join.outerwear_id = ANY($1)
+						pants_outerwear_join.outerwear_id = ANY($3)
 					) AS joined_shirt
 				GROUP BY
 					joined_shirt.shirt_id
 				HAVING
-					COUNT(joined_shirt.shirt_id) = $2
+					COUNT(joined_shirt.shirt_id) = $4
 				) AS possible_shirt
 			ON
-				shirt.id = possible_shirt.shirt_id
-			WHERE 
-				(shirt.min_temp <= $3 OR shirt.min_temp IS NULL) AND (shirt.max_temp >= $3 OR shirt.max_temp IS NULL)
+				valid_shirt.id = possible_shirt.shirt_id
 		`;
-		const shirtQueryValues = [outfit.outerwear.map(e => e.id), outfit.outerwear.length, weather.aveTemp];
+		const shirtQueryValues = [user.id, weather.aveTemp, outfit.outerwear.map(e => e.id), outfit.outerwear.length];
 		const { rows: shirtRows } = await query(shirtQueryText, shirtQueryValues);
 		possibleShirts = shirtRows;
 
 		const dressQueryText = `
 			SELECT
-				dress.*
+				valid_dress.*
 			FROM
-				dress
+				(SELECT
+					*
+				FROM
+					dress
+				WHERE
+					dress.user_id = $1 AND (dress.min_temp <= $2 OR dress.min_temp IS NULL) AND (dress.max_temp >= $2 OR dress.max_temp IS NULL)
+				) AS valid_dress
 			INNER JOIN
 				(SELECT
 					joined_dress.dress_id
@@ -167,24 +340,45 @@ async function forUser(user) {
 					FROM
 						dress_outerwear_join
 					WHERE
-						outerwear_id = ANY($1)
+						outerwear_id = ANY($3)
 					) AS joined_dress
 				GROUP BY
 					joined_dress.dress_id
 				HAVING
-					COUNT(joined_dress.dress_id) = $2
+					COUNT(joined_dress.dress_id) = $4
 				) AS possible_dress
 			ON
-				dress.id = possible_dress.dress_id
-			WHERE
-				(dress.min_temp <= $3 OR dress.min_temp IS NULL) AND (dress.max_temp >= $3 OR dress.max_temp IS NULL)
+				valid_dress.id = possible_dress.dress_id
 		`;
-		const dressQueryValues = [outfit.outerwear.map(e => e.id), outfit.outerwear.length, weather.aveTemp];
+		const dressQueryValues = [user.id, weather.aveTemp, outfit.outerwear.map(e => e.id), outfit.outerwear.length];
 		const { rows: dressRows } = await query(dressQueryText, dressQueryValues);
 		possibleDresses = dressRows;
 
 	} else {
-		possibleShirts = await select.fromTableForUserAndTemp('shirt', user.id, weather.aveTemp);
+		const queryText = `
+			SELECT
+				valid_shirt.*
+			FROM
+				(SELECT
+					*
+				FROM
+					shirt
+				WHERE
+					shirt.user_id = $1 AND (shirt.min_temp <= $2 OR shirt.min_temp IS NULL) AND (shirt.max_temp >= $2 OR shirt.max_temp IS NULL)
+				) AS valid_shirt
+			INNER JOIN
+				(SELECT
+					DISTINCT shirt_id
+				FROM
+					shirt_pants_join
+				) AS joined_shirt
+			ON
+				valid_shirt.id = joined_shirt.shirt_id;
+		`;
+		const queryValues = [user.id, weather.aveTemp];
+		const { rows } = await query(queryText, queryValues);
+		possibleShirts = rows;
+
 		possibleDresses = await select.fromTableForUserAndTemp('dress', user.id, weather.aveTemp);
 	}
 	
@@ -207,9 +401,15 @@ async function forUser(user) {
 		if (outfit.outerwear.length) {
 			queryText = `
 				SELECT
-					pants.*
+					valid_pants.*
 				FROM
-					pants
+					(SELECT
+						*
+					FROM
+						pants
+					WHERE
+						pants.user_id = $1 AND (pants.min_temp <= $2 OR pants.min_temp IS NULL) AND (pants.max_temp >= $2 OR pants.max_temp IS NULL)
+					) AS valid_pants
 				INNER JOIN
 					(SELECT
 						shirt_joined_pants.pants_id
@@ -219,7 +419,7 @@ async function forUser(user) {
 						FROM
 							shirt_pants_join
 						WHERE
-							shirt_id = $1
+							shirt_id = $3
 						) AS shirt_joined_pants
 					INNER JOIN
 						(SELECT
@@ -227,41 +427,43 @@ async function forUser(user) {
 						FROM
 							pants_outerwear_join
 						WHERE
-							outerwear_id = ANY($2)
+							outerwear_id = ANY($4)
 						GROUP BY
 							pants_id
 						HAVING
-							COUNT(pants_id) = $3
+							COUNT(pants_id) = $5
 						) AS outerwear_joined_pants
 					ON
 						shirt_joined_pants.pants_id = outerwear_joined_pants.pants_id
 					) AS possible_pants
 				ON
-					pants.id = possible_pants.pants_id
-				WHERE
-					(pants.min_temp <= $4 OR pants.min_temp IS NULL) AND (pants.max_temp >= $4 OR pants.max_temp IS NULL)
+					valid_pants.id = possible_pants.pants_id
 			`;
-			queryValues = [outfit.shirt.id, outfit.outerwear.map(e => e.id), outfit.outerwear.length, weather.aveTemp];
+			queryValues = [user.id, weather.aveTemp, outfit.shirt.id, outfit.outerwear.map(e => e.id), outfit.outerwear.length];
 		} else {
 			queryText = `
 				SELECT
-					pants.*
+					possible_pants.*
 				FROM
-					pants
+					(SELECT
+						*
+					FROM
+						pants
+					WHERE
+						pants.user_id = $1 AND (pants.min_temp <= $2 OR pants.min_temp IS NULL) AND (pants.max_temp >= $2 OR pants.max_temp IS NULL)
+					) AS possible_pants
 				INNER JOIN
 					(SELECT
 						pants_id
 					FROM
 						shirt_pants_join
 					WHERE
-						shirt_id = $1
+						shirt_id = $3
 					) AS joined_pants
 				ON
-					pants.id = joined_pants.pants_id
-				WHERE 
-					(pants.min_temp <= $2 OR pants.min_temp IS NULL) AND (pants.max_temp >= $2 OR pants.max_temp IS NULL)
+					possible_pants.id = joined_pants.pants_id
 			`;
-			queryValues = [outfit.shirt.id, weather.aveTemp];
+			queryValues = [user.id, weather.aveTemp, outfit.shirt.id];
 		}
 
 		const { rows } = await query(queryText, queryValues);
