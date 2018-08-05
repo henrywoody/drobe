@@ -10,7 +10,7 @@ const	express = require('express'),
 
 // Index
 router.get('/', async (req, res) => {
-	const { user } = req.user;
+	const { user } = req;
 	try {
 		const dresses = await select.fromTableByUser('dress', user.id);
 		res.json(dresses);
@@ -21,7 +21,7 @@ router.get('/', async (req, res) => {
 
 // Detail
 router.get('/:id', async (req, res) => {
-	const { user } = req.user;
+	const { user } = req;
 	const { id } = req.params;
 	try {
 		const dress = await select.fromTableByIdWithJoins('dress', id);

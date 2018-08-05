@@ -48,6 +48,6 @@ module.exports = (err, res) => {
 
 
 	console.log(err);
-	return res.stat(500).json({error: 'There was a problem with the server.'});
+	return res.status(500).json({error: 'There was a problem with the server.'});
 
 }
