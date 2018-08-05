@@ -6,6 +6,7 @@ const 	query = require('./query'),
 
 async function tableByIdToTableById(table1, id1, table2, id2) {
 	const joinTable = getJoinTables.forPair(table1, table2);
+	checkNotSameArticle(table1, id1, table2, id2);
 	await checkHaveSameOwner(table1, id1, table2, id2);
 	const alreadyJoined = await joinAlreadyExists(joinTable, table1, id1, table2, id2);
 	if (alreadyJoined)
@@ -18,8 +19,12 @@ async function tableByIdToTableById(table1, id1, table2, id2) {
 }
 
 async function tableByIdToMany(table, id, tableIdLists) {
-	for (const otherTable in tableIdLists) // to check all are valid
-		getJoinTables.forPair(table, singularize(otherTable));
+	for (const pluralOtherTable in tableIdLists) { // to check all are valid
+		getJoinTables.forPair(table, singularize(pluralOtherTable));
+		for (const otherId of tableIdLists[pluralOtherTable]) {
+			checkNotSameArticle(table, id, singularize(pluralOtherTable), otherId);
+		}
+	}
 	await checkAllHaveSameOwner(table, id, tableIdLists);
 
 	for (const pluralOtherTable in tableIdLists) {
@@ -61,6 +66,15 @@ function getQueryTextAndValues(joinTable, table1, id1, table2, id2) {
 			break;
 	}
 	return { queryText, queryValues };
+}
+
+
+function checkNotSameArticle(table1, id1, table2, id2) {
+	if (table1 === table2 && id1 === id2) {
+		const err = new Error('An article cannot be joied to itself');
+		err.name = 'ValidationError';
+		throw err;
+	}
 }
 
 async function checkHaveSameOwner(table1, id1, table2, id2) {

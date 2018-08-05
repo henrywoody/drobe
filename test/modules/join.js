@@ -47,6 +47,17 @@ describe ('Join module', () => {
 			}
 		});
 
+		it('should throw a ValidationError and not create a join between an outerwear and itself', async () => {
+			try {
+				await join.tableByIdToTableById('outerwear', jacket.id, 'outerwear', jacket.id);
+				assert.fail(0, 1, 'No Error was thrown');
+			} catch (err) {
+				if (err.name === 'AssertionError')
+					throw err;
+				assert.strictEqual(err.name, 'ValidationError');
+			}
+		});
+
 		it('should throw a NotFoundError if either of the object ids is invalid', async () => {
 			try {
 				await join.tableByIdToTableById('shirt', shirt.id + 100, 'pants', badPants.id);
@@ -127,6 +138,17 @@ describe ('Join module', () => {
 
 			const { rows } = await query("SELECT * FROM dress_outerwear_join");
 			assert.isEmpty(rows);
+		});
+
+		it('should throw a ValidationError and not create a join between an outerwear and itself', async () => {
+			try {
+				await join.tableByIdToMany('outerwear', jacket.id, {dresses: [dress.id], outerwears: [jacket.id]});
+				assert.fail(0, 1, 'No Error was thrown');
+			} catch (err) {
+				if (err.name === 'AssertionError')
+					throw err;
+				assert.strictEqual(err.name, 'ValidationError');
+			}
 		});
 
 		it('should throw a ValidationError and not create any joins if any objects is owned by different users', async () => {
