@@ -33,11 +33,10 @@ class OutfitGenerator extends Component {
 				const endpoint = `outerwears/${outerwear.id}`;
 				callAPI(endpoint, null, user.token, 'PUT', {
 					outerwear: {
-								...outerwear,
-								lastWorn: newDate
-						}
+						...outerwear,
+						lastWorn: newDate
 					}
-				)
+				});
 			}
 		}
 
@@ -48,7 +47,7 @@ class OutfitGenerator extends Component {
 					...outfit.shirt,
 					lastWorn: newDate
 				}
-			})
+			});
 		}
 
 		if (outfit.pants) {
@@ -58,7 +57,17 @@ class OutfitGenerator extends Component {
 					...outfit.pants,
 					lastWorn: newDate
 				}
-			})
+			});
+		}
+
+		if (outfit.dress) {
+			const endpoint = `dresses/${outfit.dress.id}`;
+			callAPI(endpoint, null, user.token, 'PUT', {
+				dress: {
+					...outfit.dress,
+					lastWorn: newDate
+				}
+			});
 		}
 	}
 
@@ -81,11 +90,16 @@ class OutfitGenerator extends Component {
 
 			if (outfit.shirt) {
 				outfitDisplay.push(<h3 key='shirt'>Shirt</h3>);
-				outfitDisplay.push(<SimpleArticle key={ outfit.shirt.id } data={ outfit.shirt } history={ history }/>);
+				outfitDisplay.push(<SimpleArticle key={ `shirt-${outfit.shirt.id}` } data={ outfit.shirt } history={ history }/>);
 			}
-			if (outfit.pants){
+			if (outfit.pants) {
 				outfitDisplay.push(<h3 key='pants'>Pants</h3>);
-				outfitDisplay.push(<SimpleArticle key={ outfit.pants.id } data={ outfit.pants } history={ history }/>);
+				outfitDisplay.push(<SimpleArticle key={ `pants-${outfit.pants.id}` } data={ outfit.pants } history={ history }/>);
+			}
+
+			if (outfit.dress) {
+				outfitDisplay.push(<h3 key='dress'>Dress</h3>);
+				outfitDisplay.push(<SimpleArticle key={ `dress-${outfit.dress.id}` } data={ outfit.dress } history={ history }/>);
 			}
 
 			if (outfit.shirt || outfit.pants)

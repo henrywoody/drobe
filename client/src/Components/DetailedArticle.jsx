@@ -63,7 +63,7 @@ class DetailedArticle extends Component {
 				additionalBits.push(
 					<li key={ key }><strong>{ key }</strong>: { articleData[key] }</li>
 				);
-			} else if (['shirts', 'pants', 'outerwears'].includes(key)) {
+			} else if (['shirts', 'pants', 'dresses', 'outerwears'].includes(key)) {
 				additionalBits.push(
 					<div key={ key }>
 						{ articleData[key].map(e => {

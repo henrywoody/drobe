@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
+import pluralizeArticleKind from '../Modules/pluralize-article-kind';
 
 export default class SimpleArticle extends Component {
 	handleClick = () => {
 		const { data, history } = this.props;
-		const pluralArticleKind = data.articleKind + (data.articleKind === 'pants' ? '' : 's');
+		const pluralArticleKind = pluralizeArticleKind(data.articleKind);
 		history.replace(`/wardrobe/${pluralArticleKind}/${data.id}`);
 	}
 

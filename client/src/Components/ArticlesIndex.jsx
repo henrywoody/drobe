@@ -6,6 +6,8 @@ import SimpleArticle from './SimpleArticle.jsx';
 import equal from 'fast-deep-equal';
 import callAPI from '../Modules/call-api';
 import fetchAllArticles from '../Modules/fetch-all-articles';
+import pluralizeArticleKind from '../Modules/pluralize-article-kind';
+import singularizeArticleKind from '../Modules/singularize-article-kind';
 
 class ArticlesIndex extends Component {
 	constructor() {
@@ -23,7 +25,7 @@ class ArticlesIndex extends Component {
 		const articles = await fetchAllArticles(user.token);
 
 		const activeArticles = [...articles]; // all are active to start
-		const categories = ['All', ...new Set(articles.map(a => a.articleKind))];
+		const categories = ['All', ...new Set(articles.map(a => pluralizeArticleKind(a.articleKind)))];
 		this.setState({ articles, activeArticles, categories });
 	}
 
@@ -35,7 +37,7 @@ class ArticlesIndex extends Component {
 		if (articleKind === 'All') {
 			activeArticles = articles;
 		} else {
-			activeArticles = articles.filter(a => a.articleKind === articleKind);			
+			activeArticles = articles.filter(a => a.articleKind === singularizeArticleKind(articleKind));			
 		}
 
 		this.setState({ activeArticles });
