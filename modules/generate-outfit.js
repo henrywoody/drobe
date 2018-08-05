@@ -1,7 +1,8 @@
 const 	weatherAPI = require('./weather-api'),
 		select = require('./select'),
 		query = require('./query'),
-		camelCaseKeys = require('./camel-case-keys');
+		camelCaseKeys = require('./camel-case-keys'),
+		cleanArticleData = require('./clean-article-data');
 
 function selectRandom(articles) {
 	const weightedArray = articles.map((e, i) => {
@@ -83,21 +84,29 @@ async function forUser(user) {
 	}
 
 	if (weather.aveTemp <= weatherRef.doubleLayerOuterwearMaxTemp) {
-		const associatedIdsQueryText1 = "SELECT a_outerwear_id FROM outerwear_outerwear_join WHERE b_outerwear_id = $1";
-		const { rows: aIds } = await query(associatedIdsQueryText1, [outfit.outerwear[0].id]);
+		const queryText = `
+			SELECT
+				outerwear.*
+			FROM
+				outerwear
+			INNER JOIN
+				(SELECT
+					*
+				FROM
+					outerwear_outerwear_join
+				WHERE
+					a_outerwear_id = $1 OR b_outerwear_id = $1
+				) AS joined_outerwear
+			ON
+				outerwear.id = ANY(ARRAY[joined_outerwear.a_outerwear_id, joined_outerwear.b_outerwear_id])
+			WHERE
+				outerwear.id != $1 AND (outerwear.min_temp <= $2 OR outerwear.min_temp IS NULL) AND (outerwear.max_temp >= $2 OR outerwear.max_temp IS NULL);
+		`;
+		const queryValues = [outfit.outerwear[0].id, weather.aveTemp];
+		const { rows } = await query(queryText, queryValues);
 
-		const associatedIdsQueryText2 = "SELECT b_outerwear_id FROM outerwear_outerwear_join WHERE a_outerwear_id = $1";
-		const { rows: bIds } = await query(associatedIdsQueryText2, [outfit.outerwear[0].id]);
-
-		const associatedIds = aIds.map(e => e.a_outerwear_id).concat(bIds.map(e => e.b_outerwear_id));
-
-
-		const queryText = "SELECT * FROM outerwear WHERE id = ANY ($1) AND (min_temp <= $2 OR min_temp IS NULL) AND (max_temp >= $2 OR max_temp IS NULL)";
-		const queryValues = [associatedIds, weather.aveTemp];
-		const { rows: possibleOuterwear } = await query(queryText, queryValues);
-
-		if (possibleOuterwear.length)
-			outfit.outerwear.push(camelCaseKeys(selectRandom(possibleOuterwear)));
+		if (rows.length)
+			outfit.outerwear.push(camelCaseKeys(selectRandom(rows)));
 	}
 
 	// ==============
@@ -105,86 +114,158 @@ async function forUser(user) {
 	// ==============
 	let possibleShirts, possibleDresses;
 	if (outfit.outerwear.length) {
-		const associatedShirtIdsQueryText1 = "SELECT shirt_id FROM shirt_outerwear_join WHERE outerwear_id = $1";
-		const { rows: associatedShirtIdRows1 } = await query(associatedShirtIdsQueryText1, [outfit.outerwear[0].id]);
-		let shirtQueryText = "SELECT * FROM shirt WHERE id = ANY ($1) AND (min_temp <= $2 OR min_temp IS NULL) AND (max_temp >= $2 OR max_temp IS NULL)";
-		const shirtQueryValues = [associatedShirtIdRows1.map(e => e.shirt_id), weather.aveTemp];
-
-		const associatedDressIdsQueryText1 = "SELECT dress_id FROM dress_outerwear_join WHERE outerwear_id = $1";
-		const { rows: associatedDressIdRows1 } = await query(associatedDressIdsQueryText1, [outfit.outerwear[0].id]);
-		let dressQueryText = "SELECT * FROM dress WHERE id = ANY ($1) AND (min_temp <= $2 OR min_temp IS NULL) AND (max_temp >= $2 OR max_temp IS NULL)";
-		const dressQueryValues = [associatedDressIdRows1.map(e => e.dress_id), weather.aveTemp];
-
-		if (outfit.outerwear.length > 1) {
-			const associatedShirtIdsQueryText2 = "SELECT shirt_id FROM shirt_outerwear_join WHERE outerwear_id = $1";
-			const { rows: associatedShirtIdRows2 } = await query(associatedShirtIdsQueryText2, [outfit.outerwear[1].id]);
-			shirtQueryText += " AND id = ANY ($3)";
-			shirtQueryValues.push(associatedShirtIdRows2.map(e => e.shirt_id));
-
-			const associatedDressIdsQueryText2 = "SELECT shirt_id FROM shirt_outerwear_join WHERE outerwear_id = $1";
-			const { rows: associatedDressIdRows2 } = await query(associatedDressIdsQueryText2, [outfit.outerwear[1].id]);
-			dressQueryText += " AND id = ANY ($3)";
-			dressQueryValues.push(associatedDressIdRows2.map(e => e.dress_id));
-		}
-
+		// get ids of shirts that have pants in common with (both) outerwear and that are joined directly with those outerwear
+		const shirtQueryText = `
+			SELECT
+				shirt.*
+			FROM
+				shirt
+			INNER JOIN
+				(SELECT
+					joined_shirt.shirt_id
+				FROM
+					(SELECT
+						DISTINCT shirt_pants_join.shirt_id, pants_outerwear_join.outerwear_id
+					FROM
+						shirt_pants_join
+					INNER JOIN
+						pants_outerwear_join
+					ON
+						shirt_pants_join.pants_id = pants_outerwear_join.pants_id
+					INNER JOIN
+						shirt_outerwear_join
+					ON
+						shirt_pants_join.shirt_id = shirt_outerwear_join.shirt_id AND pants_outerwear_join.outerwear_id = shirt_outerwear_join.outerwear_id
+					WHERE
+						pants_outerwear_join.outerwear_id = ANY($1)
+					) AS joined_shirt
+				GROUP BY
+					joined_shirt.shirt_id
+				HAVING
+					COUNT(joined_shirt.shirt_id) = $2
+				) AS possible_shirt
+			ON
+				shirt.id = possible_shirt.shirt_id
+			WHERE 
+				(shirt.min_temp <= $3 OR shirt.min_temp IS NULL) AND (shirt.max_temp >= $3 OR shirt.max_temp IS NULL)
+		`;
+		const shirtQueryValues = [outfit.outerwear.map(e => e.id), outfit.outerwear.length, weather.aveTemp];
 		const { rows: shirtRows } = await query(shirtQueryText, shirtQueryValues);
-		const { rows: dressRows } = await query(dressQueryText, dressQueryValues);
 		possibleShirts = shirtRows;
+
+		const dressQueryText = `
+			SELECT
+				dress.*
+			FROM
+				dress
+			INNER JOIN
+				(SELECT
+					joined_dress.dress_id
+				FROM 
+					(SELECT
+						DISTINCT dress_id, outerwear_id
+					FROM
+						dress_outerwear_join
+					WHERE
+						outerwear_id = ANY($1)
+					) AS joined_dress
+				GROUP BY
+					joined_dress.dress_id
+				HAVING
+					COUNT(joined_dress.dress_id) = $2
+				) AS possible_dress
+			ON
+				dress.id = possible_dress.dress_id
+			WHERE
+				(dress.min_temp <= $3 OR dress.min_temp IS NULL) AND (dress.max_temp >= $3 OR dress.max_temp IS NULL)
+		`;
+		const dressQueryValues = [outfit.outerwear.map(e => e.id), outfit.outerwear.length, weather.aveTemp];
+		const { rows: dressRows } = await query(dressQueryText, dressQueryValues);
 		possibleDresses = dressRows;
 
 	} else {
 		possibleShirts = await select.fromTableForUserAndTemp('shirt', user.id, weather.aveTemp);
 		possibleDresses = await select.fromTableForUserAndTemp('dress', user.id, weather.aveTemp);
 	}
-
-	const hasPants = await Promise.all(possibleShirts.map(async e => {
-		const queryText = "SELECT pants_id FROM shirt_pants_join WHERE shirt_id = $1";
-		const queryValues = [e.id];
-		const { rows } = await query(queryText, queryValues);
-		return rows.length;
-	}));
-	
-	possibleShirts = possibleShirts.filter((e,i) => {
-		return hasPants[i];
-	});
 	
 	const topChoices = possibleShirts.concat(possibleDresses);
 	if (topChoices.length) {
 		const selectedTop = camelCaseKeys(selectRandom(topChoices));
-
 		if (selectedTop.articleKind === 'shirt') {
-			delete selectedTop.articleType;
 			outfit.shirt = selectedTop;
 		} else {
-			delete selectedTop.articleType;
 			outfit.dress = selectedTop;
 		}
 	}
+
 
 	// ==========
 	// Pants
 	// ==========
 	if (outfit.shirt) {
-		const associatedPantsQueryText1 = "SELECT pants_id FROM shirt_pants_join WHERE shirt_id = $1";
-		const { rows: associatedPantsRows1 } = await query(associatedPantsQueryText1, [outfit.shirt.id]);
-		let pantsQueryText = "SELECT * FROM pants WHERE id = ANY ($1) AND (min_temp <= $2 OR min_temp IS NULL) AND (max_temp >= $2 OR max_temp IS NULL)";
-		const pantsQueryValues = [associatedPantsRows1.map(e => e.pants_id), weather.aveTemp];
-
+		let queryText, queryValues;
 		if (outfit.outerwear.length) {
-			const associatedPantsQueryText2 = "SELECT pants_id FROM pants_outerwear_join WHERE outerwear_id = $1";
-			const { rows: associatedPantsRows2 } = await query(associatedPantsQueryText2, [outfit.outerwear[0].id]);
-			pantsQueryText += " AND id = ANY ($3)";
-			pantsQueryValues.push(associatedPantsRows2.map(e => e.pants_id));
-
-			if (outfit.outerwear.length > 1) {
-				const associatedPantsQueryText3 = "SELECT pants_id FROM pants_outerwear_join WHERE outerwear_id = $1";
-				const { rows: associatedPantsRows3 } = await query(associatedPantsQueryText3, [outfit.outerwear[1].id]);
-				pantsQueryText += " AND id = ANY ($4)";
-				pantsQueryValues.push(associatedPantsRows3.map(e => e.pants_id));
-			}
+			queryText = `
+				SELECT
+					pants.*
+				FROM
+					pants
+				INNER JOIN
+					(SELECT
+						shirt_joined_pants.pants_id
+					FROM
+						(SELECT
+							pants_id
+						FROM
+							shirt_pants_join
+						WHERE
+							shirt_id = $1
+						) AS shirt_joined_pants
+					INNER JOIN
+						(SELECT
+							pants_id
+						FROM
+							pants_outerwear_join
+						WHERE
+							outerwear_id = ANY($2)
+						GROUP BY
+							pants_id
+						HAVING
+							COUNT(pants_id) = $3
+						) AS outerwear_joined_pants
+					ON
+						shirt_joined_pants.pants_id = outerwear_joined_pants.pants_id
+					) AS possible_pants
+				ON
+					pants.id = possible_pants.pants_id
+				WHERE
+					(pants.min_temp <= $4 OR pants.min_temp IS NULL) AND (pants.max_temp >= $4 OR pants.max_temp IS NULL)
+			`;
+			queryValues = [outfit.shirt.id, outfit.outerwear.map(e => e.id), outfit.outerwear.length, weather.aveTemp];
+		} else {
+			queryText = `
+				SELECT
+					pants.*
+				FROM
+					pants
+				INNER JOIN
+					(SELECT
+						pants_id
+					FROM
+						shirt_pants_join
+					WHERE
+						shirt_id = $1
+					) AS joined_pants
+				ON
+					pants.id = joined_pants.pants_id
+				WHERE 
+					(pants.min_temp <= $2 OR pants.min_temp IS NULL) AND (pants.max_temp >= $2 OR pants.max_temp IS NULL)
+			`;
+			queryValues = [outfit.shirt.id, weather.aveTemp];
 		}
-		const { rows: possiblePants } = await query(pantsQueryText, pantsQueryValues);
-		outfit.pants = camelCaseKeys(selectRandom(possiblePants));
+
+		const { rows } = await query(queryText, queryValues);
+		outfit.pants = camelCaseKeys(selectRandom(rows));
 	}
 
 	return outfit;
@@ -193,8 +274,5 @@ async function forUser(user) {
 module.exports = {
 	forUser: forUser
 }
-
-
-
 
 
