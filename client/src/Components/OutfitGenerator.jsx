@@ -24,16 +24,15 @@ export default class OutfitGenerator extends Component {
 		const { user } = this.props;
 		const { outfit } = this.state;
 
-		const newDate = Date.now();
+		const newDate = new Date();
 
-		if (outfit.outerwears && outfit.outerwears.length) {
-			for (const outerwear of outfit.outerwears) {
+		if (outfit.outerwear && outfit.outerwear.length) {
+			for (const outerwear of outfit.outerwear) {
 				const endpoint = `outerwears/${outerwear.id}`;
 				callAPI(endpoint, null, user.token, 'PUT', {
 					outerwear: {
 								...outerwear,
-								lastWorn: newDate,
-								wearDates: [...outerwear.wearDates, newDate]
+								lastWorn: newDate
 						}
 					}
 				)
@@ -45,8 +44,7 @@ export default class OutfitGenerator extends Component {
 			callAPI(endpoint, null, user.token, 'PUT', {
 				shirt: {
 					...outfit.shirt,
-					lastWorn: newDate,
-					wearDates: [...outfit.shirt.wearDates, newDate]
+					lastWorn: newDate
 				}
 			})
 		}
@@ -56,8 +54,7 @@ export default class OutfitGenerator extends Component {
 			callAPI(endpoint, null, user.token, 'PUT', {
 				pants: {
 					...outfit.pants,
-					lastWorn: newDate,
-					wearDates: [...outfit.pants.wearDates, newDate]
+					lastWorn: newDate
 				}
 			})
 		}
@@ -73,10 +70,10 @@ export default class OutfitGenerator extends Component {
 			outfitDisplay = <p>Loading...</p>;
 		} else {
 			outfitDisplay = [];
-			if (outfit.outerwears && outfit.outerwears.length) {
+			if (outfit.outerwear && outfit.outerwear.length) {
 				outfitDisplay.push(<h3 key={ `outerwear-${Math.random()}` }>Outerwear</h3>);
-				outfitDisplay.push(...outfit.outerwears.map(o => {
-					return <SimpleArticle key={ o.id } data={ o } history={ history }/>;
+				outfitDisplay.push(...outfit.outerwear.map(e => {
+					return <SimpleArticle key={ e.id } data={ e } history={ history }/>;
 				}));
 			}
 
