@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
+import { withRouter } from 'react-router-dom';
+import { connect } from 'react-redux';
 import callAPI from '../Modules/call-api';
 import SimpleArticle from './SimpleArticle.jsx';
 
-export default class OutfitGenerator extends Component {
+class OutfitGenerator extends Component {
 	constructor() {
 		super();
 		this.state = {
@@ -99,3 +101,11 @@ export default class OutfitGenerator extends Component {
 		)
 	}
 }
+
+const mapStateToProps = state => {
+	return {
+		user: state.user
+	}
+}
+
+export default withRouter(connect(mapStateToProps)(OutfitGenerator));

@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
+import { withRouter } from 'react-router-dom';
+import { connect } from 'react-redux';
 import callAPI from '../Modules/call-api';
 import SmallArticle from '../Components/SmallArticle.jsx';
 
-export default class ArticleForm extends Component {
+class ArticleForm extends Component {
 	constructor() {
 		super();
 		this.state = {
@@ -352,3 +354,11 @@ export default class ArticleForm extends Component {
 		)
 	}
 }
+
+const mapStateToProps = state => {
+	return {
+		user: state.user
+	}
+}
+
+export default withRouter(connect(mapStateToProps)(ArticleForm));

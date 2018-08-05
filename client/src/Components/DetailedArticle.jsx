@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
+import { NavLink, withRouter } from 'react-router-dom';
+import { connect } from 'react-redux';
 import callAPI from '../Modules/call-api';
-import { NavLink } from 'react-router-dom';
 import SmallArticle from './SmallArticle.jsx';
 
-export default class DetailedArticle extends Component {
+class DetailedArticle extends Component {
 	constructor() {
 		super();
 		this.state = {
@@ -93,3 +94,11 @@ export default class DetailedArticle extends Component {
 		);
 	}
 }
+
+const mapStateToProps = state => {
+	return {
+		user: state.user
+	}
+}
+
+export default withRouter(connect(mapStateToProps)(DetailedArticle));

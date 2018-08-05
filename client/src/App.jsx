@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Switch, Route } from 'react-router-dom';
+import { Switch, Route, withRouter } from 'react-router-dom';
 import callAPI from './Modules/call-api';
 import updateUser from './Modules/update-user';
 import Header from './Components/Header.jsx';
@@ -9,14 +9,14 @@ import Login from './Pages/Login.jsx';
 import Register from './Pages/Register.jsx';
 import Logout from './Pages/Logout.jsx';
 import NotFound from './Pages/404.jsx';
+import { connect } from 'react-redux';
+import { logUserIn, logUserOut } from './redux-actions';
 import './App.css';
 
-export default class App extends Component {
+class App extends Component {
 	constructor() {
 		super();
 		this.state = {
-			user: {},
-			isAuthenticated: false,
 			articles: []
 		}
 	}
@@ -32,6 +32,14 @@ export default class App extends Component {
 		}
 	}
 
+	logUserIn = async (user, token) => {
+		const { logUserIn } = this.props;
+
+		await logUserIn({...user, token});
+		this.storeUserInfo({...user, token});
+		this.fetchArticles();
+	}
+
 	storeUserInfo(user) {
 		localStorage.setItem('user', JSON.stringify(user));
 		localStorage.setItem('lastRefresh', Date.now().toString());
@@ -42,29 +50,22 @@ export default class App extends Component {
 		localStorage.setItem('lastRefresh', null);
 	}
 
-	logUserIn = async (user, token) => {
-		await this.setState({
-			user: {...user, token},
-			isAuthenticated: true
-		});
-		
-		this.storeUserInfo({...user, token});
-		this.fetchArticles();
-	}
-
 	updateUser = async (user) => {
+		const { logUserIn } = this.props;
+
 		const updatedUser = await updateUser(user.id, user.token, { user });
 		this.storeUserInfo({...updatedUser, token: user.token});
-		this.setState({ user: {...updatedUser, token: user.token} });
+		logUserIn({...updatedUser, token: user.token});
 	}
 
 	logUserOut = () => {
-		this.setState({ isAuthenticated: false, user: {}});
+		const { logUserOut } = this.props;
+		logUserOut();
 		this.clearUserInfo();
 	}
 
 	fetchArticles = async () => {
-		const { user, isAuthenticated } = this.state;
+		const { user, isAuthenticated } = this.props;
 		if (!isAuthenticated)
 			return;
 
@@ -107,7 +108,8 @@ export default class App extends Component {
 	}
 
 	render() {
-		const { user, isAuthenticated, articles } = this.state;
+		const { user, isAuthenticated } = this.props;
+		const { articles } = this.state;
 		
 		const updateWardrobe = {
 			add: this.addArticle,
@@ -130,8 +132,8 @@ export default class App extends Component {
 
 		const content = isAuthenticated ? (
 			<Switch>
-				<Route exact path='/' render={ props => <Home { ...props } userHasClothes={ !!articles.length } updateUser={ this.updateUser } user={ user }/> }/>
-				<Route path='/wardrobe' render={ props => <Wardrobe { ...props } articles={ articles } updateWardrobe={ updateWardrobe } user={ user }/> }/>
+				<Route exact path='/' render={ props => <Home { ...props } userHasClothes={ !!articles.length } updateUser={ this.updateUser }/> }/>
+				<Route path='/wardrobe' render={ props => <Wardrobe { ...props } articles={ articles } updateWardrobe={ updateWardrobe }/> }/>
 				<Route exact path='/logout' render={ props => <Logout { ...props} logUserOut={ this.logUserOut }/> }/>
 				<Route component={ NotFound }/>
 			</Switch>
@@ -152,3 +154,17 @@ export default class App extends Component {
 		);
 	}
 }
+
+const mapStateToProps = state => {
+	return {
+		user: state.user,
+		isAuthenticated: state.isAuthenticated
+	}
+}
+
+const mapDispatchToProps = {
+	logUserIn,
+	logUserOut
+}
+
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(App));

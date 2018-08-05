@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
+import { withRouter } from 'react-router-dom';
+import { connect } from 'react-redux';
 import callAPI from '../Modules/call-api';
 
-export default class ChangeLocationForm extends Component {
+class ChangeLocationForm extends Component {
 	constructor() {
 		super();
 		this.state = {
@@ -73,3 +75,11 @@ export default class ChangeLocationForm extends Component {
 		)
 	}
 }
+
+const mapStateToProps = state => {
+	return {
+		user: state.user
+	}
+}
+
+export default withRouter(connect(mapStateToProps)(ChangeLocationForm));

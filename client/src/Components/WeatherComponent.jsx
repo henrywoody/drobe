@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
+import { withRouter } from 'react-router-dom';
+import { connect } from 'react-redux';
 import callAPI from '../Modules/call-api';
 import PieceOfWeatherData from './PieceOfWeatherData.jsx';
 import ChangeLocationForm from '../Forms/ChangeLocationForm.jsx';
 
-export default class WeatherComponent extends Component {
+class WeatherComponent extends Component {
 	constructor() {
 		super();
 		this.state = {
@@ -73,7 +75,7 @@ export default class WeatherComponent extends Component {
 		} else {
 			content = (
 				<div>
-					<ChangeLocationForm didSubmit={ this.toggleLocationForm } updateUser={ updateUser } user={ user } />
+					<ChangeLocationForm didSubmit={ this.toggleLocationForm } updateUser={ updateUser }/>
 					<button onClick={ this.toggleLocationForm }>Cancel</button>
 				</div>
 			)
@@ -88,3 +90,11 @@ export default class WeatherComponent extends Component {
 		)
 	}
 }
+
+const mapStateToProps = state => {
+	return {
+		user: state.user
+	}
+}
+
+export default withRouter(connect(mapStateToProps)(WeatherComponent));
