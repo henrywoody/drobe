@@ -58,8 +58,7 @@ class DetailedArticle extends Component {
 
 		const additionalBits = [];
 		for (const key in articleData) {
-			// console.log(key, articleData[key])
-			if (articleData[key] && !['id', 'owner', 'name', 'image', 'description', 'articleKind', 'shirts', 'pants', 'outerwears', 'dresses'].includes(key)) {
+			if (articleData[key] && !['id', 'owner', 'name', 'imageUrl', 'description', 'articleKind', 'shirts', 'pants', 'outerwears', 'dresses'].includes(key)) {
 				additionalBits.push(
 					<li key={ key }><strong>{ key }</strong>: { articleData[key] }</li>
 				);
@@ -67,7 +66,7 @@ class DetailedArticle extends Component {
 				additionalBits.push(
 					<div key={ key }>
 						{ articleData[key].map(e => {
-							return <SmallArticle key={ e.id } field={ key } id={ e.id } name={ e.name } image={ e.image } onClick={ this.routeToArticle }/>;
+							return <SmallArticle key={ e.id } field={ key } id={ e.id } name={ e.name } imageUrl={ e.imageUrl } onClick={ this.routeToArticle }/>;
 						}) }
 					</div>
 				);
@@ -81,7 +80,7 @@ class DetailedArticle extends Component {
 				<NavLink exact to={ `/wardrobe/${pluralArticleKind}/${articleId}/edit` }>Edit</NavLink>
 				<button onClick={ this.handleDelete }>Delete</button>
 
-				<img src={ articleData.image } alt='image'/>
+				<img src={ articleData.imageUrl } alt='image'/>
 
 				<p>{ articleData.description }</p>
 

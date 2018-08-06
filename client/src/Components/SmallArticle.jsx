@@ -7,11 +7,11 @@ export default class SmallArticle extends Component {
 	}
 
 	render() {
-		const { name, image } = this.props;
+		const { name, imageUrl } = this.props;
 
 		return (
 			<div onClick={ this.handleClick }>
-				<img src={ image } alt='image'/>
+				<img src={ imageUrl } alt='image'/>
 				<span>{ name }</span>
 			</div>
 		)

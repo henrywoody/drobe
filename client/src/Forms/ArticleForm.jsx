@@ -242,25 +242,25 @@ class ArticleForm extends Component {
 		const addedShirts = articles.filter(e => {
 			return formOptions.shirts.includes(e.id) && e.articleKind === 'shirt';
 		}).map(e => {
-			return <SmallArticle key={ e.id } field='shirts' id={ e.id } name={ e.name } image={ e.image } onClick={ this.removeAssociatedArticle }/>
+			return <SmallArticle key={ e.id } field='shirts' id={ e.id } name={ e.name } imageUrl={ e.imageUrl } onClick={ this.removeAssociatedArticle }/>
 		});
 
 		const addedPants = articles.filter(e => {
 			return formOptions.pants.includes(e.id) && e.articleKind === 'pants';
 		}).map(e => {
-			return <SmallArticle key={ e.id } field='pants' id={ e.id } name={ e.name } image={ e.image } onClick={ this.removeAssociatedArticle }/>
+			return <SmallArticle key={ e.id } field='pants' id={ e.id } name={ e.name } imageUrl={ e.imageUrl } onClick={ this.removeAssociatedArticle }/>
 		});
 
 		const addedDresses = articles.filter(e => {
 			return formOptions.dresses.includes(e.id) && e.articleKind === 'dress';
 		}).map(e => {
-			return <SmallArticle key={ e.id } field='dresses' id={ e.id } name={ e.name } image={ e.image } onClick={ this.removeAssociatedArticle }/>
+			return <SmallArticle key={ e.id } field='dresses' id={ e.id } name={ e.name } imageUrl={ e.imageUrl } onClick={ this.removeAssociatedArticle }/>
 		});
 
 		const addedOuterwears = articles.filter(e => {
 			return formOptions.outerwears.includes(e.id) && e.articleKind === 'outerwear';
 		}).map(e => {
-			return <SmallArticle key={ e.id } field='outerwears' id={ e.id } name={ e.name } image={ e.image } onClick={ this.removeAssociatedArticle }/>
+			return <SmallArticle key={ e.id } field='outerwears' id={ e.id } name={ e.name } imageUrl={ e.imageUrl } onClick={ this.removeAssociatedArticle }/>
 		});
 
 
@@ -268,25 +268,25 @@ class ArticleForm extends Component {
 		const shirtSuggestions = articles.filter(e => {
 			return e.articleKind === 'shirt' && !formOptions.shirts.includes(e.id) && e.name.match(new RegExp(`^${articleSearchOptions.shirts}`, 'i'));
 		}).map(e => {
-			return <SmallArticle key={ e.id } field='shirts' id={ e.id } name={ e.name } image={ e.image } onClick={ this.addAssociatedArticle }/>
+			return <SmallArticle key={ e.id } field='shirts' id={ e.id } name={ e.name } imageUrl={ e.imageUrl } onClick={ this.addAssociatedArticle }/>
 		});
 
 		const pantsSuggestions = articles.filter(e => {
 			return e.articleKind === 'pants' && !formOptions.pants.includes(e.id) && e.name.match(new RegExp(`^${articleSearchOptions.pants}`, 'i'));
 		}).map(e => {
-			return <SmallArticle key={ e.id } field='pants' id={ e.id } name={ e.name } image={ e.image } onClick={ this.addAssociatedArticle }/>
+			return <SmallArticle key={ e.id } field='pants' id={ e.id } name={ e.name } imageUrl={ e.imageUrl } onClick={ this.addAssociatedArticle }/>
 		});
 
 		const dressSuggestions = articles.filter(e => {
 			return e.articleKind === 'dress' && !formOptions.dresses.includes(e.id) && e.name.match(new RegExp(`^${articleSearchOptions.dresses}`, 'i'));
 		}).map(e => {
-			return <SmallArticle key={ e.id } field='dresses' id={ e.id } name={ e.name } image={ e.image } onClick={ this.addAssociatedArticle }/>
+			return <SmallArticle key={ e.id } field='dresses' id={ e.id } name={ e.name } imageUrl={ e.imageUrl } onClick={ this.addAssociatedArticle }/>
 		})
 
 		const outerwearSuggestions = articles.filter(e => {
 			return e.articleKind === 'outerwear' && !formOptions.outerwears.includes(e.id) && e.id !== Number(articleId) && e.name.match(new RegExp(`^${articleSearchOptions.outerwears}`, 'i'));
 		}).map(e => {
-			return <SmallArticle key={ e.id } field='outerwears' id={ e.id } name={ e.name } image={ e.image } onClick={ this.addAssociatedArticle }/>
+			return <SmallArticle key={ e.id } field='outerwears' id={ e.id } name={ e.name } imageUrl={ e.imageUrl } onClick={ this.addAssociatedArticle }/>
 		});
 
 		// Form Fields for Associat(ing/ed) Articles
