@@ -58,7 +58,7 @@ class DetailedArticle extends Component {
 
 		const additionalBits = [];
 		for (const key in articleData) {
-			console.log(key, articleData[key])
+			// console.log(key, articleData[key])
 			if (articleData[key] && !['id', 'owner', 'name', 'image', 'description', 'articleKind', 'shirts', 'pants', 'outerwears', 'dresses'].includes(key)) {
 				additionalBits.push(
 					<li key={ key }><strong>{ key }</strong>: { articleData[key] }</li>

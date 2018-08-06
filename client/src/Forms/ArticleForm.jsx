@@ -5,6 +5,7 @@ import callAPI from '../Modules/call-api';
 import fetchAllArticles from '../Modules/fetch-all-articles';
 import pluralizeArticleKind from '../Modules/pluralize-article-kind';
 import singularizeArticleKind from '../Modules/singularize-article-kind';
+import uploadImage from '../Modules/upload-image';
 import SmallArticle from '../Components/SmallArticle.jsx';
 
 class ArticleForm extends Component {
@@ -23,10 +24,7 @@ class ArticleForm extends Component {
 				articleKind: 'shirt',
 				name: '',
 				description: '',
-				image: {
-					path: '',
-					data: null
-				},
+				imageUrl: '',
 				rating: '1',
 				color: '',
 				minTemp: 50,
@@ -39,6 +37,10 @@ class ArticleForm extends Component {
 				pants: [],
 				dresses: [],
 				outerwears: []
+			},
+			image: {
+				path: '',
+				data: null
 			},
 			message: null
 		};
@@ -70,7 +72,7 @@ class ArticleForm extends Component {
 
 	handleChange = async (event) => {
 		const { name, type, value, checked } = event.target;
-		const { formOptions, message } = this.state;
+		const { formOptions, image, message } = this.state;
 		let newMessage = message;
 
 		// handling checkboxes
@@ -79,24 +81,23 @@ class ArticleForm extends Component {
 		} else if (name === 'image') { // handling image upload
 			const imageTooLargeMessage = 'Image is too large, must be less than 16 MB.';
 			const file = event.target.files[0];
-			console.log(file)
 
-			if (file.size >= 16 * 1024 * 1024) { // max file size 16MB
-				formOptions.image.data = '';
+			if (!file) {
+				image.path = '',
+				image.data = null
+			} else if (file.size >= 16 * 1024 * 1024) { // max file size 16MB
+				image.data = '';
 				return this.setState({
 					message: imageTooLargeMessage,
 					formOptions
 				});
+			} else {
+				if (message === imageTooLargeMessage)
+					newMessage = null;
+
+				image.path = value;
+				image.data = file;
 			}
-
-			if (message === imageTooLargeMessage)
-				newMessage = null;
-
-			formOptions.image = {
-				path: value,
-				data: file
-			}
-
 		} else {
 			formOptions[name] = value;
 		}
@@ -121,13 +122,22 @@ class ArticleForm extends Component {
 				formOptions.snowOK = false;
 			}
 		}
-		this.setState({ formOptions, message: newMessage });
+		this.setState({ formOptions, image, message: newMessage });
 	}
 
 	handleSubmit = async (event) => {
 		event.preventDefault();
 		const { match, user, history } = this.props;
-		const { formOptions } = this.state;
+		const { formOptions, image } = this.state;
+
+		// upload image first if there is one
+		if (image.data) {
+			const imageResponse = await uploadImage(image, user.token);
+			if (imageResponse.error) {
+				return this.setState({message: 'There was a problem with the image upload, please try again or select a different image.'});
+			}
+			formOptions.imageUrl = imageResponse.imageUrl;
+		}
 
 		let endpoint, method, articleKind;
 		if (match.path === '/wardrobe/new') {
@@ -190,7 +200,7 @@ class ArticleForm extends Component {
 
 	render() {
 		const { match } = this.props;
-		const { articles, articleKinds, articleSearchOptions, formOptions, message } = this.state;
+		const { articles, articleKinds, articleSearchOptions, formOptions, image, message } = this.state;
 		const { articleId } = match.params;
 
 		const articleKindOptions = articleKinds.map(articleKind => {
@@ -353,7 +363,7 @@ class ArticleForm extends Component {
 				<textarea name='description' value={ formOptions.description } placeholder='description' onChange={ this.handleChange }/>
 
 				<label htmlFor='image'>Image</label>
-				<input name='image' type='file' value={ formOptions.image.path } onChange={ this.handleChange }/>
+				<input name='image' type='file' value={ image.path } onChange={ this.handleChange }/>
 
 				<label htmlFor='rating'>Rating</label>
 				<input name='rating' type='range' min='1' max='5' value={ formOptions.rating } onChange={ this.handleChange }/>

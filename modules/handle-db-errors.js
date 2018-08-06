@@ -12,6 +12,9 @@ module.exports = (err, res) => {
 	if (err.name === 'InvalidIdForOwner')
 		return res.status(403).json({error: err.name, message: err.message});
 
+	if (err.name === 'ImageUploadError')
+		return res.status(400).json({error: err.name, message: err.message});
+
 	// Duplicate Error
 	if (err.code === 11000)
 		return res.status(400).json({error: 'DuplicateError'});

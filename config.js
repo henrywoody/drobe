@@ -7,7 +7,10 @@ config.dev = {
 	dbHost: process.env.DB_HOST,
 	dbUser: process.env.DB_USER,
 	dbPassword: process.env.DB_PASSWORD,
-	appSecret: process.env.APP_SECRET
+	appSecret: process.env.APP_SECRET,
+	imagesBucket: process.env.DEV_IMAGES_BUCKET,
+	awsAccessKeyId: process.env.AWS_ACCESS_KEY_ID,
+	awsSecretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
 };
 
 // Test
@@ -17,7 +20,10 @@ config.test = {
 	dbHost: process.env.DB_HOST,
 	dbUser: process.env.DB_USER,
 	dbPassword: process.env.DB_PASSWORD,
-	appSecret: process.env.APP_SECRET
+	appSecret: process.env.APP_SECRET,
+	imagesBucket: process.env.TEST_IMAGES_BUCKET,
+	awsAccessKeyId: process.env.AWS_ACCESS_KEY_ID,
+	awsSecretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
 };
 
 
