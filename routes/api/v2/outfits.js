@@ -5,10 +5,13 @@ const	express = require('express'),
 
 router.get('/today', async (req, res) => {
 	const { user } = req;
+	try {
+		const outfit = await generateOutfit.forUser(user);
 
-	const outfit = await generateOutfit.forUser(user);
-
-	return res.json(outfit);
+		return res.json(outfit);
+	} catch (err) {
+		handleErrors(err, res);
+	}
 });
 
 module.exports = router;
