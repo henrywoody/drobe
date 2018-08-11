@@ -5,8 +5,9 @@ import OutfitGenerator from '../Components/OutfitGenerator.jsx';
 import WeatherComponent from '../Components/WeatherComponent.jsx';
 
 class Home extends Component {
+
 	render() {
-		const { userHasClothes, updateUser, user, history } = this.props;
+		const { userHasClothes, user } = this.props;
 
 		return (
 			<main>
@@ -16,9 +17,9 @@ class Home extends Component {
 					Welcome home.
 				</p>
 
-				<WeatherComponent updateUser={ updateUser } history={ history }/>
+				<WeatherComponent/>
 				
-				<OutfitGenerator disabled={ !userHasClothes } history={ history }/>
+				<OutfitGenerator/>
 			</main>
 		);
 	}

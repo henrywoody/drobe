@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import userStorage from '../Modules/user-storage';
 
 export default class UserForm extends Component {
 	constructor() {
@@ -25,7 +26,7 @@ export default class UserForm extends Component {
 
 	handleSubmit = async (event) => {
 		event.preventDefault();
-		const { formType, logUserIn, history } = this.props;
+		const { formType, history } = this.props;
 		const { formOptions } = this.state;
 
 		if (formType === 'register') {
@@ -49,7 +50,7 @@ export default class UserForm extends Component {
 			}
 		} else {
 			const jsonResponse = await response.json();
-			logUserIn(jsonResponse.user, jsonResponse.token);
+			userStorage.logUserIn(jsonResponse.user, jsonResponse.token);
 			
 			if (formType === 'register')
 				history.replace('/');

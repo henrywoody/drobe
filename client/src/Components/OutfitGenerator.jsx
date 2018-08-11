@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import { withRouter } from 'react-router-dom';
+import { withRouter, Link } from 'react-router-dom';
 import { connect } from 'react-redux';
+import getOutfit from '../Modules/get-outfit';
 import callAPI from '../Modules/call-api';
 import SimpleArticle from './SimpleArticle.jsx';
 
@@ -8,18 +9,23 @@ class OutfitGenerator extends Component {
 	constructor() {
 		super();
 		this.state = {
+			isLoading: false,
 			outfit: {},
-			loading: false
+			noArticles: false
 		}
 	}
 
 	generateOutfit = async () => {
 		const { user } = this.props;
 
-		await this.setState({ loading: true });
+		await this.setState({ isLoading: true });
 
-		const outfit = await callAPI('outfits/today', null, user.token);
-		this.setState({ outfit, loading: false });
+		const outfit = await getOutfit(user.token);
+		if ('error' in outfit) {
+			this.setState({noArticles: true, isLoading: false});
+		} else {
+			this.setState({ outfit, isLoading: false });
+		}
 	}
 
 	handleSelect = () => {
@@ -72,45 +78,49 @@ class OutfitGenerator extends Component {
 	}
 
 	render() {
-		const { disabled, history } = this.props;
-		const { outfit, loading } = this.state;
+		const { history } = this.props;
+		const { isLoading, outfit, noArticles } = this.state;
 
 		let outfitDisplay;
 
-		if (loading) {
-			outfitDisplay = <p>Loading...</p>;
+		if (isLoading) {
+			outfitDisplay = <span>Loading...</span>;
+		} else if (noArticles) {
+			outfitDisplay = <span>You don't have enough articles saved to make an outfit. <Link to='/wardrobe/new'>Add an article</Link>.</span>
 		} else {
 			outfitDisplay = [];
 			if (outfit.outerwear && outfit.outerwear.length) {
 				outfitDisplay.push(<h3 key={ `outerwear-${Math.random()}` }>Outerwear</h3>);
 				outfitDisplay.push(...outfit.outerwear.map(e => {
-					return <SimpleArticle key={ e.id } data={ e } history={ history }/>;
+					return <SimpleArticle key={ e.id } data={ e }/>;
 				}));
 			}
 
 			if (outfit.shirt) {
 				outfitDisplay.push(<h3 key='shirt'>Shirt</h3>);
-				outfitDisplay.push(<SimpleArticle key={ `shirt-${outfit.shirt.id}` } data={ outfit.shirt } history={ history }/>);
+				outfitDisplay.push(<SimpleArticle key={ `shirt-${outfit.shirt.id}` } data={ outfit.shirt }/>);
 			}
 			if (outfit.pants) {
 				outfitDisplay.push(<h3 key='pants'>Pants</h3>);
-				outfitDisplay.push(<SimpleArticle key={ `pants-${outfit.pants.id}` } data={ outfit.pants } history={ history }/>);
+				outfitDisplay.push(<SimpleArticle key={ `pants-${outfit.pants.id}` } data={ outfit.pants }/>);
 			}
 
 			if (outfit.dress) {
 				outfitDisplay.push(<h3 key='dress'>Dress</h3>);
-				outfitDisplay.push(<SimpleArticle key={ `dress-${outfit.dress.id}` } data={ outfit.dress } history={ history }/>);
+				outfitDisplay.push(<SimpleArticle key={ `dress-${outfit.dress.id}` } data={ outfit.dress }/>);
 			}
 
 			if (outfit.shirt || outfit.pants)
-				outfitDisplay.push(<button key='wear-button' onClick={ this.handleSelect }>Wear</button>)
+				outfitDisplay.push(<button key='wear-button' onClick={ this.handleSelect }>Wear</button>);
+
+			outfitDisplay.push(<button key='generate' onClick={ this.generateOutfit }>Generate Outfit</button>);
 		}
 
 		return (
 			<div>
 				<h2>Outfit</h2>
+
 				{  outfitDisplay  }
-				<button disabled={ disabled } onClick={ this.generateOutfit }>Generate Outfit</button>
 			</div>
 		)
 	}

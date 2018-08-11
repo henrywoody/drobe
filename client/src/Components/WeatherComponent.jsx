@@ -45,7 +45,7 @@ class WeatherComponent extends Component {
 	}
 
 	render() {
-		const { updateUser, user } = this.props;
+		const { user } = this.props;
 		const { weather, showLocationForm } = this.state;
 
 		let content;
@@ -75,7 +75,7 @@ class WeatherComponent extends Component {
 		} else {
 			content = (
 				<div>
-					<ChangeLocationForm didSubmit={ this.toggleLocationForm } updateUser={ updateUser }/>
+					<ChangeLocationForm didSubmit={ this.toggleLocationForm }/>
 					<button onClick={ this.toggleLocationForm }>Cancel</button>
 				</div>
 			)

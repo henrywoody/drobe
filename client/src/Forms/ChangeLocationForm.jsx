@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import callAPI from '../Modules/call-api';
+import userStorage from '../Modules/user-storage';
 
 class ChangeLocationForm extends Component {
 	constructor() {
@@ -31,9 +32,9 @@ class ChangeLocationForm extends Component {
 		if (!coordinateCheck)
 			return;
 
-		const { didSubmit, updateUser, user } = this.props;
+		const { didSubmit, user } = this.props;
 		const { locationName, longitude, latitude } = this.state;
-		updateUser({...user, locationName, longitude, latitude});
+		userStorage.updateUser({...user, locationName, longitude, latitude});
 		didSubmit();
 	}
 
