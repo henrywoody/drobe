@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { NavLink, withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
-import SubNav from './SubNav.jsx';
-import SimpleArticle from './SimpleArticle.jsx';
+import SubNav from '../Components/SubNav.jsx';
+import SimpleArticle from '../Components/SimpleArticle.jsx';
 import equal from 'fast-deep-equal';
 import callAPI from '../Modules/call-api';
 import fetchAllArticles from '../Modules/fetch-all-articles';
@@ -44,17 +44,17 @@ class ArticlesIndex extends Component {
 	}
 
 	render() {
-		const { history } = this.props;
 		const { categories, activeArticles } = this.state;
-		const articleComponents = activeArticles.map(a => <SimpleArticle key={ `${a.articleKind}-${a.id}` } data={ a } history={ history }/>);
+		const articleComponents = activeArticles.map(e => <SimpleArticle key={ `${e.articleKind}-${e.id}` } data={ e }/>);
 
 		return (
-			<div>
-				<h2>Display</h2>
+			<main>
+				<h1>Wardrobe</h1>
+				
 				<SubNav items={ categories } handleClick={ this.filterArticles }/>
 				<NavLink exact to='/wardrobe/new'>New</NavLink>
 				{ articleComponents }
-			</div>
+			</main>
 		);
 	}
 }

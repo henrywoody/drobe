@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import { NavLink, withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import callAPI from '../Modules/call-api';
-import SmallArticle from './SmallArticle.jsx';
+import SmallArticle from '../Components/SmallArticle.jsx';
 
-class DetailedArticle extends Component {
+class ArticleDetail extends Component {
 	constructor() {
 		super();
 		this.state = {
@@ -42,12 +42,12 @@ class DetailedArticle extends Component {
 		const { articleData } = this.state;
 		
 		await callAPI(`${pluralArticleKind}/${articleId}`, null, user.token, 'DELETE');
-		history.replace('/wardrobe');
+		history.push('/wardrobe');
 	}
 
 	routeToArticle = async (pluralArticleKind, id) => {
 		const { history } = this.props;
-		history.replace(`/wardrobe/${pluralArticleKind}/${id}`);
+		history.push(`/wardrobe/${pluralArticleKind}/${id}`);
 	}
 
 	render() {
@@ -74,8 +74,8 @@ class DetailedArticle extends Component {
 		}
 
 		return (
-			<div>
-				<h3>{ articleData.name }</h3>
+			<main>
+				<h1>{ articleData.name }</h1>
 
 				<NavLink exact to={ `/wardrobe/${pluralArticleKind}/${articleId}/edit` }>Edit</NavLink>
 				<button onClick={ this.handleDelete }>Delete</button>
@@ -88,7 +88,7 @@ class DetailedArticle extends Component {
 					{ additionalBits }
 				</ul>
 
-			</div>
+			</main>
 		);
 	}
 }
@@ -99,4 +99,4 @@ const mapStateToProps = state => {
 	}
 }
 
-export default withRouter(connect(mapStateToProps)(DetailedArticle));
+export default withRouter(connect(mapStateToProps)(ArticleDetail));
