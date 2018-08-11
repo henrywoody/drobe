@@ -1,16 +1,14 @@
 import React, { Component } from 'react';
-import { Link, withRouter } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import UserForm from '../Forms/UserForm.jsx';
 
-class Login extends Component {
+export default class Login extends Component {
 	render() {
-		const { logUserIn } = this.props;
-		
 		return (
 			<main>
 				<h1>Login</h1>
 
-				<UserForm formType='login' logUserIn={ logUserIn }/>
+				<UserForm formType='login'/>
 				
 				<p>
 					Don't have an account? <Link exact to='/register'>Register here</Link>
@@ -19,5 +17,3 @@ class Login extends Component {
 		)
 	}
 }
-
-export default withRouter(Login);

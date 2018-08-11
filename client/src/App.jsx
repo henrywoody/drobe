@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Switch, Route, withRouter } from 'react-router-dom';
-import callAPI from './Modules/call-api';
 import updateUser from './Modules/update-user';
 import Header from './Components/Header.jsx';
 import Wardrobe from './Hubs/Wardrobe.jsx';
@@ -39,9 +38,9 @@ class App extends Component {
 
 			content = (
 				<Switch>
-					<Route exact path='/' render={ props => <Home { ...props } updateUser={ this.updateUser }/> }/>
-					<Route path='/wardrobe' render={ props => <Wardrobe { ...props }/> }/>
-					<Route exact path='/logout' render={ props => <Logout { ...props} logUserOut={ this.logUserOut }/> }/>
+					<Route exact path='/' component={ Home }/>
+					<Route path='/wardrobe' component={ Wardrobe }/>
+					<Route exact path='/logout' component={ Logout }/>
 					<Route component={ NotFound }/>
 				</Switch>
 			)
@@ -53,9 +52,9 @@ class App extends Component {
 
 			content = (
 				<Switch>
-					<Route exact path='/register' render={ props => <Register { ...props } logUserIn={ this.logUserIn }/> }/>
-					<Route exact path='/logout' render={ props => <Logout { ...props} logUserOut={ this.logUserOut }/> }/>
-					<Route path='/' render={ props => <Login { ...props } logUserIn={ this.logUserIn }/> }/>
+					<Route exact path='/register' component={ Register }/>
+					<Route exact path='/logout' component={ Logout }/>
+					<Route path='/' component={ Login }/>
 				</Switch>
 			)
 		}

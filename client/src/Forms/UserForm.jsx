@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
+import { withRouter } from 'react-router-dom';
 import userStorage from '../Modules/user-storage';
 
-export default class UserForm extends Component {
+class UserForm extends Component {
 	constructor() {
 		super();
 		this.state = {
@@ -102,3 +103,5 @@ export default class UserForm extends Component {
 		)
 	}
 }
+
+export default withRouter(UserForm);

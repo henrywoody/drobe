@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import { NavLink, withRouter } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import userStorage from '../Modules/user-storage';
 
-class Logout extends Component {
+export default class Logout extends Component {
 	componentWillMount() {
 		fetch('/users/logout');
 		userStorage.logUserOut();
@@ -24,5 +24,3 @@ class Logout extends Component {
 		)
 	}
 }
-
-export default withRouter(Logout);
