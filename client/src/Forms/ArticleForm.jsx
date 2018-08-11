@@ -158,7 +158,7 @@ class ArticleForm extends Component {
 		} else {
 			const { id } = response;
 			const pluralArticleKind = pluralizeArticleKind(response.articleKind);
-			history.replace(`/wardrobe/${pluralArticleKind}/${id}`);
+			history.push(`/wardrobe/${pluralArticleKind}/${id}`);
 		}
 	}
 
@@ -171,9 +171,9 @@ class ArticleForm extends Component {
 		const { pluralArticleKind, articleId } = match.params;
 
 		if (match.path === '/wardrobe/new') {
-			history.replace('/wardrobe');
+			history.push('/wardrobe');
 		} else {
-			history.replace(`/wardrobe/${pluralArticleKind}/${articleId}`);
+			history.push(`/wardrobe/${pluralArticleKind}/${articleId}`);
 		}
 	}
 

@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, withRouter } from 'react-router-dom';
 import UserForm from '../Forms/UserForm.jsx';
 
-export default class Register extends Component {
+class Register extends Component {
 	render() {
 		const { logUserIn, history } = this.props;
 
@@ -19,3 +19,5 @@ export default class Register extends Component {
 		)
 	}
 }
+
+export default withRouter(Register);

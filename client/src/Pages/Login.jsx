@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import { NavLink } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 import UserForm from '../Forms/UserForm.jsx';
 
-export default class Login extends Component {
+class Login extends Component {
 	render() {
 		const { logUserIn } = this.props;
 		
@@ -13,9 +13,11 @@ export default class Login extends Component {
 				<UserForm formType='login' logUserIn={ logUserIn }/>
 				
 				<p>
-					Don't have an account? <NavLink exact to='/register'>Register here</NavLink>
+					Don't have an account? <Link exact to='/register'>Register here</Link>
 				</p>
 			</main>
 		)
 	}
 }
+
+export default withRouter(Login);

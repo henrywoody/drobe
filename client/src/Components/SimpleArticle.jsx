@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
+import { withRouter } from 'react-router-dom';
 import pluralizeArticleKind from '../Modules/pluralize-article-kind';
 
-export default class SimpleArticle extends Component {
+class SimpleArticle extends Component {
 	handleClick = () => {
 		const { data, history } = this.props;
 		const pluralArticleKind = pluralizeArticleKind(data.articleKind);
-		history.replace(`/wardrobe/${pluralArticleKind}/${data.id}`);
+		history.push(`/wardrobe/${pluralArticleKind}/${data.id}`);
 	}
 
 	render() {
@@ -22,3 +23,5 @@ export default class SimpleArticle extends Component {
 		);
 	}
 }
+
+export default withRouter(SimpleArticle);
