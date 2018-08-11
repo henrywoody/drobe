@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { withRouter, Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import getOutfit from '../Modules/get-outfit';
-import callAPI from '../Modules/call-api';
+import wearOutfit from '../Modules/wear-outfit';
 import SimpleArticle from './SimpleArticle.jsx';
 
 class OutfitGenerator extends Component {
@@ -31,50 +31,7 @@ class OutfitGenerator extends Component {
 	handleSelect = () => {
 		const { user } = this.props;
 		const { outfit } = this.state;
-
-		const newDate = new Date();
-
-		if (outfit.outerwear && outfit.outerwear.length) {
-			for (const outerwear of outfit.outerwear) {
-				const endpoint = `outerwears/${outerwear.id}`;
-				callAPI(endpoint, null, user.token, 'PUT', {
-					outerwear: {
-						...outerwear,
-						lastWorn: newDate
-					}
-				});
-			}
-		}
-
-		if (outfit.shirt) {
-			const endpoint = `shirts/${outfit.shirt.id}`;
-			callAPI(endpoint, null, user.token, 'PUT', {
-				shirt: {
-					...outfit.shirt,
-					lastWorn: newDate
-				}
-			});
-		}
-
-		if (outfit.pants) {
-			const endpoint = `pants/${outfit.pants.id}`;
-			callAPI(endpoint, null, user.token, 'PUT', {
-				pants: {
-					...outfit.pants,
-					lastWorn: newDate
-				}
-			});
-		}
-
-		if (outfit.dress) {
-			const endpoint = `dresses/${outfit.dress.id}`;
-			callAPI(endpoint, null, user.token, 'PUT', {
-				dress: {
-					...outfit.dress,
-					lastWorn: newDate
-				}
-			});
-		}
+		wearOutfit(outfit, user.token);
 	}
 
 	render() {
