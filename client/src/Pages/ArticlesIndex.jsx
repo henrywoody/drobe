@@ -4,8 +4,7 @@ import { connect } from 'react-redux';
 import SubNav from '../Components/SubNav.jsx';
 import SimpleArticle from '../Components/SimpleArticle.jsx';
 import equal from 'fast-deep-equal';
-import callAPI from '../Modules/call-api';
-import fetchAllArticles from '../Modules/fetch-all-articles';
+import api from '../Modules/api';
 import pluralizeArticleKind from '../Modules/pluralize-article-kind';
 import singularizeArticleKind from '../Modules/singularize-article-kind';
 
@@ -22,7 +21,7 @@ class ArticlesIndex extends Component {
 	async componentWillMount() {
 		const { user } = this.props
 		
-		const articles = await fetchAllArticles(user.token);
+		const articles = await api.getAllArticles(user.token);
 
 		const activeArticles = [...articles]; // all are active to start
 		const categories = ['All', ...new Set(articles.map(a => pluralizeArticleKind(a.articleKind)))];

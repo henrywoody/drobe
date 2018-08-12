@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { NavLink, withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
-import callAPI from '../Modules/call-api';
+import api from '../Modules/api';
 import SmallArticle from '../Components/SmallArticle.jsx';
 
 class ArticleDetail extends Component {
@@ -32,7 +32,7 @@ class ArticleDetail extends Component {
 
 	async setupData(pluralArticleKind, articleId) {
 		const { user } = this.props;
-		const articleData = await callAPI(`${pluralArticleKind}/${articleId}`, null, user.token);
+		const articleData = await api.getArticle(pluralArticleKind, articleId, user.token);
 		await this.setState({ articleData });
 	}
 
@@ -40,8 +40,8 @@ class ArticleDetail extends Component {
 		const { match, history, user } = this.props;
 		const { pluralArticleKind, articleId } = match.params;
 		const { articleData } = this.state;
-		
-		await callAPI(`${pluralArticleKind}/${articleId}`, null, user.token, 'DELETE');
+			
+		await api.deleteArticle(pluralArticleKind, articleId, user.token);
 		history.push('/wardrobe');
 	}
 

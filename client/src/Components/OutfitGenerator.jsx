@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import { withRouter, Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import getOutfit from '../Modules/get-outfit';
-import wearOutfit from '../Modules/wear-outfit';
+import api from '../Modules/api';
 import SimpleArticle from './SimpleArticle.jsx';
 
 class OutfitGenerator extends Component {
@@ -20,7 +19,7 @@ class OutfitGenerator extends Component {
 
 		await this.setState({ isLoading: true });
 
-		const outfit = await getOutfit(user.token);
+		const outfit = await api.getOutfit(user.token);
 		if ('error' in outfit) {
 			this.setState({noArticles: true, isLoading: false});
 		} else {
@@ -31,7 +30,7 @@ class OutfitGenerator extends Component {
 	handleSelect = () => {
 		const { user } = this.props;
 		const { outfit } = this.state;
-		wearOutfit(outfit, user.token);
+		api.wearOutfit(outfit, user.token);
 	}
 
 	render() {
@@ -67,7 +66,7 @@ class OutfitGenerator extends Component {
 				outfitDisplay.push(<SimpleArticle key={ `dress-${outfit.dress.id}` } data={ outfit.dress }/>);
 			}
 
-			if (outfit.shirt || outfit.pants)
+			if (outfit.shirt || outfit.dress)
 				outfitDisplay.push(<button key='wear-button' onClick={ this.handleSelect }>Wear</button>);
 
 			outfitDisplay.push(<button key='generate' onClick={ this.generateOutfit }>Generate Outfit</button>);

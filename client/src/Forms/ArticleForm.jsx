@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
-import callAPI from '../Modules/call-api';
-import fetchAllArticles from '../Modules/fetch-all-articles';
+import api from '../Modules/api';
 import pluralizeArticleKind from '../Modules/pluralize-article-kind';
 import singularizeArticleKind from '../Modules/singularize-article-kind';
 import uploadImage from '../Modules/upload-image';
@@ -20,7 +19,7 @@ class ArticleForm extends Component {
 				outerwears: ''
 			},
 			articles: [],
-			formOptions: {
+			formData: {
 				articleKind: 'shirt',
 				name: '',
 				description: '',
@@ -48,36 +47,36 @@ class ArticleForm extends Component {
 
 	async componentWillMount() {
 		const { match, user } = this.props;
-		const { formOptions } = this.state;
+		const { formData } = this.state;
 		if (match.path !== '/wardrobe/new') {
 			const { pluralArticleKind, articleId } = match.params;
-			const data = await callAPI(`${pluralArticleKind}/${articleId}`, null, user.token);
+			const data = await api.getArticle(pluralArticleKind, articleId, user.token);
 
 			for (const option in data) {
-				if (option in formOptions) {
+				if (option in formData) {
 					if (option === 'image') continue;
 					if (['shirts', 'pants', 'dresses', 'outerwears'].includes(option)) {
-						formOptions[option] = data[option].map(e => e.id);
+						formData[option] = data[option].map(e => e.id);
 					} else {
-						formOptions[option] = data[option];
+						formData[option] = data[option];
 					}
 				}
 			}
 		}
-		this.setState({ formOptions });
+		this.setState({ formData });
 
-		const articles = await fetchAllArticles(user.token);
+		const articles = await api.getAllArticles(user.token);
 		this.setState({ articles });
 	}
 
 	handleChange = async (event) => {
 		const { name, type, value, checked } = event.target;
-		const { formOptions, image, message } = this.state;
+		const { formData, image, message } = this.state;
 		let newMessage = message;
 
 		// handling checkboxes
 		if (type === 'checkbox') {
-			formOptions[name] = checked;
+			formData[name] = checked;
 		} else if (name === 'image') { // handling image upload
 			const imageTooLargeMessage = 'Image is too large, must be less than 16 MB.';
 			const file = event.target.files[0];
@@ -89,7 +88,7 @@ class ArticleForm extends Component {
 				image.data = '';
 				return this.setState({
 					message: imageTooLargeMessage,
-					formOptions
+					formData
 				});
 			} else {
 				if (message === imageTooLargeMessage)
@@ -99,36 +98,36 @@ class ArticleForm extends Component {
 				image.data = file;
 			}
 		} else {
-			formOptions[name] = value;
+			formData[name] = value;
 		}
 
 		// handling min/max values
-		if (name === 'minTemp' && Number(formOptions.maxTemp) < Number(formOptions.minTemp)) {
-			formOptions.maxTemp = value;
-		} else if (name === 'maxTemp' && Number(formOptions.minTemp) > Number(formOptions.maxTemp)) {
-			formOptions.minTemp = value;
+		if (name === 'minTemp' && Number(formData.maxTemp) < Number(formData.minTemp)) {
+			formData.maxTemp = value;
+		} else if (name === 'maxTemp' && Number(formData.minTemp) > Number(formData.maxTemp)) {
+			formData.minTemp = value;
 		}
 
 		// setting default values dynamically
 		if (name === 'specificType') {
 			if (value === 'raincoat') {
-				formOptions.rainOK = true;
-				formOptions.snowOK = false;
+				formData.rainOK = true;
+				formData.snowOK = false;
 			} else if (value === 'snowcoat') {
-				formOptions.snowOK = true;
-				formOptions.rainOK = false;
+				formData.snowOK = true;
+				formData.rainOK = false;
 			} else {
-				formOptions.rainOK = false;
-				formOptions.snowOK = false;
+				formData.rainOK = false;
+				formData.snowOK = false;
 			}
 		}
-		this.setState({ formOptions, image, message: newMessage });
+		this.setState({ formData, image, message: newMessage });
 	}
 
 	handleSubmit = async (event) => {
 		event.preventDefault();
 		const { match, user, history } = this.props;
-		const { formOptions, image } = this.state;
+		const { formData, image } = this.state;
 
 		// upload image first if there is one
 		if (image.data) {
@@ -136,22 +135,19 @@ class ArticleForm extends Component {
 			if (imageResponse.error) {
 				return this.setState({message: 'There was a problem with the image upload, please try again or select a different image.'});
 			}
-			formOptions.imageUrl = imageResponse.imageUrl;
+			formData.imageUrl = imageResponse.imageUrl;
 		}
 
-		let endpoint, method, articleKind;
+		let response;
 		if (match.path === '/wardrobe/new') {
-			endpoint = pluralizeArticleKind(formOptions.articleKind);
-			method = 'POST';
-			articleKind = formOptions.articleKind;
+			const pluralArticleKind = pluralizeArticleKind(formData.articleKind);
+			const articleKind = formData.articleKind;
+			response = await api.postArticle(pluralArticleKind, {[articleKind]: formData}, user.token);
 		} else {
 			const { pluralArticleKind, articleId } = match.params;
-			articleKind = singularizeArticleKind(pluralArticleKind);
-			endpoint = `${pluralArticleKind}/${articleId}`;
-			method = 'PUT';
+			const articleKind = singularizeArticleKind(pluralArticleKind);
+			response = await api.putArticle(pluralArticleKind, articleId, {[articleKind]: formData}, user.token);
 		}
-
-		const response = await callAPI(endpoint, null, user.token, method, {[articleKind]: formOptions});
 
 		if (response.error) {
 			this.handleError(response.error);
@@ -186,21 +182,21 @@ class ArticleForm extends Component {
 	}
 
 	addAssociatedArticle = (fieldName, id) => {
-		const { formOptions } = this.state;
-		formOptions[fieldName].push(id);
-		formOptions[fieldName] = [...new Set(formOptions[fieldName])];
-		this.setState({ formOptions });
+		const { formData } = this.state;
+		formData[fieldName].push(id);
+		formData[fieldName] = [...new Set(formData[fieldName])];
+		this.setState({ formData });
 	}
 
 	removeAssociatedArticle = (fieldName, id) => {
-		const { formOptions } = this.state;
-		formOptions[fieldName].splice(formOptions[fieldName].indexOf(id), 1);
-		this.setState({ formOptions });
+		const { formData } = this.state;
+		formData[fieldName].splice(formData[fieldName].indexOf(id), 1);
+		this.setState({ formData });
 	}
 
 	render() {
 		const { match } = this.props;
-		const { articles, articleKinds, articleSearchOptions, formOptions, image, message } = this.state;
+		const { articles, articleKinds, articleSearchOptions, formData, image, message } = this.state;
 		const { articleId } = match.params;
 
 		const articleKindOptions = articleKinds.map(articleKind => {
@@ -210,18 +206,18 @@ class ArticleForm extends Component {
 		const articleKindField = match.path === '/wardrobe/new' ? (
 			<div>
 				<label htmlFor='articleKind'>Kind</label>
-				<select name='articleKind' value={ formOptions.articleKind } onChange={ this.handleChange }>
+				<select name='articleKind' value={ formData.articleKind } onChange={ this.handleChange }>
 					{ articleKindOptions }
 				</select>
 			</div>
 		) : ( null )
 
 		let additionalFields = {};
-		if (formOptions.articleKind === 'outerwear') {
+		if (formData.articleKind === 'outerwear') {
 			additionalFields.specificType = (
 				<div>
 					<label htmlFor='specificType'>Specific Kind</label>
-					<select name='specificType' value={ formOptions.specificType } onChange={ this.handleChange }>
+					<select name='specificType' value={ formData.specificType } onChange={ this.handleChange }>
 						{['sweater', 'jacket', 'vest', 'raincoat', 'snowcoat'].map(type => {
 							return <option key={ type } value={ type }>{ type }</option>;
 						})}
@@ -232,7 +228,7 @@ class ArticleForm extends Component {
 			additionalFields.innerLayer = (
 				<div>
 					<label htmlFor='innerLayer'>Inner Layer</label>
-					<input name='innerLayer' type='checkbox' checked={ formOptions.innerLayer } onChange={ this.handleChange }/>
+					<input name='innerLayer' type='checkbox' checked={ formData.innerLayer } onChange={ this.handleChange }/>
 				</div>
 			)
 		}
@@ -240,25 +236,25 @@ class ArticleForm extends Component {
 
 		// Added Articles
 		const addedShirts = articles.filter(e => {
-			return formOptions.shirts.includes(e.id) && e.articleKind === 'shirt';
+			return formData.shirts.includes(e.id) && e.articleKind === 'shirt';
 		}).map(e => {
 			return <SmallArticle key={ e.id } field='shirts' id={ e.id } name={ e.name } imageUrl={ e.imageUrl } onClick={ this.removeAssociatedArticle }/>
 		});
 
 		const addedPants = articles.filter(e => {
-			return formOptions.pants.includes(e.id) && e.articleKind === 'pants';
+			return formData.pants.includes(e.id) && e.articleKind === 'pants';
 		}).map(e => {
 			return <SmallArticle key={ e.id } field='pants' id={ e.id } name={ e.name } imageUrl={ e.imageUrl } onClick={ this.removeAssociatedArticle }/>
 		});
 
 		const addedDresses = articles.filter(e => {
-			return formOptions.dresses.includes(e.id) && e.articleKind === 'dress';
+			return formData.dresses.includes(e.id) && e.articleKind === 'dress';
 		}).map(e => {
 			return <SmallArticle key={ e.id } field='dresses' id={ e.id } name={ e.name } imageUrl={ e.imageUrl } onClick={ this.removeAssociatedArticle }/>
 		});
 
 		const addedOuterwears = articles.filter(e => {
-			return formOptions.outerwears.includes(e.id) && e.articleKind === 'outerwear';
+			return formData.outerwears.includes(e.id) && e.articleKind === 'outerwear';
 		}).map(e => {
 			return <SmallArticle key={ e.id } field='outerwears' id={ e.id } name={ e.name } imageUrl={ e.imageUrl } onClick={ this.removeAssociatedArticle }/>
 		});
@@ -266,32 +262,32 @@ class ArticleForm extends Component {
 
 		// Suggested (not yet added) Articles
 		const shirtSuggestions = articles.filter(e => {
-			return e.articleKind === 'shirt' && !formOptions.shirts.includes(e.id) && e.name.match(new RegExp(`^${articleSearchOptions.shirts}`, 'i'));
+			return e.articleKind === 'shirt' && !formData.shirts.includes(e.id) && e.name.match(new RegExp(`^${articleSearchOptions.shirts}`, 'i'));
 		}).map(e => {
 			return <SmallArticle key={ e.id } field='shirts' id={ e.id } name={ e.name } imageUrl={ e.imageUrl } onClick={ this.addAssociatedArticle }/>
 		});
 
 		const pantsSuggestions = articles.filter(e => {
-			return e.articleKind === 'pants' && !formOptions.pants.includes(e.id) && e.name.match(new RegExp(`^${articleSearchOptions.pants}`, 'i'));
+			return e.articleKind === 'pants' && !formData.pants.includes(e.id) && e.name.match(new RegExp(`^${articleSearchOptions.pants}`, 'i'));
 		}).map(e => {
 			return <SmallArticle key={ e.id } field='pants' id={ e.id } name={ e.name } imageUrl={ e.imageUrl } onClick={ this.addAssociatedArticle }/>
 		});
 
 		const dressSuggestions = articles.filter(e => {
-			return e.articleKind === 'dress' && !formOptions.dresses.includes(e.id) && e.name.match(new RegExp(`^${articleSearchOptions.dresses}`, 'i'));
+			return e.articleKind === 'dress' && !formData.dresses.includes(e.id) && e.name.match(new RegExp(`^${articleSearchOptions.dresses}`, 'i'));
 		}).map(e => {
 			return <SmallArticle key={ e.id } field='dresses' id={ e.id } name={ e.name } imageUrl={ e.imageUrl } onClick={ this.addAssociatedArticle }/>
 		})
 
 		const outerwearSuggestions = articles.filter(e => {
-			return e.articleKind === 'outerwear' && !formOptions.outerwears.includes(e.id) && e.id !== Number(articleId) && e.name.match(new RegExp(`^${articleSearchOptions.outerwears}`, 'i'));
+			return e.articleKind === 'outerwear' && !formData.outerwears.includes(e.id) && e.id !== Number(articleId) && e.name.match(new RegExp(`^${articleSearchOptions.outerwears}`, 'i'));
 		}).map(e => {
 			return <SmallArticle key={ e.id } field='outerwears' id={ e.id } name={ e.name } imageUrl={ e.imageUrl } onClick={ this.addAssociatedArticle }/>
 		});
 
 		// Form Fields for Associat(ing/ed) Articles
 		let associatedArticleFields = [];
-		if (['pants', 'outerwear'].includes(formOptions.articleKind)) {
+		if (['pants', 'outerwear'].includes(formData.articleKind)) {
 			associatedArticleFields.push(
 				<div key='shirtsField'>
 
@@ -305,7 +301,7 @@ class ArticleForm extends Component {
 				</div>
 			);
 		}
-		if (['shirt', 'outerwear'].includes(formOptions.articleKind)) {
+		if (['shirt', 'outerwear'].includes(formData.articleKind)) {
 			associatedArticleFields.push(
 				<div key='pantsField'>
 
@@ -319,7 +315,7 @@ class ArticleForm extends Component {
 				</div>
 			);
 		}
-		if (['outerwear'].includes(formOptions.articleKind)) {
+		if (['outerwear'].includes(formData.articleKind)) {
 			associatedArticleFields.push(
 				<div key='dressesField'>
 
@@ -333,7 +329,7 @@ class ArticleForm extends Component {
 				</div>
 			);
 		}
-		if (['shirt', 'pants', 'dress', 'outerwear'].includes(formOptions.articleKind)) {
+		if (['shirt', 'pants', 'dress', 'outerwear'].includes(formData.articleKind)) {
 			associatedArticleFields.push(
 				<div key='outerwearsField'>
 
@@ -357,31 +353,31 @@ class ArticleForm extends Component {
 				{ additionalFields.specificType }
 
 				<label htmlFor='name'>Name</label>
-				<input name='name' type='text' value={ formOptions.name } placeholder='name' onChange={ this.handleChange }/>
+				<input name='name' type='text' value={ formData.name } placeholder='name' onChange={ this.handleChange }/>
 
 				<label htmlFor='description'>Description</label>
-				<textarea name='description' value={ formOptions.description } placeholder='description' onChange={ this.handleChange }/>
+				<textarea name='description' value={ formData.description } placeholder='description' onChange={ this.handleChange }/>
 
 				<label htmlFor='image'>Image</label>
 				<input name='image' type='file' value={ image.path } onChange={ this.handleChange }/>
 
 				<label htmlFor='rating'>Rating</label>
-				<input name='rating' type='range' min='1' max='5' value={ formOptions.rating } onChange={ this.handleChange }/>
+				<input name='rating' type='range' min='1' max='5' value={ formData.rating } onChange={ this.handleChange }/>
 
 				<label htmlFor='color'>Color</label>
-				<input name='color' type='text' value={ formOptions.color } placeholder='color' onChange={ this.handleChange }/>
+				<input name='color' type='text' value={ formData.color } placeholder='color' onChange={ this.handleChange }/>
 
 				<label>Temperature Range</label>
-				<input name='minTemp' type='number' value={ formOptions.minTemp } onChange={ this.handleChange }/>
-				<input name='maxTemp' type='number' value={ formOptions.maxTemp } onChange={ this.handleChange }/>
+				<input name='minTemp' type='number' value={ formData.minTemp } onChange={ this.handleChange }/>
+				<input name='maxTemp' type='number' value={ formData.maxTemp } onChange={ this.handleChange }/>
 
 				{ additionalFields.innerLayer }
 
 				<label htmlFor='rainOK'>Rain</label>
-				<input name='rainOK' type='checkbox' checked={ formOptions.rainOK } onChange={ this.handleChange }/>
+				<input name='rainOK' type='checkbox' checked={ formData.rainOK } onChange={ this.handleChange }/>
 
 				<label htmlFor='snowOK'>Snow</label>
-				<input name='snowOK' type='checkbox' checked={ formOptions.snowOK } onChange={ this.handleChange }/>
+				<input name='snowOK' type='checkbox' checked={ formData.snowOK } onChange={ this.handleChange }/>
 
 				{ associatedArticleFields }
 

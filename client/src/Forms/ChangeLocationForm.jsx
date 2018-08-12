@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
-import callAPI from '../Modules/call-api';
+import api from '../Modules/api';
 import userStorage from '../Modules/user-storage';
 
 class ChangeLocationForm extends Component {
@@ -44,7 +44,7 @@ class ChangeLocationForm extends Component {
 		const { locationName, message } = this.state;
 		const locationNotRecognized = 'Location not recognized.'
 
-		const locationData = await callAPI('data/coordinates', {address: locationName});
+		const locationData = await api.getLocationData(locationName);
 		if (locationData.error) {
 			this.setState({message: locationNotRecognized});
 		} else {

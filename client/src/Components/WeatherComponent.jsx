@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
-import callAPI from '../Modules/call-api';
+import api from '../Modules/api';
 import PieceOfWeatherData from './PieceOfWeatherData.jsx';
 import ChangeLocationForm from '../Forms/ChangeLocationForm.jsx';
 
@@ -30,12 +30,12 @@ class WeatherComponent extends Component {
 
 		if (!(user.longitude && user.latitude)) return;
 
-		const location = {
+		const coordinates = {
 			latitude: user.latitude,
 			longitude: user.longitude
 		}
 
-		const weather = await callAPI('data/weather', location, user.token);
+		const weather = await api.getWeather(coordinates, user.token);
 		this.setState({ weather });
 	}
 
