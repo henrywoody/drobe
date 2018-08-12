@@ -71,9 +71,9 @@ describe('Insert module', () => {
 			}
 		});
 
-		it('should throw a ValidationError if the given an invalid specificType for an outerwear', async () => {
+		it('should throw a ValidationError if the given an invalid specificKind for an outerwear', async () => {
 			try {
-				await insert.intoTableValues('outerwear', {name: 'Not a coat', userId: badUser.id, specificType: 'somethingElse'});
+				await insert.intoTableValues('outerwear', {name: 'Not a coat', userId: badUser.id, specificKind: 'somethingElse'});
 				assert.fail(0, 1, 'Error not thrown');
 			} catch (err) {
 				if (err.name === 'AssertionError')
@@ -101,7 +101,7 @@ describe('Insert module', () => {
 		});
 
 		it('should return the newly created article with camelCased keys', async () => {
-			const coatData = {name: 'Favorite', userId: goodUser.id, description: 'the best', rating: 5, color: 'red', maxTemp: 100, minTemp: 70, rainOk: false, snowOk: false, specificType: 'jacket'};
+			const coatData = {name: 'Favorite', userId: goodUser.id, description: 'the best', rating: 5, color: 'red', maxTemp: 100, minTemp: 70, rainOk: false, snowOk: false, specificKind: 'jacket'};
 			const newCoat = await insert.intoTableValues('outerwear', coatData);
 
 			for (const key in coatData) {

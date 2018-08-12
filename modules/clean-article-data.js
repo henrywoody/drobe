@@ -31,7 +31,7 @@ const fieldsForTable = {
 	],
 	outerwear: [
 		...articleFields,
-		'specific_type',
+		'specific_kind',
 		'shirts',
 		'pants',
 		'dresses',

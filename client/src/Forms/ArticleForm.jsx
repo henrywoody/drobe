@@ -30,7 +30,7 @@ class ArticleForm extends Component {
 				maxTemp: 100,
 				rainOK: false,
 				snowOK: false,
-				specificType: 'sweater',
+				specificKind: 'sweater',
 				innerLayer: false,
 				shirts: [],
 				pants: [],
@@ -109,7 +109,7 @@ class ArticleForm extends Component {
 		}
 
 		// setting default values dynamically
-		if (name === 'specificType') {
+		if (name === 'specificKind') {
 			if (value === 'raincoat') {
 				formData.rainOK = true;
 				formData.snowOK = false;
@@ -214,10 +214,10 @@ class ArticleForm extends Component {
 
 		let additionalFields = {};
 		if (formData.articleKind === 'outerwear') {
-			additionalFields.specificType = (
+			additionalFields.specificKind = (
 				<div>
-					<label htmlFor='specificType'>Specific Kind</label>
-					<select name='specificType' value={ formData.specificType } onChange={ this.handleChange }>
+					<label htmlFor='specificKind'>Specific Kind</label>
+					<select name='specificKind' value={ formData.specificKind } onChange={ this.handleChange }>
 						{['sweater', 'jacket', 'vest', 'raincoat', 'snowcoat'].map(type => {
 							return <option key={ type } value={ type }>{ type }</option>;
 						})}
@@ -350,7 +350,7 @@ class ArticleForm extends Component {
 
 				{ articleKindField }
 
-				{ additionalFields.specificType }
+				{ additionalFields.specificKind }
 
 				<label htmlFor='name'>Name</label>
 				<input name='name' type='text' value={ formData.name } placeholder='name' onChange={ this.handleChange }/>

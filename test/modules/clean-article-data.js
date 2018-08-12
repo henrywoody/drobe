@@ -33,7 +33,7 @@ describe('Clean Article Data module', () => {
 					data = {...baseData, 'outerwears': [5,6]};
 					break;
 				case 'outerwear':
-					data = {...baseData, 'specificType': 'sweater', 'shirts': [1,2], 'pants': [1,2,3], 'dresses': [2,3], 'outerwears': [5,7]};
+					data = {...baseData, 'specificKind': 'sweater', 'shirts': [1,2], 'pants': [1,2,3], 'dresses': [2,3], 'outerwears': [5,7]};
 					break;
 			}
 			const cleanData = cleanArticleData(table, data);

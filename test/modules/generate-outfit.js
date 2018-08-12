@@ -30,7 +30,7 @@ describe('Generate Outfit module', () => {
 		dress2 = await insert.intoTableValues('dress', {name: 'dress2', userId: user.id});
 		outerwear1 = await insert.intoTableValues('outerwear', {name: 'outerwear1', userId: user.id});
 		outerwear2 = await insert.intoTableValues('outerwear', {name: 'outerwear2', userId: user.id});
-		raincoat = await insert.intoTableValues('outerwear', {name: 'raincoat', userId: user.id, specificType: 'raincoat'});
+		raincoat = await insert.intoTableValues('outerwear', {name: 'raincoat', userId: user.id, specificKind: 'raincoat'});
 
 
 		await Promise.all([
