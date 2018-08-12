@@ -11,7 +11,6 @@ class ArticleForm extends Component {
 	constructor() {
 		super();
 		this.state = {
-			articleKinds: ['shirt', 'pants', 'dress', 'outerwear'],
 			articleSearchOptions: {
 				shirts: '',
 				pants: '',
@@ -19,15 +18,14 @@ class ArticleForm extends Component {
 				outerwears: ''
 			},
 			articles: [],
-			formData: {
-				articleKind: 'shirt',
+			initialFormData: {
+				articleKind: '',
 				name: '',
 				description: '',
 				imageUrl: '',
 				rating: '1',
-				color: '',
-				minTemp: 50,
-				maxTemp: 100,
+				minTemp: '',
+				maxTemp: '',
 				rainOK: false,
 				snowOK: false,
 				specificKind: 'sweater',
@@ -37,6 +35,7 @@ class ArticleForm extends Component {
 				dresses: [],
 				outerwears: []
 			},
+			formData: {},
 			image: {
 				path: '',
 				data: null
@@ -44,8 +43,12 @@ class ArticleForm extends Component {
 			message: null
 		};
 	}
+	
+	componentWillMount() {
+		this.resetFormData();
+	}
 
-	async componentWillMount() {
+	async componentDidMount() {
 		const { match, user } = this.props;
 		const { formData } = this.state;
 		if (match.path !== '/wardrobe/new') {
@@ -67,6 +70,11 @@ class ArticleForm extends Component {
 
 		const articles = await api.getAllArticles(user.token);
 		this.setState({ articles });
+	}
+
+	resetFormData() {
+		const { initialFormData } = this.state;
+		this.setState({ formData: {...initialFormData} });
 	}
 
 	handleChange = async (event) => {
@@ -124,7 +132,7 @@ class ArticleForm extends Component {
 		this.setState({ formData, image, message: newMessage });
 	}
 
-	handleSubmit = async (event) => {
+	handleSubmit = async (event, routeToNewArticle) => {
 		event.preventDefault();
 		const { match, user, history } = this.props;
 		const { formData, image } = this.state;
@@ -138,23 +146,33 @@ class ArticleForm extends Component {
 			formData.imageUrl = imageResponse.imageUrl;
 		}
 
+		const nonemptyFormData = {};
+		for (const field in formData) {
+			if (formData[field])
+				nonemptyFormData[field] = formData[field];
+		}
+
 		let response;
 		if (match.path === '/wardrobe/new') {
-			const pluralArticleKind = pluralizeArticleKind(formData.articleKind);
-			const articleKind = formData.articleKind;
-			response = await api.postArticle(pluralArticleKind, {[articleKind]: formData}, user.token);
+			const pluralArticleKind = pluralizeArticleKind(nonemptyFormData.articleKind);
+			const articleKind = nonemptyFormData.articleKind;
+			response = await api.postArticle(pluralArticleKind, {[articleKind]: nonemptyFormData}, user.token);
 		} else {
 			const { pluralArticleKind, articleId } = match.params;
 			const articleKind = singularizeArticleKind(pluralArticleKind);
-			response = await api.putArticle(pluralArticleKind, articleId, {[articleKind]: formData}, user.token);
+			response = await api.putArticle(pluralArticleKind, articleId, {[articleKind]: nonemptyFormData}, user.token);
 		}
 
-		if (response.error) {
-			this.handleError(response.error);
-		} else {
+		if ('error' in response) {
+			return this.handleError(response.error);
+		}
+
+		if (routeToNewArticle) {
 			const { id } = response;
 			const pluralArticleKind = pluralizeArticleKind(response.articleKind);
 			history.push(`/wardrobe/${pluralArticleKind}/${id}`);
+		} else {
+			this.resetFormData();
 		}
 	}
 
@@ -196,32 +214,51 @@ class ArticleForm extends Component {
 
 	render() {
 		const { match } = this.props;
-		const { articles, articleKinds, articleSearchOptions, formData, image, message } = this.state;
+		const { articles, articleSearchOptions, formData, image, message } = this.state;
 		const { articleId } = match.params;
 
-		const articleKindOptions = articleKinds.map(articleKind => {
-			return <option key={ articleKind } value={ articleKind }>{ articleKind }</option>
-		});
+		let articleKindField;
 
-		const articleKindField = match.path === '/wardrobe/new' ? (
-			<div>
-				<label htmlFor='articleKind'>Kind</label>
-				<select name='articleKind' value={ formData.articleKind } onChange={ this.handleChange }>
-					{ articleKindOptions }
-				</select>
-			</div>
-		) : ( null )
+		if (match.path === '/wardrobe/new') {
+			articleKindField = (
+				<div>
+					<label htmlFor='articleKind'>Kind</label>
+					<input type='radio' name='articleKind' id='shirt' value='shirt' checked={ formData.articleKind === 'shirt' } onChange={ this.handleChange }/>
+					<label htmlFor='shirt'>Shirt</label>
+					<input type='radio' name='articleKind' id='pants' value='pants' checked={ formData.articleKind === 'pants' } onChange={ this.handleChange }/>
+					<label htmlFor='pants'>Pants</label>
+					<input type='radio' name='articleKind' id='dress' value='dress' checked={ formData.articleKind === 'dress' } onChange={ this.handleChange }/>
+					<label htmlFor='dress'>Dress</label>
+					<input type='radio' name='articleKind' id='outerwear' value='outerwear' checked={ formData.articleKind === 'outerwear' } onChange={ this.handleChange }/>
+					<label htmlFor='outerwear'>Outerwear</label>
+				</div>
+			)
+
+			if (!formData.articleKind) {
+				return (
+					<form>
+						{ articleKindField }
+						<button onClick={ this.handleCancel }>Cancel</button>
+					</form>
+				)
+			}
+		}
 
 		let additionalFields = {};
 		if (formData.articleKind === 'outerwear') {
 			additionalFields.specificKind = (
 				<div>
 					<label htmlFor='specificKind'>Specific Kind</label>
-					<select name='specificKind' value={ formData.specificKind } onChange={ this.handleChange }>
-						{['sweater', 'jacket', 'vest', 'raincoat', 'snowcoat'].map(type => {
-							return <option key={ type } value={ type }>{ type }</option>;
-						})}
-					</select>
+					<input type='radio' name='specificKind' id='sweater' value='sweater' checked={ formData.specificKind === 'sweater' } onChange={ this.handleChange }/>
+					<label htmlFor='sweater'>Sweater</label>
+					<input type='radio' name='specificKind' id='jacket' value='jacket' checked={ formData.specificKind === 'jacket' } onChange={ this.handleChange }/>
+					<label htmlFor='jacket'>Jacket</label>
+					<input type='radio' name='specificKind' id='vest' value='vest' checked={ formData.specificKind === 'vest' } onChange={ this.handleChange }/>
+					<label htmlFor='vest'>Vest</label>
+					<input type='radio' name='specificKind' id='raincoat' value='raincoat' checked={ formData.specificKind === 'raincoat' } onChange={ this.handleChange }/>
+					<label htmlFor='raincoat'>Raincoat</label>
+					<input type='radio' name='specificKind' id='snowcoat' value='snowcoat' checked={ formData.specificKind === 'snowcoat' } onChange={ this.handleChange }/>
+					<label htmlFor='snowcoat'>Snowcoat</label>
 				</div>
 			);
 
@@ -344,8 +381,19 @@ class ArticleForm extends Component {
 			);
 		}
 
+		const submitButtons = match.path === '/wardrobe/new' ? (
+			[
+				<button key='create' onClick={ e => this.handleSubmit(e, true)}>Create</button>,
+				<button key='another' onClick={ e => this.handleSubmit(e, false)}>Create and Add Another</button>
+			]
+		) : (
+			[
+				<button onClick={ e => this.handleSubmit(e, true)}>Update</button>
+			]
+		);
+
 		return (
-			<form onSubmit={ this.handleSubmit }>
+			<form>
 				{ message }
 
 				{ articleKindField }
@@ -355,7 +403,7 @@ class ArticleForm extends Component {
 				<label htmlFor='name'>Name</label>
 				<input name='name' type='text' value={ formData.name } placeholder='name' onChange={ this.handleChange }/>
 
-				<label htmlFor='description'>Description</label>
+				<label htmlFor='description'>Description <span>optional</span></label>
 				<textarea name='description' value={ formData.description } placeholder='description' onChange={ this.handleChange }/>
 
 				<label htmlFor='image'>Image</label>
@@ -364,12 +412,9 @@ class ArticleForm extends Component {
 				<label htmlFor='rating'>Rating</label>
 				<input name='rating' type='range' min='1' max='5' value={ formData.rating } onChange={ this.handleChange }/>
 
-				<label htmlFor='color'>Color</label>
-				<input name='color' type='text' value={ formData.color } placeholder='color' onChange={ this.handleChange }/>
-
-				<label>Temperature Range</label>
-				<input name='minTemp' type='number' value={ formData.minTemp } onChange={ this.handleChange }/>
-				<input name='maxTemp' type='number' value={ formData.maxTemp } onChange={ this.handleChange }/>
+				<label>Temperature Range <span>optional</span></label>
+				<input name='minTemp' type='number' placeholder='Min' value={ formData.minTemp } onChange={ this.handleChange }/>
+				<input name='maxTemp' type='number' placeholder='Max' value={ formData.maxTemp } onChange={ this.handleChange }/>
 
 				{ additionalFields.innerLayer }
 
@@ -381,7 +426,7 @@ class ArticleForm extends Component {
 
 				{ associatedArticleFields }
 
-				<input type='submit'/>
+				{ submitButtons }
 
 				<button onClick={ this.handleCancel }>Cancel</button>
 			</form>
