@@ -71,7 +71,7 @@ router.put('/:id', async (req, res) => {
 // Delete
 router.delete('/:id', async (req, res) => {
 	const { user } = req;
-	const { id } = user.params;
+	const { id } = req.params;
 	try {
 		const dress = await select.fromTableById('dress', id);
 
