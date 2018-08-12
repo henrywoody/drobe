@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Switch, Route, withRouter } from 'react-router-dom';
-import { connect } from 'react-redux';
 import ArticlesIndex from '../Pages/ArticlesIndex.jsx';
 import ArticleDetail from '../Pages/ArticleDetail.jsx';
 import ArticleEdit from '../Pages/ArticleEdit.jsx';
@@ -8,8 +7,6 @@ import ArticleNew from '../Pages/ArticleNew.jsx';
 
 class Wardrobe extends Component {
 	render() {
-		const { user, articles } = this.props;
-
 		return (
 			<Switch>
 				<Route exact path='/wardrobe' component={ ArticlesIndex }/>
@@ -21,10 +18,4 @@ class Wardrobe extends Component {
 	}
 }
 
-const mapStateToProps = state => {
-	return {
-		user: state.user
-	}
-}
-
-export default withRouter(connect(mapStateToProps)(Wardrobe));
+export default withRouter(Wardrobe);

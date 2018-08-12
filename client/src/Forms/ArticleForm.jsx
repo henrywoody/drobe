@@ -82,8 +82,8 @@ class ArticleForm extends Component {
 			const file = event.target.files[0];
 
 			if (!file) {
-				image.path = '',
-				image.data = null
+				image.path = '';
+				image.data = null;
 			} else if (file.size >= 16 * 1024 * 1024) { // max file size 16MB
 				image.data = '';
 				return this.setState({

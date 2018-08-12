@@ -11,5 +11,7 @@ export default function pluralizeArticleKind(articleKind) {
 		case 'outerwear':
 		case 'outerwears':
 			return 'outerwears';
+		default:
+			return articleKind;
 	}
 }

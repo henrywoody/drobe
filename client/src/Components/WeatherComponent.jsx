@@ -21,7 +21,9 @@ class WeatherComponent extends Component {
 	componentDidUpdate(prevProps) {
 		const { user } = this.props;
 		if (!(user.longitude && user.latitude)) return;
-		if ((user.longitude && user.latitude) && !(prevProps.user.longitude && prevProps.user.latitude) || user.longitude !== prevProps.user.longitude || user.latitude !== prevProps.user.latitude)
+		const userReceivedCoordinates = (user.longitude && user.latitude) && !(prevProps.user.longitude && prevProps.user.latitude);
+		const userChangedCoordinates = user.longitude !== prevProps.user.longitude || user.latitude !== prevProps.user.latitude;
+		if (userReceivedCoordinates || userChangedCoordinates)
 			this.refreshWeather();
 	}
 

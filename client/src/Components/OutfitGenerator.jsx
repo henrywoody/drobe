@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { withRouter, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import api from '../Modules/api';
 import SimpleArticle from './SimpleArticle.jsx';
@@ -34,7 +34,6 @@ class OutfitGenerator extends Component {
 	}
 
 	render() {
-		const { history } = this.props;
 		const { isLoading, outfit, noArticles } = this.state;
 
 		let outfitDisplay;
@@ -88,4 +87,4 @@ const mapStateToProps = state => {
 	}
 }
 
-export default withRouter(connect(mapStateToProps)(OutfitGenerator));
+export default connect(mapStateToProps)(OutfitGenerator);

@@ -39,7 +39,6 @@ class ArticleDetail extends Component {
 	handleDelete = async () => {
 		const { match, history, user } = this.props;
 		const { pluralArticleKind, articleId } = match.params;
-		const { articleData } = this.state;
 			
 		await api.deleteArticle(pluralArticleKind, articleId, user.token);
 		history.push('/wardrobe');
@@ -80,7 +79,7 @@ class ArticleDetail extends Component {
 				<NavLink exact to={ `/wardrobe/${pluralArticleKind}/${articleId}/edit` }>Edit</NavLink>
 				<button onClick={ this.handleDelete }>Delete</button>
 
-				<img src={ articleData.imageUrl } alt='image'/>
+				<img src={ articleData.imageUrl } alt='article'/>
 
 				<p>{ articleData.description }</p>
 

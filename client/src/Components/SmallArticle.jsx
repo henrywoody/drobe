@@ -5,7 +5,7 @@ export default props => {
 
 	return (
 		<div onClick={ () => onClick(field, id) }>
-			<img src={ imageUrl } alt='image'/>
+			<img src={ imageUrl } alt='article'/>
 			<span>{ name }</span>
 		</div>
 	)

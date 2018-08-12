@@ -11,5 +11,7 @@ export default function singularizeArticleKind(articleKind) {
 		case 'outerwear':
 		case 'outerwears':
 			return 'outerwear';
+		default:
+			return articleKind;
 	}
 }

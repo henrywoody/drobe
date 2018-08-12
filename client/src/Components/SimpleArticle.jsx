@@ -16,7 +16,7 @@ class SimpleArticle extends Component {
 			<div onClick={ this.handleClick }>
 				<span>{ data.name }</span>
 
-				<img src={ data.imageUrl } alt='image'/>
+				<img src={ data.imageUrl } alt='article'/>
 
 				<p>{ data.description }</p>
 			</div>

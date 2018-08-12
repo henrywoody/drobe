@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
-import { Switch, Route, withRouter } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import HeaderNavAuthenticated from './Components/HeaderNavAuthenticated.jsx';
 import HeaderNavNotAuthenticated from './Components/HeaderNavNotAuthenticated.jsx';
 import MainAuthenticated from './Hubs/MainAuthenticated.jsx';
 import MainNotAuthenticated from './Hubs/MainNotAuthenticated.jsx';
 import { connect } from 'react-redux';
-import { logUserIn } from './redux-actions';
 import userStorage from './Modules/user-storage';
 import './App.css';
 

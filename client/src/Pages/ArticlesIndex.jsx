@@ -3,7 +3,6 @@ import { NavLink, withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import SubNav from '../Components/SubNav.jsx';
 import SimpleArticle from '../Components/SimpleArticle.jsx';
-import equal from 'fast-deep-equal';
 import api from '../Modules/api';
 import pluralizeArticleKind from '../Modules/pluralize-article-kind';
 import singularizeArticleKind from '../Modules/singularize-article-kind';

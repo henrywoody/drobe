@@ -11,7 +11,7 @@ export default class Login extends Component {
 				<UserForm formType='login'/>
 				
 				<p>
-					Don't have an account? <Link exact to='/register'>Register here</Link>
+					Don't have an account? <Link to='/register'>Register here</Link>
 				</p>
 			</main>
 		)
