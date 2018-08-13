@@ -1,5 +1,4 @@
 const	request = require('request-promise-native');
-
 class weatherAPI {
 	async getWeather(longitude, latitude) {
 		const weatherURL = `https://api.darksky.net/forecast/${process.env.WEATHER_API_KEY}/${latitude},${longitude}`;
@@ -10,12 +9,13 @@ class weatherAPI {
 			temperatureLow: minTemp,
 			temperatureHigh: maxTemp,
 			precipProbability: rainProb,
-			precipIntensity: rainRate
+			precipIntensity: rainRate,
+			summary
 		} = weatherData;
 
 		const aveTemp = (minTemp + maxTemp)/2;
 
-		return { minTemp, maxTemp, aveTemp, rainProb, rainRate };
+		return { summary, aveTemp, minTemp, maxTemp, rainProb, rainRate };
 	}
 }
 

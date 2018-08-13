@@ -1,6 +1,6 @@
 const	express = require('express'),
 		router = express.Router(),
-		getWeather = require('../../../modules/get-weather'),
+		weatherAPI = require('../../../modules/weather-api'),
 		getCoordinates = require('../../../modules/get-coordinates'),
 		handleErrors = require('../../../modules/handle-db-errors');
 
@@ -10,10 +10,10 @@ router.get('/weather', async (req, res) => {
 	if (!user)
 		return res.sendStatus(401);
 
-	const { latitude, longitude } = req.query;
+	const { longitude, latitude } = req.query;
 
 	try {
-		const weather = await getWeather(latitude, longitude);
+		const weather = await weatherAPI.getWeather(longitude, latitude);
 		res.json(weather);
 	} catch (err) {
 		handleErrors(err, res);
