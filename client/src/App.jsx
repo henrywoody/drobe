@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { NavLink, withRouter } from 'react-router-dom';
 import HeaderNav from './Components/HeaderNav';
+import Runner from './Components/Runner';
 import Main from './Hubs/Main';
 import { connect } from 'react-redux';
 import userStorage from './Modules/user-storage';
@@ -36,6 +37,7 @@ class App extends Component {
 					<NavLink to='/' className='title'>Dr obe</NavLink>
 					<HeaderNav isAuthenticated={ isAuthenticated } hideDrawer={ hideDrawer } handleDrawerClick={ () => this.setState({hideDrawer: true}) }/>
 					<button className='button-toggle-nav-drawer' onClick={ () => this.setState({hideDrawer: !hideDrawer}) }>+</button>
+					<Runner width={ window.innerWidth } height={ 2 }/>
 				</header>
 
 				<Main isAuthenticated={ isAuthenticated }/>

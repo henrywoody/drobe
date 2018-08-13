@@ -6,7 +6,7 @@ header {
 	width: 100%;
 	height: var(--header-height);
 	line-height: var(--header-height);
-	border-bottom: .1rem solid var(--drobe-blue);
+	/*border-bottom: .1rem solid var(--drobe-blue);*/
 	padding: .2rem 1rem;
 	position: relative;
 	top: 0;
@@ -29,6 +29,12 @@ header a.title {
 	width: 11.5rem;
 	line-height: 3.2rem;
 	flex-shrink: 0;
+}
+
+header canvas {
+	position: absolute;
+	bottom: 0;
+	left: 0;
 }
 
 header nav.nav-drawer {
