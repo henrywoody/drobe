@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import userStorage from '../Modules/user-storage';
+import userStorage from '../../Modules/user-storage';
 
 class UserForm extends Component {
 	constructor() {

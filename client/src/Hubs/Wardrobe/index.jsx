@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { Switch, Route, withRouter } from 'react-router-dom';
-import ArticlesIndex from '../Pages/ArticlesIndex.jsx';
-import ArticleDetail from '../Pages/ArticleDetail.jsx';
-import ArticleEdit from '../Pages/ArticleEdit.jsx';
-import ArticleNew from '../Pages/ArticleNew.jsx';
+import ArticlesIndex from '../../Pages/ArticlesIndex';
+import ArticleDetail from '../../Pages/ArticleDetail';
+import ArticleEdit from '../../Pages/ArticleEdit';
+import ArticleNew from '../../Pages/ArticleNew';
 
 class Wardrobe extends Component {
 	render() {

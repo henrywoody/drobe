@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { NavLink } from 'react-router-dom';
-import UserForm from '../Forms/UserForm.jsx';
+import UserForm from '../../Forms/UserForm';
 
 export default class Register extends Component {
 	render() {

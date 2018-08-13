@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { NavLink } from 'react-router-dom';
-import userStorage from '../Modules/user-storage';
+import userStorage from '../../Modules/user-storage';
 
 export default class Logout extends Component {
 	componentWillMount() {

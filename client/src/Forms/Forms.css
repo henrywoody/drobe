@@ -1,0 +1,16 @@
+form div.div-input {
+	display: flex;
+	flex-flow: column;
+}
+
+form label {
+	font-size: .65rem;
+	font-weight: 500;
+	text-transform: uppercase;
+	color: var(--gray);
+}
+
+form div.div-buttons { 
+	display: flex;
+	flex-flow: row;
+}

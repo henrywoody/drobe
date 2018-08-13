@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { NavLink, withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
-import SubNav from '../Components/SubNav.jsx';
-import SimpleArticle from '../Components/SimpleArticle.jsx';
-import api from '../Modules/api';
-import pluralizeArticleKind from '../Modules/pluralize-article-kind';
-import singularizeArticleKind from '../Modules/singularize-article-kind';
+import SubNav from '../../Components/SubNav';
+import SimpleArticle from '../../Components/SimpleArticle';
+import api from '../../Modules/api';
+import pluralizeArticleKind from '../../Modules/pluralize-article-kind';
+import singularizeArticleKind from '../../Modules/singularize-article-kind';
 
 class ArticlesIndex extends Component {
 	constructor() {

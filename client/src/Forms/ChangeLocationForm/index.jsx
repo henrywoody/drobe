@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
-import api from '../Modules/api';
-import userStorage from '../Modules/user-storage';
+import api from '../../Modules/api';
+import userStorage from '../../Modules/user-storage';
+import '../Forms.css';
 
 class ChangeLocationForm extends Component {
 	constructor() {
@@ -18,7 +19,7 @@ class ChangeLocationForm extends Component {
 	componentWillMount() {
 		const { user } = this.props;
 		const { locationName, longitude, latitude } = user;
-		this.setState({ locationName, longitude, latitude });
+		this.setState({ locationName: locationName || '', longitude, latitude });
 	}
 
 	handleChange = (event) => {
@@ -68,10 +69,15 @@ class ChangeLocationForm extends Component {
 		return (
 			<form onSubmit={ this.handleSubmit }>
 				{ message }
-				<label htmlFor='location-name'>Location</label>
-				<input name='location-name' type='text' placeholder='location' value={ locationName } onChange={ this.handleChange }/>
-				<button onClick={ this.findCoordinates }>Validate</button>
-				<input type='submit'/>
+				<div className='div-input'>
+					<label htmlFor='location-name'>Location</label>
+					<input name='location-name' type='text' placeholder='Seattle, WA, USA' value={ locationName } onChange={ this.handleChange }/>
+				</div>
+
+				<div className='div-buttons'>
+					<button className='btn-secondary' onClick={ this.findCoordinates }>Validate</button>
+					<button className='btn-primary' onClick={ e => this.handleSubmit(e) }>Update</button>
+				</div>
 			</form>
 		)
 	}

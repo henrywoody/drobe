@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import api from '../Modules/api';
-import SimpleArticle from './SimpleArticle.jsx';
+import api from '../../Modules/api';
+import SimpleArticle from '../SimpleArticle';
 
 class OutfitGenerator extends Component {
 	constructor() {
@@ -66,13 +66,13 @@ class OutfitGenerator extends Component {
 			}
 
 			if (outfit.shirt || outfit.dress)
-				outfitDisplay.push(<button key='wear-button' onClick={ this.handleSelect }>Wear</button>);
+				outfitDisplay.push(<button className='btn-primary' key='wear-button' onClick={ this.handleSelect }>Wear</button>);
 
-			outfitDisplay.push(<button key='generate' onClick={ this.generateOutfit }>Generate Outfit</button>);
+			outfitDisplay.push(<button className={ Object.keys(outfit).length ? 'btn-secondary' : 'btn-primary' } key='generate' onClick={ this.generateOutfit }>Generate Outfit</button>);
 		}
 
 		return (
-			<div>
+			<div className='component'>
 				<h2>Outfit</h2>
 
 				{  outfitDisplay  }

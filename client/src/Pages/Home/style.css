@@ -1,0 +1,12 @@
+p.welcome-message {
+	text-align: center;
+}
+
+.components {
+	display: flex;
+	flex-flow: row;
+}
+
+.components .component {
+	width: 50%;
+}

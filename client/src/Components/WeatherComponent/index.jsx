@@ -1,0 +1,121 @@
+import React, { Component } from 'react';
+import { withRouter } from 'react-router-dom';
+import { connect } from 'react-redux';
+import api from '../../Modules/api';
+import ChangeLocationForm from '../../Forms/ChangeLocationForm';
+import './style.css';
+
+class WeatherComponent extends Component {
+	constructor() {
+		super();
+		this.state = {
+			isLoading: true,
+			weather: {},
+			showLocationForm: false
+		}
+	}
+
+	componentWillMount() {
+		this.refreshWeather();
+	}
+
+	componentDidUpdate(prevProps) {
+		const { user } = this.props;
+		if (!(user.longitude && user.latitude)) return;
+		const userReceivedCoordinates = (user.longitude && user.latitude) && !(prevProps.user.longitude && prevProps.user.latitude);
+		const userChangedCoordinates = user.longitude !== prevProps.user.longitude || user.latitude !== prevProps.user.latitude;
+		if (userReceivedCoordinates || userChangedCoordinates)
+			this.refreshWeather();
+	}
+
+	async refreshWeather() {
+		this.setState({isLoading: true});
+		const { user } = this.props;
+
+		if (!(user.longitude && user.latitude)) return;
+
+		const coordinates = {
+			latitude: user.latitude,
+			longitude: user.longitude
+		}
+
+		const weather = await api.getWeather(coordinates, user.token);
+		this.setState({ isLoading: false, weather });
+	}
+
+	toggleLocationForm = () => {
+		const { showLocationForm } = this.state;
+		this.setState({ showLocationForm: !showLocationForm });
+	}
+
+	render() {
+		const { user } = this.props;
+		const { isLoading, weather, showLocationForm } = this.state;
+
+		let content;
+		if (isLoading && user.longitude && user.latitude) {
+			content = <div className='content'><span>Loading...</span></div>
+		} else if (user.longitude && user.latitude && !showLocationForm) {
+			content = (
+				<div className='content'>
+					<div className='location'>
+						<span>In { user.locationName }</span>
+						<button className='btn-secondary' onClick={ this.toggleLocationForm }>Change Location</button>
+					</div>
+
+					<div className='weather-data'>
+						<div className='summary'><span>{ weather.summary }</span></div>
+						<div className='temperature'>
+							<span className='main-temperature'>{ Math.round(weather.aveTemp) }˚F</span>
+							<div>
+								<span>Ave. Temperature</span>
+								<span>High { Math.ceil(weather.maxTemp) }˚F</span>
+								<span>Low { Math.ceil(weather.minTemp) }˚F</span>
+							</div>
+						</div>
+						<div className='rain'>
+							<span>{ Math.round(weather.rainProb * 100) }% Chance of Rain</span>
+							<span>Rainfall { weather.rainRate * 1000 } mm/hr</span>
+						</div>
+						<div className='powered-by'><span>Powered by <a href='https://darksky.net/poweredby/'>Dark Sky</a></span></div>
+					</div>
+				</div>
+			)
+		} else if (!showLocationForm) {
+			content = (
+				<div className='content'>
+					<div className='location'>
+						<span>
+							You haven't set a location yet.
+							Location information is used to get weather data, which is used in picking outfits.
+						</span>
+						<button className='btn-primary' onClick={ this.toggleLocationForm }>Add Location</button>
+					</div>
+				</div>
+			)
+		} else {
+			content = (
+				<div className='content'>
+					<ChangeLocationForm didSubmit={ this.toggleLocationForm }/>
+					<button className='btn-secondary' onClick={ this.toggleLocationForm }>Cancel</button>
+				</div>
+			)
+		}
+
+		return (
+			<div className='component'>
+				<h2>Weather</h2>
+
+				{ content }
+			</div>
+		)
+	}
+}
+
+const mapStateToProps = state => {
+	return {
+		user: state.user
+	}
+}
+
+export default withRouter(connect(mapStateToProps)(WeatherComponent));

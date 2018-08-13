@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import ArticleForm from '../Forms/ArticleForm.jsx';
+import ArticleForm from '../../Forms/ArticleForm';
 
-class ArticleNew extends Component {
+class ArticleEdit extends Component {
 	render() {
 		return (
 			<main>
-				<h1>New Article</h1>
+				<h1>Edit</h1>
 
 				<ArticleForm/>
 			</main>
@@ -14,4 +14,4 @@ class ArticleNew extends Component {
 	}
 }
 
-export default withRouter(ArticleNew);
+export default withRouter(ArticleEdit);

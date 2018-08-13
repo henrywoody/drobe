@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
-import { withRouter } from 'react-router-dom';
 
-class NotFound extends Component {
+export default class NotFound extends Component {
 	render() {
 		return (
 			<main>
@@ -14,5 +13,3 @@ class NotFound extends Component {
 		)
 	}
 }
-
-export default withRouter(NotFound);

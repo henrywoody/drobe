@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import pluralizeArticleKind from '../Modules/pluralize-article-kind';
+import pluralizeArticleKind from '../../Modules/pluralize-article-kind';
 
 class SimpleArticle extends Component {
 	handleClick = () => {

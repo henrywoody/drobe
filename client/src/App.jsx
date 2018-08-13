@@ -1,14 +1,20 @@
 import React, { Component } from 'react';
-import { withRouter } from 'react-router-dom';
-import HeaderNavAuthenticated from './Components/HeaderNavAuthenticated.jsx';
-import HeaderNavNotAuthenticated from './Components/HeaderNavNotAuthenticated.jsx';
-import MainAuthenticated from './Hubs/MainAuthenticated.jsx';
-import MainNotAuthenticated from './Hubs/MainNotAuthenticated.jsx';
+import { NavLink, withRouter } from 'react-router-dom';
+import HeaderNav from './Components/HeaderNav';
+import Main from './Hubs/Main';
 import { connect } from 'react-redux';
 import userStorage from './Modules/user-storage';
 import './App.css';
+import './Header.css';
 
 class App extends Component {
+	constructor() {
+		super();
+		this.state = {
+			hideDrawer: true
+		}
+	}
+
 	componentWillMount() {
 		const user = JSON.parse(localStorage.getItem('user'));
 		const lastRefresh = Number(localStorage.getItem('lastRefresh'));
@@ -22,15 +28,17 @@ class App extends Component {
 
 	render() {
 		const { isAuthenticated } = this.props;
+		const { hideDrawer } = this.state;
 
 		return (
 			<div className="App">
 				<header>
-					<span id='title'>Drobe</span>
-					{ isAuthenticated ? <HeaderNavAuthenticated/> : <HeaderNavNotAuthenticated/>}
+					<NavLink to='/' className='title'>Dr obe</NavLink>
+					<HeaderNav isAuthenticated={ isAuthenticated } hideDrawer={ hideDrawer } handleDrawerClick={ () => this.setState({hideDrawer: true}) }/>
+					<button className='button-toggle-nav-drawer' onClick={ () => this.setState({hideDrawer: !hideDrawer}) }>+</button>
 				</header>
 
-				{ isAuthenticated ? <MainAuthenticated/> : <MainNotAuthenticated/>}
+				<Main isAuthenticated={ isAuthenticated }/>
 			</div>
 		)
 	}

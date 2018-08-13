@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
-import api from '../Modules/api';
-import pluralizeArticleKind from '../Modules/pluralize-article-kind';
-import singularizeArticleKind from '../Modules/singularize-article-kind';
-import uploadImage from '../Modules/upload-image';
-import SmallArticle from '../Components/SmallArticle.jsx';
+import api from '../../Modules/api';
+import pluralizeArticleKind from '../../Modules/pluralize-article-kind';
+import singularizeArticleKind from '../../Modules/singularize-article-kind';
+import uploadImage from '../../Modules/upload-image';
+import SmallArticle from '../../Components/SmallArticle';
 
 class ArticleForm extends Component {
 	constructor() {

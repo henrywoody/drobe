@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { NavLink, withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
-import api from '../Modules/api';
-import SmallArticle from '../Components/SmallArticle.jsx';
+import api from '../../Modules/api';
+import SmallArticle from '../../Components/SmallArticle';
 
 class ArticleDetail extends Component {
 	constructor() {
@@ -20,7 +20,7 @@ class ArticleDetail extends Component {
 
 		this.unlisten = history.listen((location, action) => {
 			if (location.pathname.match(/wardrobe\/\w*?\/\w*?$/)) {
-				const [_, pluralArticleKind, id] = location.pathname.match(/wardrobe\/(\w*?)\/(\w*?)$/);
+				const [pluralArticleKind, id] = location.pathname.match(/wardrobe\/(\w*?)\/(\w*?)$/).slice(1);
 				this.setupData(pluralArticleKind, id);
 			}
 		})
