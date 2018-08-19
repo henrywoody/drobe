@@ -4,13 +4,12 @@ import CanvasComponent from './CanvasComponent.jsx';
 export default class Runner extends Component {
 	constructor(props) {
 		super(props);
-		const { width } = this.props;
 		this.state = {
 			runnerPosition: 0,
 			isRunning: false,
 			runEvery: 250,
+			runSpeed: props.runSpeed || 3,
 			waitCounter: 0,
-			runSpeed: 3,
 			fadeCounter: 0,
 			fadeFrequency: 20
 		}
@@ -31,7 +30,7 @@ export default class Runner extends Component {
 
 	update = () => {
 		const { width } = this.props;
-		const { runnerPosition, isRunning, runEvery, waitCounter, runSpeed, fadeCounter, fadeFrequency } = this.state;
+		const { runnerPosition, isRunning, runEvery, runSpeed, waitCounter, fadeCounter, fadeFrequency } = this.state;
 
 		if (isRunning) {
 			this.setState({
@@ -65,9 +64,17 @@ export default class Runner extends Component {
 	}
 
 	render() {
-		const { width, height } = this.props;
-		const { isRunning, runnerPosition, runSpeed, fadeCounter } = this.state;
+		const { width, height, inverted } = this.props;
+		const { isRunning, runSpeed, runnerPosition, fadeCounter } = this.state;
 
-		return <CanvasComponent width={ width } height={ height } runnerPosition={ runnerPosition } runnerWidth={ runSpeed } displayRunner={ isRunning } applyFade={ fadeCounter === 0 }/>
+		return <CanvasComponent
+					width={ width }
+					height={ height }
+					runnerPosition={ runnerPosition }
+					runnerWidth={ runSpeed }
+					displayRunner={ isRunning }
+					applyFade={ fadeCounter === 0 }
+					inverted={ inverted }
+				/>
 	}
 }

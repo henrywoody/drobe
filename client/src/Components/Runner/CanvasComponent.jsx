@@ -9,10 +9,10 @@ export default class CanvasComponent extends Component {
 	}
 
 	componentDidMount() {
-		const { width, height } = this.props;
+		const { width, height, inverted } = this.props;
 		const { drobeBlue } = this.state;
 		const ctx = this.refs.canvas.getContext('2d');
-		ctx.fillStyle = drobeBlue;
+		ctx.fillStyle = inverted ? '#ffffff' : drobeBlue;
 		ctx.fillRect(0,0, width,height);
 	}
 
@@ -21,19 +21,19 @@ export default class CanvasComponent extends Component {
 	}
 
 	update() {
-		const { width, height, runnerPosition, runnerWidth, displayRunner, applyFade } = this.props;
+		const { width, height, runnerPosition, runnerWidth, displayRunner, applyFade, inverted } = this.props;
 		const { drobeBlue } = this.state;
 
 		const ctx = this.refs.canvas.getContext('2d');
 		if (applyFade) {
 			ctx.globalAlpha = 0.02;
-			ctx.fillStyle = '#ffffff';
+			ctx.fillStyle = inverted ? drobeBlue : '#ffffff';
 			ctx.fillRect(0,0, width,height);
 		}
 
 		if (displayRunner) {
 			ctx.globalAlpha = 1;
-			ctx.fillStyle = drobeBlue;
+			ctx.fillStyle = inverted ? '#ffffff' : drobeBlue;
 			ctx.fillRect(width/2 - runnerPosition,0, runnerWidth,height);
 			ctx.fillRect(width/2 + runnerPosition,0, runnerWidth,height);
 		}
