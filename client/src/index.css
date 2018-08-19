@@ -1,17 +1,27 @@
 :root {
+	--dark-drobe-blue: #1ba6d1;
 	--drobe-blue: #1bb8d1;
+	--nearly-white: #fafafa;
 	--light-gray: #d9e1e2;
 	--gray: #a7a7a7;
+	--dark-gray: #888888;
 	--nearly-black: #202020;
 
+	--drobe-blue-gradient: linear-gradient(to bottom, var(--drobe-blue), var(--dark-drobe-blue));
+
 	--title-font: Monoton;
-	--header-font: Comfortaa;
+	--header-font: Open Sans;
 	--body-font: Open Sans;
+}
+
+html {
+	height: 100%;
 }
 
 body {
 	font-family: var(--body-font);
 	color: var(--nearly-black);
+
 	padding: 0;
 	margin: 0;
 }
@@ -21,11 +31,26 @@ h1, h2, h3 {
 	text-align: center;
 }
 
+.title {
+	font-family: var(--title-font);
+	font-size: 2.5rem;
+	color: var(--drobe-blue);
+	text-transform: uppercase;
+	text-decoration: none;
+	letter-spacing: .1rem;
+	word-spacing: -.5rem;
+	width: 11.5rem;
+	line-height: 3.2rem;
+	flex-shrink: 0;
+}
+
 
 button {
 	color: var(--nearly-black);
 	font-weight: 200;
 	letter-spacing: .03rem;
+	height: 2rem;
+	border: none;
 	padding: .4rem .8rem;
 	outline: 0;
 	transform: translate(-.1rem, -.1rem);
@@ -36,7 +61,7 @@ button:active {
 }
 
 .btn-primary {
-	color: #fff;
+	color: var(--nearly-white);
 	background-color: var(--drobe-blue);
 	border-radius: .1rem;
 }

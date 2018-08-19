@@ -31,14 +31,17 @@ class App extends Component {
 		const { isAuthenticated } = this.props;
 		const { hideDrawer } = this.state;
 
+
 		return (
 			<div className="App">
-				<header>
-					<NavLink to='/' className='title'>Dr obe</NavLink>
-					<HeaderNav isAuthenticated={ isAuthenticated } hideDrawer={ hideDrawer } handleDrawerClick={ () => this.setState({hideDrawer: true}) }/>
-					<button className='button-toggle-nav-drawer' onClick={ () => this.setState({hideDrawer: !hideDrawer}) }>+</button>
-					<Runner width={ window.innerWidth } height={ 2 }/>
-				</header>
+				{ isAuthenticated &&
+					<header>
+						<NavLink to='/' className='title'>Dr obe</NavLink>
+						<HeaderNav hideDrawer={ hideDrawer } handleDrawerClick={ () => this.setState({hideDrawer: true}) }/>
+						<button className='button-toggle-nav-drawer' onClick={ () => this.setState({hideDrawer: !hideDrawer}) }>+</button>
+						<Runner width={ window.innerWidth } height={ 2 }/>
+					</header>
+				}
 
 				<Main isAuthenticated={ isAuthenticated }/>
 			</div>

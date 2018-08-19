@@ -11,7 +11,7 @@ export default class Register extends Component {
 				<UserForm formType='register'/>
 
 				<p>
-					Have an account? <NavLink exact to='/'>Login here</NavLink>
+					Have an account? <NavLink exact to='/login'>Login here</NavLink>
 				</p>
 			</main>
 		)

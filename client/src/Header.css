@@ -18,19 +18,6 @@ header {
 	box-sizing: border-box;
 }
 
-header a.title {
-	font-family: var(--title-font);
-	font-size: 2.5rem;
-	color: var(--drobe-blue);
-	text-transform: uppercase;
-	text-decoration: none;
-	letter-spacing: .1rem;
-	word-spacing: -.4rem;
-	width: 11.5rem;
-	line-height: 3.2rem;
-	flex-shrink: 0;
-}
-
 header canvas {
 	position: absolute;
 	bottom: 0;

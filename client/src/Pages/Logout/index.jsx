@@ -18,7 +18,7 @@ export default class Logout extends Component {
 				</p>
 
 				<p>
-					<NavLink exact to='/'>Click to log back in</NavLink>
+					<NavLink exact to='/login'>Click to log back in</NavLink>
 				</p>
 			</main>
 		)

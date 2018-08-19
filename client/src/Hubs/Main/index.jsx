@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Switch, Route, withRouter } from 'react-router-dom';
 import Register from '../../Pages/Register';
 import Login from '../../Pages/Login';
+import Landing from '../../Pages/Landing';
 import Home from '../../Pages/Home';
 import Wardrobe from '../Wardrobe';
 import Logout from '../../Pages/Logout';
@@ -23,9 +24,10 @@ class Main extends Component {
 		} else {
 			return (
 				<Switch>
+					<Route exact path='/login' component={ Login }/>
 					<Route exact path='/register' component={ Register }/>
 					<Route exact path='/logout' component={ Logout }/>
-					<Route path='/' component={ Login }/>
+					<Route path='/' component={ Landing }/>
 				</Switch>
 			)
 		}
