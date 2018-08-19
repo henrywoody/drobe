@@ -32,7 +32,7 @@ class UserForm extends Component {
 
 		if (formType === 'register') {
 			if (formOptions.password !== formOptions.passwordCheck)
-				this.setState({message: 'Passwords do not match.'});
+				return this.setState({message: 'Passwords do not match.'});
 		}
 
 		const response = await fetch(`/users/${formType}`, {
@@ -53,52 +53,50 @@ class UserForm extends Component {
 			const jsonResponse = await response.json();
 			userStorage.logUserIn(jsonResponse.user, jsonResponse.token);
 			
-			if (formType === 'register')
-				history.replace('/');
+			history.replace('/');
 		}
 	}
 
 	render() {
-		const { formType } = this.props;
+		const { formType, handleCancel } = this.props;
 		const { formOptions, message } = this.state;
-
-		const formInputs = [];
-		formInputs.push(
-			<div key='username'>
-				<label htmlFor='username'>Username</label>
-				<input name='username' type='text' placeholder='username' value={ formOptions.username } onChange={ this.handleChange }/>
-			</div>
-		);
-		formInputs.push(
-			<div key='password'>
-				<label htmlFor='password'>Password</label>
-				<input name='password' type='password' placeholder='password' value={ formOptions.password } onChange={ this.handleChange }/>
-			</div>
-		);
-
-		if (formType === 'login') {
-			formInputs.push(
-				<input key='login' type='submit' value='Login'/>
-			)
-		}
-
-		if (formType === 'register') {
-			formInputs.push(
-				<div key='passwordCheck'>
-					<label htmlFor='passwordCheck'>Confirm Password</label>
-					<input name='passwordCheck' type='password' placeholder='password' value={ formOptions.passwordCheck } onChange={ this.handleChange }/>
-				</div>
-			);
-
-			formInputs.push(
-				<input key='register' type='submit' value='Register'/>
-			);
-		}
 
 		return (
 			<form onSubmit={ this.handleSubmit }>
-				{ message }
-				{ formInputs }
+				<div className='form-message-container'>
+					<span className='form-message'>{ message }</span>
+				</div>
+				
+				<div className='input-container'>
+					<label htmlFor='username'>Username</label>
+					<input name='username' type='text' placeholder='username' value={ formOptions.username } onChange={ this.handleChange }/>
+				</div>
+
+				<div className='input-container'>
+					<label htmlFor='password'>Password</label>
+					<input name='password' type='password' placeholder='password' value={ formOptions.password } onChange={ this.handleChange }/>
+				</div>
+
+				{ formType === 'register' &&
+					<div className='input-container'>
+						<label htmlFor='passwordCheck'>Confirm Password</label>
+						<input name='passwordCheck' type='password' placeholder='password' value={ formOptions.passwordCheck } onChange={ this.handleChange }/>
+					</div>
+				}
+
+				<div className='buttons-container'>
+					{ formType === 'login' && 
+						<button className='btn-primary' onClick={ this.handleSubmit }>Login</button>
+					}
+
+					{ formType === 'register' && 
+						<button className='btn-primary' onClick={ this.handleSubmit }>Register</button>
+					}
+
+					{ handleCancel && 
+						<button className='btn-secondary' onClick={ e => { e.preventDefault(); handleCancel() } }>Cancel</button>
+					}
+				</div>
 			</form>
 		)
 	}
