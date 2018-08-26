@@ -25,6 +25,7 @@ h1.big-title {
 h2.tagline {
 	font-size: 2rem;
 	font-weight: 300;
+	color: var(--nearly-white);
 	width: 100%;
 	margin-bottom: .5rem;
 	display: inline-block;
@@ -35,7 +36,7 @@ main.landing section {
 	padding: 1.5rem;
 }
 
-main.landing section .form-box {
+main.landing .form-box {
 	color: var(--dark-gray);
 	background-color: var(--nearly-white);
 	min-width: 15rem;
@@ -44,16 +45,17 @@ main.landing section .form-box {
 	border-radius: .25rem;
 	padding: 1rem;
 	margin: 0 auto;
+	box-shadow: .5rem .5rem 1rem var(--dark-drobe-blue-shadow);
 	display: flex;
 	flex-flow: column;
 	justify-content: space-around;
 }
 
-main.landing section .form-box h3 {
+main.landing .form-box h3 {
 	margin: 1rem auto .5rem;
 }
 
-main.landing section .form-box > .buttons-container {
+main.landing .form-box > .buttons-container {
 	display: flex;
 	flex-flow: row;
 	justify-content: space-around;
@@ -101,7 +103,7 @@ main.landing .runner-container {
 		width: 40%;
 	}
 
-	main.landing section .form-box {
+	main.landing .form-box {
 		width: 80%;
 		padding: 1rem 1.25rem;
 		margin-top: 10rem;
