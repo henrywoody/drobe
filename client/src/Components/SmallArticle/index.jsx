@@ -1,11 +1,15 @@
 import React from 'react';
+import './style.css';
 
 export default props => {
-	const { name, imageUrl, onClick, field, id } = props;
+	const { name, imageUrl, clickIcon, onClick } = props;
 
 	return (
-		<div onClick={ () => onClick(field, id) }>
-			<img src={ imageUrl } alt='article'/>
+		<div className='small-article' onClick={ onClick }>
+			{ clickIcon && <span className='click-icon'>{ clickIcon }</span> }
+			<div className='img-container'>
+				<img src={ imageUrl } alt='article'/>
+			</div>
 			<span>{ name }</span>
 		</div>
 	)

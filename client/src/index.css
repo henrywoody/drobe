@@ -1,14 +1,19 @@
 :root {
 	--dark-drobe-blue: #1ba6d1;
+	--dark-drobe-blue-shadow: #1697bf;
 	--drobe-blue: #1bb8d1;
 	--nearly-white: #fafafa;
 	--light-gray: #d9e1e2;
 	--gray: #a7a7a7;
 	--dark-gray: #888888;
 	--nearly-black: #202020;
+	--default-text-color: var(--nearly-black);
 	--default-background-color: #fff;
 
 	--drobe-blue-gradient: linear-gradient(to right, var(--drobe-blue), var(--dark-drobe-blue));
+
+	--default-border-width: .1rem;
+	--default-border: var(--default-border-width) solid var(--light-gray);
 
 	--title-font: Monoton, sans-serif;
 	--header-font: Open Sans, sans-serif;
@@ -22,19 +27,22 @@ html {
 main {
 	padding-top: 1rem;
 	box-sizing: border-box;
+	margin-bottom: 3rem;
 }
 
 body {
 	font-family: var(--body-font);
-	color: var(--nearly-black);
+	color: var(--default-text-color);
 
 	padding: 0;
 	margin: 0;
 }
 
 h1, h2, h3 {
+	color: var(--gray);
 	font-family: var(--header-font);
 	text-align: center;
+	font-weight: 300;
 
 	margin: .5rem 0 1.5rem;
 }

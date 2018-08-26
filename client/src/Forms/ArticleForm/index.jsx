@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
+import JoinedArticlesInput from './JoinedArticlesInput.jsx';
 import api from '../../Modules/api';
 import pluralizeArticleKind from '../../Modules/pluralize-article-kind';
 import singularizeArticleKind from '../../Modules/singularize-article-kind';
 import uploadImage from '../../Modules/upload-image';
-import SmallArticle from '../../Components/SmallArticle';
+import './style.css';
 
 class ArticleForm extends Component {
 	constructor() {
@@ -221,16 +222,18 @@ class ArticleForm extends Component {
 
 		if (match.path === '/wardrobe/new') {
 			articleKindField = (
-				<div>
+				<div className='input-container'>
 					<label htmlFor='articleKind'>Kind</label>
-					<input type='radio' name='articleKind' id='shirt' value='shirt' checked={ formData.articleKind === 'shirt' } onChange={ this.handleChange }/>
-					<label htmlFor='shirt'>Shirt</label>
-					<input type='radio' name='articleKind' id='pants' value='pants' checked={ formData.articleKind === 'pants' } onChange={ this.handleChange }/>
-					<label htmlFor='pants'>Pants</label>
-					<input type='radio' name='articleKind' id='dress' value='dress' checked={ formData.articleKind === 'dress' } onChange={ this.handleChange }/>
-					<label htmlFor='dress'>Dress</label>
-					<input type='radio' name='articleKind' id='outerwear' value='outerwear' checked={ formData.articleKind === 'outerwear' } onChange={ this.handleChange }/>
-					<label htmlFor='outerwear'>Outerwear</label>
+					<div className='radio-container'>
+						<input type='radio' name='articleKind' id='shirt' value='shirt' checked={ formData.articleKind === 'shirt' } onChange={ this.handleChange }/>
+						<label htmlFor='shirt'>Shirt</label>
+						<input type='radio' name='articleKind' id='pants' value='pants' checked={ formData.articleKind === 'pants' } onChange={ this.handleChange }/>
+						<label htmlFor='pants'>Pants</label>
+						<input type='radio' name='articleKind' id='dress' value='dress' checked={ formData.articleKind === 'dress' } onChange={ this.handleChange }/>
+						<label htmlFor='dress'>Dress</label>
+						<input type='radio' name='articleKind' id='outerwear' value='outerwear' checked={ formData.articleKind === 'outerwear' } onChange={ this.handleChange }/>
+						<label htmlFor='outerwear'>Outerwear</label>
+					</div>
 				</div>
 			)
 
@@ -238,7 +241,7 @@ class ArticleForm extends Component {
 				return (
 					<form>
 						{ articleKindField }
-						<button onClick={ this.handleCancel }>Cancel</button>
+						<button className='btn-secondary' onClick={ this.handleCancel }>Cancel</button>
 					</form>
 				)
 			}
@@ -247,23 +250,25 @@ class ArticleForm extends Component {
 		let additionalFields = {};
 		if (formData.articleKind === 'outerwear') {
 			additionalFields.specificKind = (
-				<div>
+				<div className='input-container'>
 					<label htmlFor='specificKind'>Specific Kind</label>
-					<input type='radio' name='specificKind' id='sweater' value='sweater' checked={ formData.specificKind === 'sweater' } onChange={ this.handleChange }/>
-					<label htmlFor='sweater'>Sweater</label>
-					<input type='radio' name='specificKind' id='jacket' value='jacket' checked={ formData.specificKind === 'jacket' } onChange={ this.handleChange }/>
-					<label htmlFor='jacket'>Jacket</label>
-					<input type='radio' name='specificKind' id='vest' value='vest' checked={ formData.specificKind === 'vest' } onChange={ this.handleChange }/>
-					<label htmlFor='vest'>Vest</label>
-					<input type='radio' name='specificKind' id='raincoat' value='raincoat' checked={ formData.specificKind === 'raincoat' } onChange={ this.handleChange }/>
-					<label htmlFor='raincoat'>Raincoat</label>
-					<input type='radio' name='specificKind' id='snowcoat' value='snowcoat' checked={ formData.specificKind === 'snowcoat' } onChange={ this.handleChange }/>
-					<label htmlFor='snowcoat'>Snowcoat</label>
+					<div className='radio-container'>
+						<input type='radio' name='specificKind' id='sweater' value='sweater' checked={ formData.specificKind === 'sweater' } onChange={ this.handleChange }/>
+						<label htmlFor='sweater'>Sweater</label>
+						<input type='radio' name='specificKind' id='jacket' value='jacket' checked={ formData.specificKind === 'jacket' } onChange={ this.handleChange }/>
+						<label htmlFor='jacket'>Jacket</label>
+						<input type='radio' name='specificKind' id='vest' value='vest' checked={ formData.specificKind === 'vest' } onChange={ this.handleChange }/>
+						<label htmlFor='vest'>Vest</label>
+						<input type='radio' name='specificKind' id='raincoat' value='raincoat' checked={ formData.specificKind === 'raincoat' } onChange={ this.handleChange }/>
+						<label htmlFor='raincoat'>Raincoat</label>
+						<input type='radio' name='specificKind' id='snowcoat' value='snowcoat' checked={ formData.specificKind === 'snowcoat' } onChange={ this.handleChange }/>
+						<label htmlFor='snowcoat'>Snowcoat</label>
+					</div>
 				</div>
 			);
 
 			additionalFields.innerLayer = (
-				<div>
+				<div className='input-container'>
 					<label htmlFor='innerLayer'>Inner Layer</label>
 					<input name='innerLayer' type='checkbox' checked={ formData.innerLayer } onChange={ this.handleChange }/>
 				</div>
@@ -274,123 +279,100 @@ class ArticleForm extends Component {
 		// Added Articles
 		const addedShirts = articles.filter(e => {
 			return formData.shirts.includes(e.id) && e.articleKind === 'shirt';
-		}).map(e => {
-			return <SmallArticle key={ e.id } field='shirts' id={ e.id } name={ e.name } imageUrl={ e.imageUrl } onClick={ this.removeAssociatedArticle }/>
 		});
-
 		const addedPants = articles.filter(e => {
 			return formData.pants.includes(e.id) && e.articleKind === 'pants';
-		}).map(e => {
-			return <SmallArticle key={ e.id } field='pants' id={ e.id } name={ e.name } imageUrl={ e.imageUrl } onClick={ this.removeAssociatedArticle }/>
 		});
-
 		const addedDresses = articles.filter(e => {
 			return formData.dresses.includes(e.id) && e.articleKind === 'dress';
-		}).map(e => {
-			return <SmallArticle key={ e.id } field='dresses' id={ e.id } name={ e.name } imageUrl={ e.imageUrl } onClick={ this.removeAssociatedArticle }/>
 		});
-
 		const addedOuterwears = articles.filter(e => {
 			return formData.outerwears.includes(e.id) && e.articleKind === 'outerwear';
-		}).map(e => {
-			return <SmallArticle key={ e.id } field='outerwears' id={ e.id } name={ e.name } imageUrl={ e.imageUrl } onClick={ this.removeAssociatedArticle }/>
 		});
 
 
 		// Suggested (not yet added) Articles
 		const shirtSuggestions = articles.filter(e => {
 			return e.articleKind === 'shirt' && !formData.shirts.includes(e.id) && e.name.match(new RegExp(`^${articleSearchOptions.shirts}`, 'i'));
-		}).map(e => {
-			return <SmallArticle key={ e.id } field='shirts' id={ e.id } name={ e.name } imageUrl={ e.imageUrl } onClick={ this.addAssociatedArticle }/>
 		});
-
 		const pantsSuggestions = articles.filter(e => {
 			return e.articleKind === 'pants' && !formData.pants.includes(e.id) && e.name.match(new RegExp(`^${articleSearchOptions.pants}`, 'i'));
-		}).map(e => {
-			return <SmallArticle key={ e.id } field='pants' id={ e.id } name={ e.name } imageUrl={ e.imageUrl } onClick={ this.addAssociatedArticle }/>
 		});
-
 		const dressSuggestions = articles.filter(e => {
 			return e.articleKind === 'dress' && !formData.dresses.includes(e.id) && e.name.match(new RegExp(`^${articleSearchOptions.dresses}`, 'i'));
-		}).map(e => {
-			return <SmallArticle key={ e.id } field='dresses' id={ e.id } name={ e.name } imageUrl={ e.imageUrl } onClick={ this.addAssociatedArticle }/>
-		})
-
+		});
 		const outerwearSuggestions = articles.filter(e => {
 			return e.articleKind === 'outerwear' && !formData.outerwears.includes(e.id) && e.id !== Number(articleId) && e.name.match(new RegExp(`^${articleSearchOptions.outerwears}`, 'i'));
-		}).map(e => {
-			return <SmallArticle key={ e.id } field='outerwears' id={ e.id } name={ e.name } imageUrl={ e.imageUrl } onClick={ this.addAssociatedArticle }/>
 		});
 
 		// Form Fields for Associat(ing/ed) Articles
 		let associatedArticleFields = [];
 		if (['pants', 'outerwear'].includes(formData.articleKind)) {
 			associatedArticleFields.push(
-				<div key='shirtsField'>
-
-					{ addedShirts }
-
-					<label htmlFor='shirts'>Shirts</label>
-					<input name='shirts' type='search' value={ articleSearchOptions.shirts } onChange={ this.handleSearchChange }/>
-
-					{ shirtSuggestions }
-
-				</div>
+				<JoinedArticlesInput key='pantsField'
+					fieldName='shirts'
+					label={ <label htmlFor='shirts'>Associated Shirts</label> }
+					addedArticles={ addedShirts }
+					searchInput={ <input name='shirts' type='search' placeholder='Search' value={ articleSearchOptions.shirts } onChange={ this.handleSearchChange }/> }
+					suggestedArticles={ shirtSuggestions }
+					addArticle={ this.addAssociatedArticle }
+					removeArticle={ this.removeAssociatedArticle }
+				/>
 			);
 		}
 		if (['shirt', 'outerwear'].includes(formData.articleKind)) {
 			associatedArticleFields.push(
-				<div key='pantsField'>
-
-					{ addedPants }
-
-					<label htmlFor='pants'>Pants</label>
-					<input name='pants' type='search' value={ articleSearchOptions.pants } onChange={ this.handleSearchChange }/>
-
-					{ pantsSuggestions }
-
-				</div>
-			);
+				<JoinedArticlesInput key='pantsField'
+					fieldName='pants'
+					label={ <label htmlFor='pants'>Associated Pants</label> }
+					addedArticles={ addedPants }
+					searchInput={ <input name='pants' type='search' placeholder='Search' value={ articleSearchOptions.pants } onChange={ this.handleSearchChange }/> }
+					suggestedArticles={ pantsSuggestions }
+					addArticle={ this.addAssociatedArticle }
+					removeArticle={ this.removeAssociatedArticle }
+				/>
+			)
 		}
 		if (['outerwear'].includes(formData.articleKind)) {
 			associatedArticleFields.push(
-				<div key='dressesField'>
-
-					{ addedDresses }
-
-					<label htmlFor='dresses'>Dresses</label>
-					<input name='dresses' type='search' value={ articleSearchOptions.dresses } onChange={ this.handleSearchChange }/>
-
-					{ dressSuggestions }
-
-				</div>
+				<JoinedArticlesInput key='dressesField'
+					fieldName='dresses'
+					label={ <label htmlFor='dresses'>Associated Dresses</label> }
+					addedArticles={ addedDresses }
+					searchInput={ <input name='dresses' type='search' placeholder='Search' value={ articleSearchOptions.dresses } onChange={ this.handleSearchChange }/> }
+					suggestedArticles={ dressSuggestions }
+					addArticle={ this.addAssociatedArticle }
+					removeArticle={ this.removeAssociatedArticle }
+				/>
 			);
 		}
 		if (['shirt', 'pants', 'dress', 'outerwear'].includes(formData.articleKind)) {
 			associatedArticleFields.push(
-				<div key='outerwearsField'>
-
-					{ addedOuterwears}
-
-					<label htmlFor='outerwears'>Outerwear</label>
-					<input name='outerwears' type='search' value={ articleSearchOptions.outerwears } onChange={ this.handleSearchChange }/>
-
-					{ outerwearSuggestions }
-
-				</div>
+				<JoinedArticlesInput key='outerwearsField'
+					fieldName='outerwears'
+					label={ <label htmlFor='outerwears'>Associated Outerwear</label> }
+					addedArticles={ addedOuterwears }
+					searchInput={ <input name='outerwears' type='search' placeholder='Search' value={ articleSearchOptions.outerwears } onChange={ this.handleSearchChange }/> }
+					suggestedArticles={ outerwearSuggestions }
+					addArticle={ this.addAssociatedArticle }
+					removeArticle={ this.removeAssociatedArticle }
+				/>
 			);
 		}
 
 		const submitButtons = match.path === '/wardrobe/new' ? (
 			[
-				<button key='create' onClick={ e => this.handleSubmit(e, true)}>Create</button>,
-				<button key='another' onClick={ e => this.handleSubmit(e, false)}>Create and Add Another</button>
+				<button key='another' className='btn-secondary' onClick={ e => this.handleSubmit(e, false)}>Create and Add Another</button>,
+				<button key='create' className='btn-primary' onClick={ e => this.handleSubmit(e, true)}>Create</button>
 			]
 		) : (
 			[
-				<button onClick={ e => this.handleSubmit(e, true)}>Update</button>
+				<button className='btn-primary' onClick={ e => this.handleSubmit(e, true)}>Update</button>
 			]
 		);
+
+		let namePlaceholder = formData.articleKind === 'outerwear' ? formData.specificKind : formData.articleKind;
+		namePlaceholder = namePlaceholder.charAt(0).toUpperCase() + namePlaceholder.slice(1);
 
 		return (
 			<form>
@@ -400,35 +382,54 @@ class ArticleForm extends Component {
 
 				{ additionalFields.specificKind }
 
-				<label htmlFor='name'>Name</label>
-				<input name='name' type='text' value={ formData.name } placeholder='name' onChange={ this.handleChange }/>
+				<div className='input-container'>
+					<label htmlFor='name'>Name</label>
+					<input name='name' type='text' value={ formData.name } placeholder={ `My Great ${namePlaceholder}` } onChange={ this.handleChange }/>
+				</div>
 
-				<label htmlFor='description'>Description <span>optional</span></label>
-				<textarea name='description' value={ formData.description } placeholder='description' onChange={ this.handleChange }/>
+				<div className='input-container'>
+					<label htmlFor='description'>Description <span className='optional'>optional</span></label>
+					<textarea name='description' value={ formData.description } placeholder='Something descriptive' onChange={ this.handleChange }/>
+				</div>
 
-				<label htmlFor='image'>Image</label>
-				<input name='image' type='file' value={ image.path } onChange={ this.handleChange }/>
+				<div className='input-container'>
+					<label htmlFor='image'>Image</label>
+					<input name='image' type='file' value={ image.path } onChange={ this.handleChange }/>
+				</div>
 
-				<label htmlFor='rating'>Rating</label>
-				<input name='rating' type='range' min='1' max='5' value={ formData.rating } onChange={ this.handleChange }/>
+				<div className='input-container'>
+					<label htmlFor='rating'>Rating</label>
+					<input name='rating' type='range' min='1' max='5' value={ formData.rating } onChange={ this.handleChange }/>
+				</div>
 
-				<label>Temperature Range <span>optional</span></label>
-				<input name='minTemp' type='number' placeholder='Min' value={ formData.minTemp } onChange={ this.handleChange }/>
-				<input name='maxTemp' type='number' placeholder='Max' value={ formData.maxTemp } onChange={ this.handleChange }/>
+				<div className='input-container'>
+					<label>Temperature Range <span className='optional'>optional</span></label>
+					<div className='input-grouping always-row temp-inputs-container'>
+						<input name='minTemp' type='number' placeholder='Min Temp' value={ formData.minTemp } onChange={ this.handleChange }/>
+						<input name='maxTemp' type='number' placeholder='Max Temp' value={ formData.maxTemp } onChange={ this.handleChange }/>
+					</div>
+				</div>
 
-				{ additionalFields.innerLayer }
+				<div className='input-grouping always-row '>
+					{ additionalFields.innerLayer }
 
-				<label htmlFor='rainOK'>Rain</label>
-				<input name='rainOK' type='checkbox' checked={ formData.rainOK } onChange={ this.handleChange }/>
+					<div className='input-container'>
+						<label htmlFor='rainOK'>Rain</label>
+						<input name='rainOK' type='checkbox' checked={ formData.rainOK } onChange={ this.handleChange }/>
+					</div>
 
-				<label htmlFor='snowOK'>Snow</label>
-				<input name='snowOK' type='checkbox' checked={ formData.snowOK } onChange={ this.handleChange }/>
+					<div className='input-container'>
+						<label htmlFor='snowOK'>Snow</label>
+						<input name='snowOK' type='checkbox' checked={ formData.snowOK } onChange={ this.handleChange }/>
+					</div>
+				</div>
 
 				{ associatedArticleFields }
 
-				{ submitButtons }
-
-				<button onClick={ this.handleCancel }>Cancel</button>
+				<div className='buttons-container'>
+					<button className='btn-secondary' onClick={ this.handleCancel }>Cancel</button>
+					{ submitButtons }
+				</div>
 			</form>
 		)
 	}

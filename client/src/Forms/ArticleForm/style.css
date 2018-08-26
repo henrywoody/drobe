@@ -1,0 +1,20 @@
+.temp-inputs-container input {
+	width: 48%;
+}
+
+.temp-inputs-container input:first-of-type {
+	margin-bottom: .75rem;
+}
+
+
+.small-articles-container {
+	display: flex;
+	flex-flow: row;
+	justify-content: left;
+	flex-wrap: nowrap;
+	overflow: scroll;
+}
+
+input[type='search'] {
+	margin-bottom: .3rem;	
+}
