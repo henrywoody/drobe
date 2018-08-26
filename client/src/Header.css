@@ -55,6 +55,7 @@ header nav a {
 	color: var(--nearly-black);
 	text-decoration: none;
 	display: inline-block;
+	transition: .1s ease-out;
 }
 
 header nav a.active {

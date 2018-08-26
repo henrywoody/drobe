@@ -1,0 +1,24 @@
+.subnav {
+	width: 90%;
+	max-width: 25rem;
+	margin: 2rem auto;
+	list-style-type: none;
+	display: flex;
+	flex-flow: row;
+}
+
+.subnav li {
+	font-size: .9rem;
+	text-align: center;
+	border-bottom: .1rem solid var(--light-gray);
+	padding-bottom: .25rem;
+	display: block;
+	flex-grow: 1;
+	transition: .1s ease-out;
+}
+
+.subnav li:hover, .subnav li.active {
+	color: var(--drobe-blue);
+	border-bottom: .1rem solid var(--drobe-blue);
+	cursor: pointer;
+}

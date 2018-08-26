@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { NavLink, withRouter } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import SubNav from '../../Components/SubNav';
 import SimpleArticle from '../../Components/SimpleArticle';
@@ -11,6 +11,7 @@ class ArticlesIndex extends Component {
 	constructor() {
 		super();
 		this.state = {
+			activeCategory: 'all',
 			categories: [],
 			articles: [],
 			activeArticles: []
@@ -23,34 +24,39 @@ class ArticlesIndex extends Component {
 		const articles = await api.getAllArticles(user.token);
 
 		const activeArticles = [...articles]; // all are active to start
-		const categories = ['All', ...new Set(articles.map(a => pluralizeArticleKind(a.articleKind)))];
+		const categories = ['all', ...new Set(articles.map(a => pluralizeArticleKind(a.articleKind)))];
 		this.setState({ articles, activeArticles, categories });
 	}
 
 	filterArticles = (event) => {
 		const { articles } = this.state;
-		const articleKind = event.currentTarget.innerHTML;
+		const articleKind = event.currentTarget.innerHTML.toLowerCase();
 
 		let activeArticles;
-		if (articleKind === 'All') {
+		if (articleKind === 'all') {
 			activeArticles = articles;
 		} else {
 			activeArticles = articles.filter(a => a.articleKind === singularizeArticleKind(articleKind));			
 		}
 
-		this.setState({ activeArticles });
+		this.setState({ activeArticles, activeCategory: articleKind });
+	}
+
+	handleNewClick = event => {
+		const { history } = this.props;
+		history.push('/wardrobe/new');
 	}
 
 	render() {
-		const { categories, activeArticles } = this.state;
+		const { activeCategory, categories, activeArticles } = this.state;
 		const articleComponents = activeArticles.map(e => <SimpleArticle key={ `${e.articleKind}-${e.id}` } data={ e }/>);
 
 		return (
 			<main>
 				<h1>Wardrobe</h1>
 				
-				<SubNav items={ categories } handleClick={ this.filterArticles }/>
-				<NavLink exact to='/wardrobe/new'>New</NavLink>
+				<SubNav items={ categories } activeItem={ activeCategory } handleClick={ this.filterArticles }/>
+				<button className='btn-primary' onClick={ this.handleNewClick }>Create Article</button>
 				{ articleComponents }
 			</main>
 		);
