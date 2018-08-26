@@ -6,6 +6,7 @@ import SimpleArticle from '../../Components/SimpleArticle';
 import api from '../../Modules/api';
 import pluralizeArticleKind from '../../Modules/pluralize-article-kind';
 import singularizeArticleKind from '../../Modules/singularize-article-kind';
+import './style.css';
 
 class ArticlesIndex extends Component {
 	constructor() {
@@ -54,10 +55,14 @@ class ArticlesIndex extends Component {
 		return (
 			<main>
 				<h1>Wardrobe</h1>
+					
+				<button className='btn-primary btn-create-new' onClick={ this.handleNewClick }>Create Article</button>
 				
 				<SubNav items={ categories } activeItem={ activeCategory } handleClick={ this.filterArticles }/>
-				<button className='btn-primary' onClick={ this.handleNewClick }>Create Article</button>
-				{ articleComponents }
+
+				<div className='articles-index'>
+					{ articleComponents }
+				</div>
 			</main>
 		);
 	}

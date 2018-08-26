@@ -1,0 +1,53 @@
+.article-simple {
+	background-color: #fff;
+	width: 90%;
+	min-height: 12rem;
+	border: .1rem solid var(--default-background-color);
+	border-radius: .1rem;
+	padding: 1rem;
+	margin: .5rem auto;
+	display: flex;
+	flex-flow: column;
+	box-sizing: border-box;
+
+	transition: .2s ease-out;
+}
+
+.article-simple:hover {
+	border: .1rem solid var(--drobe-blue);
+	cursor: pointer;
+}
+
+.article-simple .name {
+	font-size: 1.1rem;
+	text-align: left;
+	margin-bottom: .25rem;
+}
+
+.article-simple img {
+	width: 90%;
+}
+
+.article-simple .description {
+	font-size: .8rem;
+	text-align: justify;
+}
+
+@media all and (min-width: 750px) {
+	.article-simple {
+		width: 49%;
+		margin: .5rem 0;
+	}
+}
+
+@media all and (min-width: 1000px) {
+	.article-simple {
+		width: 32%;
+	}
+}
+
+@media all and (min-width: 1200px) {
+	.article-simple {
+		width: 24%;
+	}
+}

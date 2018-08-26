@@ -6,16 +6,22 @@
 	--gray: #a7a7a7;
 	--dark-gray: #888888;
 	--nearly-black: #202020;
+	--default-background-color: #fff;
 
-	--drobe-blue-gradient: linear-gradient(to bottom, var(--drobe-blue), var(--dark-drobe-blue));
+	--drobe-blue-gradient: linear-gradient(to right, var(--drobe-blue), var(--dark-drobe-blue));
 
-	--title-font: Monoton;
-	--header-font: Open Sans;
-	--body-font: Open Sans;
+	--title-font: Monoton, sans-serif;
+	--header-font: Open Sans, sans-serif;
+	--body-font: Open Sans, sans-serif;
 }
 
 html {
 	height: 100%;
+}
+
+main {
+	padding-top: 1rem;
+	box-sizing: border-box;
 }
 
 body {
@@ -29,6 +35,8 @@ body {
 h1, h2, h3 {
 	font-family: var(--header-font);
 	text-align: center;
+
+	margin: .5rem 0 1.5rem;
 }
 
 .title {
@@ -54,6 +62,10 @@ button {
 	padding: .4rem .8rem;
 	outline: 0;
 	transform: translate(-.1rem, -.1rem);
+}
+
+button:hover {
+	cursor: pointer;
 }
 
 button:active {

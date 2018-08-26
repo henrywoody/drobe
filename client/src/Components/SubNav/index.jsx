@@ -6,7 +6,7 @@ export default props => {
 
 	const lis = items.map(item => {
 		const capitalizedItem = item.charAt(0).toUpperCase() + item.slice(1);
-		return<li className={ item === activeItem ? 'active' : '' } key={ item }><a onClick={ handleClick }>{ capitalizedItem }</a></li>
+		return<li className={ item === activeItem ? 'active' : '' } key={ item } onClick={ handleClick }>{ capitalizedItem }</li>
 	});
 
 	return (

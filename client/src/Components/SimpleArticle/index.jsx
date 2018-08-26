@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import pluralizeArticleKind from '../../Modules/pluralize-article-kind';
+import './style.css';
 
 class SimpleArticle extends Component {
 	handleClick = () => {
@@ -13,12 +14,12 @@ class SimpleArticle extends Component {
 		const { data } = this.props;
 
 		return (
-			<div onClick={ this.handleClick }>
-				<span>{ data.name }</span>
+			<div className='article-simple' onClick={ this.handleClick }>
+				<span className='name'>{ data.name }</span>
 
 				<img src={ data.imageUrl } alt='article'/>
 
-				<p>{ data.description }</p>
+				<p className='description'>{ data.description }</p>
 			</div>
 		);
 	}
