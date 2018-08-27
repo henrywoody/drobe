@@ -27,8 +27,8 @@ class ArticleForm extends Component {
 				rating: '1',
 				minTemp: '',
 				maxTemp: '',
-				rainOK: false,
-				snowOK: false,
+				rainOk: false,
+				snowOk: false,
 				specificKind: 'sweater',
 				innerLayer: false,
 				shirts: [],
@@ -81,12 +81,11 @@ class ArticleForm extends Component {
 	handleChange = async (event) => {
 		const { name, type, value, checked } = event.target;
 		const { formData, image, message } = this.state;
-		let newMessage = message;
+		let newMessage = '';
 
-		// handling checkboxes
-		if (type === 'checkbox') {
-			formData[name] = checked;
-		} else if (name === 'image') { // handling image upload
+		const newFormData = {...formData};
+
+		if (name === 'image') { // handling image upload
 			const imageTooLargeMessage = 'Image is too large, must be less than 16 MB.';
 			const file = event.target.files[0];
 
@@ -97,7 +96,7 @@ class ArticleForm extends Component {
 				image.data = '';
 				return this.setState({
 					message: imageTooLargeMessage,
-					formData
+					formData: newFormData
 				});
 			} else {
 				if (message === imageTooLargeMessage)
@@ -107,30 +106,24 @@ class ArticleForm extends Component {
 				image.data = file;
 			}
 		} else {
-			formData[name] = value;
-		}
-
-		// handling min/max values
-		if (name === 'minTemp' && Number(formData.maxTemp) < Number(formData.minTemp)) {
-			formData.maxTemp = value;
-		} else if (name === 'maxTemp' && Number(formData.minTemp) > Number(formData.maxTemp)) {
-			formData.minTemp = value;
+			newFormData[name] = type === 'checkbox' ? checked : value;
 		}
 
 		// setting default values dynamically
 		if (name === 'specificKind') {
 			if (value === 'raincoat') {
-				formData.rainOK = true;
-				formData.snowOK = false;
+				newFormData.rainOk = true;
+				newFormData.snowOk = false;
 			} else if (value === 'snowcoat') {
-				formData.snowOK = true;
-				formData.rainOK = false;
+				newFormData.snowOk = true;
+				newFormData.rainOk = false;
 			} else {
-				formData.rainOK = false;
-				formData.snowOK = false;
+				newFormData.rainOk = false;
+				newFormData.snowOk = false;
 			}
 		}
-		this.setState({ formData, image, message: newMessage });
+
+		this.setState({ formData: newFormData, image, message: newMessage });
 	}
 
 	handleSubmit = async (event, routeToNewArticle) => {
@@ -138,6 +131,15 @@ class ArticleForm extends Component {
 		const { match, user, history } = this.props;
 		const { formData, image } = this.state;
 
+		// Validation
+		if (!formData.name) {
+			return this.setState({message: 'Name cannot be blank.'})
+		}
+		if (formData.maxTemp !== '' && formData.minTemp !== '' && Number(formData.minTemp) > Number(formData.maxTemp)) {
+			return this.setState({message: 'Minimum temperature cannot exceed maximum temperature.'})
+		}
+
+		// Upload
 		// upload image first if there is one
 		if (image.data) {
 			const imageResponse = await uploadImage(image, user.token);
@@ -147,21 +149,15 @@ class ArticleForm extends Component {
 			formData.imageUrl = imageResponse.imageUrl;
 		}
 
-		const nonemptyFormData = {};
-		for (const field in formData) {
-			if (formData[field])
-				nonemptyFormData[field] = formData[field];
-		}
-
 		let response;
 		if (match.path === '/wardrobe/new') {
-			const pluralArticleKind = pluralizeArticleKind(nonemptyFormData.articleKind);
-			const articleKind = nonemptyFormData.articleKind;
-			response = await api.postArticle(pluralArticleKind, {[articleKind]: nonemptyFormData}, user.token);
+			const pluralArticleKind = pluralizeArticleKind(formData.articleKind);
+			const articleKind = formData.articleKind;
+			response = await api.postArticle(pluralArticleKind, {[articleKind]: formData}, user.token);
 		} else {
 			const { pluralArticleKind, articleId } = match.params;
 			const articleKind = singularizeArticleKind(pluralArticleKind);
-			response = await api.putArticle(pluralArticleKind, articleId, {[articleKind]: nonemptyFormData}, user.token);
+			response = await api.putArticle(pluralArticleKind, articleId, {[articleKind]: formData}, user.token);
 		}
 
 		if ('error' in response) {
@@ -266,13 +262,6 @@ class ArticleForm extends Component {
 					</div>
 				</div>
 			);
-
-			additionalFields.innerLayer = (
-				<div className='input-container'>
-					<label htmlFor='innerLayer'>Inner Layer</label>
-					<input name='innerLayer' type='checkbox' checked={ formData.innerLayer } onChange={ this.handleChange }/>
-				</div>
-			)
 		}
 
 
@@ -309,7 +298,7 @@ class ArticleForm extends Component {
 		let associatedArticleFields = [];
 		if (['pants', 'outerwear'].includes(formData.articleKind)) {
 			associatedArticleFields.push(
-				<JoinedArticlesInput key='pantsField'
+				<JoinedArticlesInput key='shirtsField'
 					fieldName='shirts'
 					label={ <label htmlFor='shirts'>Associated Shirts</label> }
 					addedArticles={ addedShirts }
@@ -393,7 +382,7 @@ class ArticleForm extends Component {
 				</div>
 
 				<div className='input-container'>
-					<label htmlFor='image'>Image</label>
+					<label htmlFor='image'>Image <span className='optional'>optional</span></label>
 					<input name='image' type='file' value={ image.path } onChange={ this.handleChange }/>
 				</div>
 
@@ -410,17 +399,15 @@ class ArticleForm extends Component {
 					</div>
 				</div>
 
-				<div className='input-grouping always-row '>
-					{ additionalFields.innerLayer }
-
+				<div className='input-grouping always-row'>
 					<div className='input-container'>
-						<label htmlFor='rainOK'>Rain</label>
-						<input name='rainOK' type='checkbox' checked={ formData.rainOK } onChange={ this.handleChange }/>
+						<label htmlFor='rainOk'>Rain</label>
+						<input name='rainOk' type='checkbox' checked={ formData.rainOk } onChange={ this.handleChange }/>
 					</div>
 
 					<div className='input-container'>
-						<label htmlFor='snowOK'>Snow</label>
-						<input name='snowOK' type='checkbox' checked={ formData.snowOK } onChange={ this.handleChange }/>
+						<label htmlFor='snowOk'>Snow</label>
+						<input name='snowOk' type='checkbox' checked={ formData.snowOk } onChange={ this.handleChange }/>
 					</div>
 				</div>
 

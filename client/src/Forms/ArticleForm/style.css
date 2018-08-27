@@ -15,6 +15,14 @@
 	overflow: scroll;
 }
 
+.small-articles-container .small-article:first-of-type {
+	margin-left: 0;
+}
+
+.small-articles-container .small-article:last-of-type {
+	margin-right: 0;
+}
+
 input[type='search'] {
 	margin-bottom: .3rem;	
 }

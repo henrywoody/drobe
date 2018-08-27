@@ -33,7 +33,7 @@ form .input-container {
 	flex-flow: column;
 }
 
-label {
+label, .label {
 	font-size: .7rem;
 	font-weight: 500;
 	text-transform: uppercase;
@@ -55,9 +55,12 @@ input, textarea {
 	font-size: 1rem;
 	line-height: 2rem;
 	border: .1rem solid var(--light-gray);
-	outline-color: var(--drobe-blue);
 	padding: .5rem .5rem;
 	box-sizing: border-box;
+}
+
+input:not([type='checkbox']):not([type='range']):focus, textarea:focus {
+	outline: .15rem solid var(--drobe-blue);
 }
 
 input {
