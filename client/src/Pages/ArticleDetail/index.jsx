@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import { NavLink, withRouter } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import api from '../../Modules/api';
-import SmallArticle from '../../Components/SmallArticle';
+import AssociatedArticlesContainer from './AssociatedArticlesContainer.jsx';
+import './style.css';
 
 class ArticleDetail extends Component {
 	constructor() {
@@ -49,43 +50,79 @@ class ArticleDetail extends Component {
 		history.push(`/wardrobe/${pluralArticleKind}/${id}`);
 	}
 
+	handleEditClick = event => {
+		const { history, match } = this.props;
+		const { pluralArticleKind, articleId } = match.params;
+		history.push(`/wardrobe/${pluralArticleKind}/${articleId}/edit`);
+	}
+
 	render() {
-		const { match } = this.props;
 		const { articleData } = this.state;
 
-		const { pluralArticleKind, articleId } = match.params;
-
-		const additionalBits = [];
-		for (const key in articleData) {
-			if (articleData[key] && !['id', 'owner', 'name', 'imageUrl', 'description', 'articleKind', 'shirts', 'pants', 'outerwears', 'dresses'].includes(key)) {
-				additionalBits.push(
-					<li key={ key }><strong>{ key }</strong>: { articleData[key] }</li>
-				);
-			} else if (['shirts', 'pants', 'dresses', 'outerwears'].includes(key)) {
-				additionalBits.push(
-					<div key={ key }>
-						{ articleData[key].map(e => {
-							return <SmallArticle key={ e.id } field={ key } id={ e.id } name={ e.name } imageUrl={ e.imageUrl } onClick={ this.routeToArticle }/>;
-						}) }
-					</div>
-				);
-			}
-		}
-
 		return (
-			<main>
+			<main className='article-detail'>
 				<h1>{ articleData.name }</h1>
 
-				<NavLink exact to={ `/wardrobe/${pluralArticleKind}/${articleId}/edit` }>Edit</NavLink>
-				<button onClick={ this.handleDelete }>Delete</button>
+				<div className='content'>
+					<div className='img-container'>
+						<img src={ articleData.imageUrl } alt='article'/>
+					</div>
 
-				<img src={ articleData.imageUrl } alt='article'/>
+					<p>{ articleData.description }</p>
 
-				<p>{ articleData.description }</p>
+					<div className='article-attributes'>
+						{ articleData.articleKind === 'outerwear' && (
+							<span><span className='label accented'>Type</span> { articleData.specificKind.charAt(0).toUpperCase() + articleData.specificKind.slice(1) }</span>
+						)}
 
-				<ul>
-					{ additionalBits }
-				</ul>
+						{ articleData.rating && 
+							<span><span className='label accented'>Rating</span> { articleData.rating }</span>
+						}
+
+						{ (articleData.maxTemp !== null || articleData.minTemp !== null) && (
+							<span>
+								<span className='label accented'>Temperature</span> { articleData.minTemp !== null && <span>{ articleData.minTemp }<span className='sublabel'>min</span></span> } { articleData.maxTemp !== null && <span>{ articleData.maxTemp }<span className='sublabel'>max</span></span> }
+							</span>
+						)}
+
+						<span>
+							<span className='label accented'>Weather</span> <span>{ articleData.rainOk ? 'Rain Allowed' : 'Rain Not Allowed' }</span>, <span>{ articleData.snowOk ? 'Snow Allowed' : 'Snow Not Allowed' }</span>
+						</span>
+
+						{ !!articleData.shirts && !!articleData.shirts.length && (
+							<div>
+								<span className='label accented'>Associated Shirts</span>
+								<AssociatedArticlesContainer articles={ articleData.shirts } modelName='shirts' handleClick={ this.routeToArticle }/>
+							</div>
+						)}
+
+						{ !!articleData.pants && !!articleData.pants.length && (
+							<div>
+								<span className='label accented'>Associated Pants</span>
+								<AssociatedArticlesContainer articles={ articleData.pants } modelName='pants' handleClick={ this.routeToArticle }/>
+							</div>
+						)}
+
+						{ !!articleData.dresses && !!articleData.dresses.length && (
+							<div>
+								<span className='label accented'>Associated Dresses</span>
+								<AssociatedArticlesContainer articles={ articleData.dresses } modelName='dresses' handleClick={ this.routeToArticle }/>
+							</div>
+						)}
+
+						{ !!articleData.outerwears && !!articleData.outerwears.length && (
+							<div>
+								<span className='label accented'>Associated Outerwear</span>
+								<AssociatedArticlesContainer articles={ articleData.outerwears } modelName='outerwears' handleClick={ this.routeToArticle }/>
+							</div>
+						)}
+					</div>
+
+					<div className='buttons-container'>
+						<button className='btn-danger' onClick={ this.handleDelete }>Delete</button>
+						<button className='btn-secondary' onClick={ this.handleEditClick }>Edit</button>
+					</div>
+				</div>
 
 			</main>
 		);

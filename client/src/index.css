@@ -27,7 +27,6 @@ html {
 main {
 	padding-top: 1rem;
 	box-sizing: border-box;
-	margin-bottom: 3rem;
 }
 
 body {
@@ -92,6 +91,11 @@ button:active {
 }
 
 .btn-danger {
+	color: var(--nearly-white);
 	background-color: red;
 	border-radius: .1rem;
+}
+
+.accented {
+	color: var(--drobe-blue) !important;
 }
