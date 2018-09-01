@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import api from '../../Modules/api';
+import Loader from '../Loader';
 import SimpleArticle from '../SimpleArticle';
+import api from '../../Modules/api';
 import './style.css';
 
 class OutfitGenerator extends Component {
@@ -42,7 +43,7 @@ class OutfitGenerator extends Component {
 		let outfitDisplay;
 
 		if (isLoading) {
-			outfitDisplay = <span>Loading...</span>;
+			outfitDisplay = <Loader/>;
 		} else if (noArticles) {
 			outfitDisplay = <span>You don't have enough articles saved to make an outfit. <Link to='/wardrobe/new'>Add an article</Link>.</span>
 		} else {

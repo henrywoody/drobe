@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
-import api from '../../Modules/api';
+import Loader from '../Loader';
 import ChangeLocationForm from '../../Forms/ChangeLocationForm';
+import api from '../../Modules/api';
 import './style.css';
 
 class WeatherComponent extends Component {
@@ -54,7 +55,11 @@ class WeatherComponent extends Component {
 
 		let content;
 		if (isLoading && user.longitude && user.latitude) {
-			content = <div className='content'><span>Loading...</span></div>
+			content = (
+				<div className='content'>
+					<Loader/>
+				</div>
+			)
 		} else if (user.longitude && user.latitude && !showLocationForm) {
 			content = (
 				<div className='content'>
