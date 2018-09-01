@@ -60,23 +60,27 @@ class WeatherComponent extends Component {
 				<div className='content'>
 					<div className='location'>
 						<span>In { user.locationName }</span>
-						<button className='btn-secondary' onClick={ this.toggleLocationForm }>Change Location</button>
+
+						<div className='buttons-container'>
+							<button className='btn-secondary' onClick={ this.toggleLocationForm }>Change Location</button>
+						</div>
 					</div>
 
 					<div className='weather-data'>
 						<div className='summary'><span>{ weather.summary }</span></div>
 						<div className='temperature'>
 							<span className='main-temperature'>{ Math.round(weather.aveTemp) }˚F</span>
-							<div>
+							<div className='side-temperature'>
 								<span>Ave. Temperature</span>
 								<span>High { Math.ceil(weather.maxTemp) }˚F</span>
 								<span>Low { Math.ceil(weather.minTemp) }˚F</span>
 							</div>
 						</div>
 						<div className='rain'>
-							<span>{ Math.round(weather.rainProb * 100) }% Chance of Rain</span>
+							<span><span style={ {fontSize: `${1 + weather.rainProb * 2}rem`} }>{ Math.round(weather.rainProb * 100) }%</span> Chance of Rain</span>
 							<span>Rainfall { weather.rainRate * 1000 } mm/hr</span>
 						</div>
+
 						<div className='powered-by'><span>Powered by <a href='https://darksky.net/poweredby/'>Dark Sky</a></span></div>
 					</div>
 				</div>
@@ -89,7 +93,9 @@ class WeatherComponent extends Component {
 							You haven't set a location yet.
 							Location information is used to get weather data, which is used in picking outfits.
 						</span>
-						<button className='btn-primary' onClick={ this.toggleLocationForm }>Add Location</button>
+						<div className='buttons-container'>
+							<button className='btn-primary' onClick={ this.toggleLocationForm }>Add Location</button>
+						</div>
 					</div>
 				</div>
 			)
@@ -97,7 +103,9 @@ class WeatherComponent extends Component {
 			content = (
 				<div className='content'>
 					<ChangeLocationForm didSubmit={ this.toggleLocationForm }/>
-					<button className='btn-secondary' onClick={ this.toggleLocationForm }>Cancel</button>
+					<div className='buttons-container'>
+						<button className='btn-secondary' onClick={ this.toggleLocationForm }>Cancel</button>
+					</div>
 				</div>
 			)
 		}

@@ -69,14 +69,14 @@ class ChangeLocationForm extends Component {
 		return (
 			<form onSubmit={ this.handleSubmit }>
 				{ message }
-				<div className='div-input'>
+				<div className='input-container'>
 					<label htmlFor='location-name'>Location</label>
 					<input name='location-name' type='text' placeholder='Seattle, WA, USA' value={ locationName } onChange={ this.handleChange }/>
 				</div>
 
-				<div className='div-buttons'>
-					<button className='btn-secondary' onClick={ this.findCoordinates }>Validate</button>
+				<div className='buttons-container'>
 					<button className='btn-primary' onClick={ e => this.handleSubmit(e) }>Update</button>
+					<button className='btn-secondary' onClick={ this.findCoordinates }>Validate</button>
 				</div>
 			</form>
 		)

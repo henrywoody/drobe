@@ -5,7 +5,7 @@
 
 
 .content .location {
-	margin: 0 auto 1rem;
+	margin: 0 auto;
 	display: flex;
 	flex-flow: column;
 }
@@ -34,12 +34,15 @@
 	margin: 0 auto .5rem;
 	display: flex;
 	flex-flow: row;
+	justify-content: space-between;
 }
 .content .weather-data .temperature .main-temperature {
 	font-size: 3rem;
 	line-height: 3rem;
+	padding: 0 1rem;
+	box-sizing: border-box;
 }
-.content .weather-data .temperature div {
+.content .weather-data .temperature .side-temperature {
 	font-size: .75rem;
 	line-height: .9rem;
 	display: flex;
@@ -52,11 +55,16 @@
 	justify-content: center;
 }
 
+.content .weather-data .rain {
+	text-align: center;
+}
+
 .content .weather-data .powered-by span, .content .weather-data .powered-by a {
 	color: var(--gray);
 	font-size: .75rem;
 }
 
 .content .weather-data .powered-by span {
+	margin-top: 1rem;
 	float: right;
 }
