@@ -7,9 +7,13 @@ export default props => {
 	return (
 		<div className='small-article' onClick={ onClick }>
 			{ clickIcon && <span className='click-icon'>{ clickIcon }</span> }
-			<div className='img-container'>
-				<img src={ imageUrl } alt='article'/>
-			</div>
+
+			{ imageUrl && (
+				<div className='img-container'>
+					<img src={ imageUrl } alt='article'/>
+				</div>
+			)}
+			
 			<span>{ name }</span>
 		</div>
 	)

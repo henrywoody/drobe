@@ -64,9 +64,11 @@ class ArticleDetail extends Component {
 				<h1>{ articleData.name }</h1>
 
 				<div className='content'>
-					<div className='img-container'>
-						<img src={ articleData.imageUrl } alt='article'/>
-					</div>
+					{ articleData.imageUrl && (
+						<div className='img-container'>
+							<img src={ articleData.imageUrl } alt='article'/>
+						</div>
+					)}
 
 					<p>{ articleData.description }</p>
 
