@@ -75,7 +75,8 @@ textarea {
 	color: var(--gray);
 }
 
-.buttons-container { 
+.buttons-container {
+	margin: 1.5rem auto;
 	display: flex;
 	flex-flow: row;
 	justify-content: space-between;

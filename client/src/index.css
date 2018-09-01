@@ -15,6 +15,8 @@
 	--default-border-width: .1rem;
 	--default-border: var(--default-border-width) solid var(--light-gray);
 
+	--default-transition: .1s ease-out;
+
 	--title-font: Monoton, sans-serif;
 	--header-font: Open Sans, sans-serif;
 	--body-font: Open Sans, sans-serif;

@@ -10,7 +10,7 @@
 	flex-flow: column;
 	box-sizing: border-box;
 
-	transition: .2s ease-out;
+	transition: var(--default-transition);
 }
 
 .article-simple:hover {

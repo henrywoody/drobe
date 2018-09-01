@@ -351,8 +351,8 @@ class ArticleForm extends Component {
 
 		const submitButtons = match.path === '/wardrobe/new' ? (
 			[
-				<button key='another' className='btn-secondary' onClick={ e => this.handleSubmit(e, false)}>Create and Add Another</button>,
-				<button key='create' className='btn-primary' onClick={ e => this.handleSubmit(e, true)}>Create</button>
+				<button key='create' className='btn-primary' onClick={ e => this.handleSubmit(e, true)}>Create</button>,
+				<button key='another' className='btn-secondary' onClick={ e => this.handleSubmit(e, false)}>Create and Add Another</button>
 			]
 		) : (
 			[
@@ -414,8 +414,8 @@ class ArticleForm extends Component {
 				{ associatedArticleFields }
 
 				<div className='buttons-container'>
-					<button className='btn-secondary' onClick={ this.handleCancel }>Cancel</button>
 					{ submitButtons }
+					<button className='btn-secondary' onClick={ this.handleCancel }>Cancel</button>
 				</div>
 			</form>
 		)
