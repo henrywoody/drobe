@@ -1,0 +1,148 @@
+:root {
+	--header-height: 3.5rem;
+}
+
+header {
+	--drawer-slide-transition-time: .3s;
+	--drawer-slide-transition-timing: var(--drawer-slide-transition-time) ease-out;
+
+	height: var(--header-height);
+	position: relative;
+	top: 0;
+	left: 0;
+}
+
+header .bar {
+	background-color: var(--default-background-color);
+	width: 100%;
+	height: var(--header-height);
+	line-height: var(--header-height);
+	/*border-bottom: .1rem solid var(--drobe-blue);*/ /* Removed for Runner */
+	padding: .2rem 1rem;
+	display: flex;
+	flex-flow: row;
+	justify-content: space-between;
+	box-sizing: border-box;
+	position: absolute;
+	z-index: 100;
+}
+
+header .title {
+	font-family: var(--title-font);
+	font-size: 2.5rem;
+	color: var(--drobe-blue);
+	text-transform: uppercase;
+	text-decoration: none;
+	letter-spacing: .1rem;
+	word-spacing: -.5rem;
+	width: 11.5rem;
+	height: 2.75rem;
+	line-height: 2.75rem;
+	display: block;
+	flex-shrink: 0;
+	position: absolute;
+	z-index: 100;
+	box-sizing: border-box;
+}
+
+header canvas {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	z-index: 100;
+}
+
+header nav.nav-drawer {
+	--nav-drawer-width: 15rem;
+	--nav-drawer-hidden-offset: -16rem;
+	background-color: #fff;
+	width: var(--nav-drawer-width);
+	height: 100vh;
+	border-right: var(--drobe-blue);
+	padding-top: 5rem;
+	padding-left: 2rem;
+	display: flex;
+	flex-flow: column;
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 99;
+	box-sizing: border-box;
+
+	transition: left var(--drawer-slide-transition-timing);
+}
+
+header nav.nav-drawer.hidden {
+	left: var(--nav-drawer-hidden-offset);
+}
+
+header nav.nav-bar {
+	display: none;
+}
+
+header nav a {
+	font-family: var(--header-font);
+	color: var(--nearly-black);
+	text-decoration: none;
+	display: inline-block;
+	transition: .1s ease-out;
+}
+
+header nav a.active {
+	color: var(--drobe-blue);
+}
+
+header nav a:hover {
+	color: var(--drobe-blue);
+}
+
+header button.button-toggle-nav-drawer {
+	width: 2.2rem;
+	height: 2.2rem;
+	margin: .5rem;
+}
+
+@media all and (min-width: 765px) {
+	header nav.nav-drawer {
+		display: none;
+	}
+
+	header button.button-toggle-nav-drawer {
+		display: none;
+	}
+
+	header nav.nav-bar {
+		display: flex;
+		flex-flow: row;
+		flex-wrap: wrap;
+		justify-content: space-between;
+	}
+
+	header nav.nav-bar.logged-in {
+		width: 17rem;
+	}
+	header nav.nav-bar.logged-out {
+		width: 9rem;
+	}
+}
+
+
+header .gray-screen {
+	background-color: var(--dark-gray);
+	opacity: 0.6;
+	width: 100vw;
+	height: 100vh;
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 10;
+
+	transition: opacity var(--drawer-slide-transition-timing), z-index 0s;
+}
+
+header .gray-screen.hidden {
+	opacity: 0;
+	z-index: -1000;
+
+	transition: opacity var(--drawer-slide-transition-timing), z-index 0s var(--drawer-slide-transition-time);
+}
