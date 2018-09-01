@@ -21,10 +21,6 @@ form {
 	.input-grouping {
 		flex-flow: row;
 	}
-
-	.input-grouping {
-
-	}
 }
 
 form .input-container {
@@ -83,7 +79,8 @@ textarea {
 }
 
 .buttons-container-final {
-	width: 60%;
+	width: 100%;
+	max-width: 30rem;
 }
 
 .form-message-container {

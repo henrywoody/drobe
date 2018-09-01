@@ -64,6 +64,7 @@ h1, h2, h3 {
 
 button {
 	color: var(--nearly-black);
+	font-size: .8rem;
 	font-weight: 200;
 	letter-spacing: .03rem;
 	height: 2rem;
