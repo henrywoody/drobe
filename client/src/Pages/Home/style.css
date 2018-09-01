@@ -9,4 +9,6 @@ p.welcome-message {
 
 .components .component {
 	width: 50%;
+	padding: 1rem;
+	box-sizing: border-box;
 }

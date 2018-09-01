@@ -413,7 +413,7 @@ class ArticleForm extends Component {
 
 				{ associatedArticleFields }
 
-				<div className='buttons-container'>
+				<div className='buttons-container buttons-container-final'>
 					{ submitButtons }
 					<button className='btn-secondary' onClick={ this.handleCancel }>Cancel</button>
 				</div>

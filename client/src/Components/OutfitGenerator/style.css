@@ -1,0 +1,15 @@
+.outfit-row {
+	display: flex;
+	flex-flow: column;
+}
+
+.outfit-row .articles-container {
+	display: flex;
+	flex-flow: row;
+	flex-wrap: wrap;
+	justify-content: space-around;
+}
+
+.message {
+	text-align: center;
+}

@@ -79,7 +79,11 @@ textarea {
 	margin: 1.5rem auto;
 	display: flex;
 	flex-flow: row;
-	justify-content: space-between;
+	justify-content: space-around;
+}
+
+.buttons-container-final {
+	width: 60%;
 }
 
 .form-message-container {
