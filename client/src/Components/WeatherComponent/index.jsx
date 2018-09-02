@@ -34,7 +34,9 @@ class WeatherComponent extends Component {
 		this.setState({isLoading: true});
 		const { user } = this.props;
 
-		if (!(user.longitude && user.latitude)) return;
+		if (!(user.longitude && user.latitude)) {
+			return this.setState({isLoading: false});
+		}
 
 		const coordinates = {
 			latitude: user.latitude,
@@ -58,7 +60,7 @@ class WeatherComponent extends Component {
 		const { isLoading, weather, showLocationForm } = this.state;
 
 		let content;
-		if (isLoading && user.longitude && user.latitude) {
+		if (isLoading) {
 			content = (
 				<div className='content'>
 					<Loader/>

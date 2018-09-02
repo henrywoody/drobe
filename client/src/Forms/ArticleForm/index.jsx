@@ -165,7 +165,7 @@ class ArticleForm extends Component {
 		}
 
 		if ('error' in response) {
-			return this.handleError(response.error);
+			return this.handleError(response);
 		}
 
 		if (routeToNewArticle) {
@@ -177,8 +177,9 @@ class ArticleForm extends Component {
 		}
 	}
 
-	handleError(message) {
-		this.setState({ message });
+	handleError(response) {
+		this.setState({message: response.message || response.error, isLoading: false});
+		window.scrollTo(0,0);
 	}
 
 	handleCancel = event => {
@@ -370,7 +371,7 @@ class ArticleForm extends Component {
 
 		return (
 			<form>
-				{ message }
+				<span className='danger'>{ message }</span>
 
 				{ articleKindField }
 

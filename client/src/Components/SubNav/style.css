@@ -1,6 +1,7 @@
 .subnav {
 	width: 90%;
 	max-width: 25rem;
+	padding: 0;
 	margin: 2rem auto;
 	list-style-type: none;
 	display: flex;

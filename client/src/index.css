@@ -9,6 +9,7 @@
 	--nearly-black: #202020;
 	--default-text-color: var(--nearly-black);
 	--default-background-color: #fff;
+	--danger-color: #e00d23;
 
 	--drobe-blue-gradient: linear-gradient(to right, var(--drobe-blue), var(--dark-drobe-blue));
 
@@ -94,10 +95,14 @@ button:active {
 
 .btn-danger {
 	color: var(--nearly-white);
-	background-color: red;
+	background-color: var(--danger-color);
 	border-radius: .1rem;
 }
 
 .accented {
 	color: var(--drobe-blue) !important;
+}
+
+.danger {
+	color: var(--danger-color);
 }
