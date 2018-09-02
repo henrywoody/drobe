@@ -36,7 +36,7 @@ class ChangeLocationForm extends Component {
 		const { didSubmit, user } = this.props;
 		const { locationName, longitude, latitude } = this.state;
 		userStorage.updateUser({...user, locationName, longitude, latitude});
-		didSubmit();
+		didSubmit(user.locationName !== locationName);
 	}
 
 	findCoordinates = async (event) => {

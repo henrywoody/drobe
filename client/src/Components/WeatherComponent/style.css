@@ -30,6 +30,7 @@
 }
 
 .content .weather-data .temperature {
+	width: 15rem;
 	margin: 0 auto .5rem;
 	display: flex;
 	flex-flow: row;

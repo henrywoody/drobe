@@ -25,8 +25,9 @@ class WeatherComponent extends Component {
 		if (!(user.longitude && user.latitude)) return;
 		const userReceivedCoordinates = (user.longitude && user.latitude) && !(prevProps.user.longitude && prevProps.user.latitude);
 		const userChangedCoordinates = user.longitude !== prevProps.user.longitude || user.latitude !== prevProps.user.latitude;
-		if (userReceivedCoordinates || userChangedCoordinates)
+		if (userReceivedCoordinates || userChangedCoordinates) {
 			this.refreshWeather();
+		}
 	}
 
 	async refreshWeather() {
@@ -44,9 +45,12 @@ class WeatherComponent extends Component {
 		this.setState({ isLoading: false, weather });
 	}
 
-	toggleLocationForm = () => {
-		const { showLocationForm } = this.state;
-		this.setState({ showLocationForm: !showLocationForm });
+	didSubmitLocation = (wasChanged) => {
+		if (wasChanged) {
+			this.setState({showLocationForm: false, isLoading: true});
+		} else {
+			this.setState({showLocationForm: false});
+		}
 	}
 
 	render() {
@@ -67,7 +71,7 @@ class WeatherComponent extends Component {
 						<span>In { user.locationName }</span>
 
 						<div className='buttons-container'>
-							<button className='btn-secondary' onClick={ this.toggleLocationForm }>Change Location</button>
+							<button className='btn-secondary' onClick={ () => this.setState({showLocationForm: true}) }>Change Location</button>
 						</div>
 					</div>
 
@@ -99,7 +103,7 @@ class WeatherComponent extends Component {
 							Location information is used to get weather data, which is used in picking outfits.
 						</span>
 						<div className='buttons-container'>
-							<button className='btn-primary' onClick={ this.toggleLocationForm }>Add Location</button>
+							<button className='btn-primary' onClick={ () => this.setState({showLocationForm: true}) }>Add Location</button>
 						</div>
 					</div>
 				</div>
@@ -107,9 +111,9 @@ class WeatherComponent extends Component {
 		} else {
 			content = (
 				<div className='content'>
-					<ChangeLocationForm didSubmit={ this.toggleLocationForm }/>
+					<ChangeLocationForm didSubmit={ this.didSubmitLocation }/>
 					<div className='buttons-container'>
-						<button className='btn-secondary' onClick={ this.toggleLocationForm }>Cancel</button>
+						<button className='btn-secondary' onClick={ () => this.setState({showLocationForm: false}) }>Cancel</button>
 					</div>
 				</div>
 			)
