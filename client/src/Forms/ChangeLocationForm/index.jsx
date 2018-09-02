@@ -16,7 +16,7 @@ class ChangeLocationForm extends Component {
 		};
 	}
 
-	componentWillMount() {
+	componentDidMount() {
 		const { user } = this.props;
 		const { locationName, longitude, latitude } = user;
 		this.setState({ locationName: locationName || '', longitude, latitude });

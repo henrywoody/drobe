@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
+import Loader from '../../Components/Loader';
 import JoinedArticlesInput from './JoinedArticlesInput.jsx';
-import api from '../../Modules/api';
 import pluralizeArticleKind from '../../Modules/pluralize-article-kind';
 import singularizeArticleKind from '../../Modules/singularize-article-kind';
+import api from '../../Modules/api';
 import uploadImage from '../../Modules/upload-image';
 import './style.css';
 
@@ -12,6 +13,7 @@ class ArticleForm extends Component {
 	constructor() {
 		super();
 		this.state = {
+			isLoading: true,
 			articleSearchOptions: {
 				shirts: '',
 				pants: '',
@@ -44,12 +46,19 @@ class ArticleForm extends Component {
 			message: null
 		};
 	}
-	
-	componentWillMount() {
-		this.resetFormData();
-	}
 
 	async componentDidMount() {
+		await this.resetFormData();
+		this.fetchData();
+	}
+
+	resetFormData() {
+		const { initialFormData } = this.state;
+		this.setState({ formData: {...initialFormData} });
+	}
+
+	async fetchData() {
+		this.setState({isLoading: true});
 		const { match, user } = this.props;
 		const { formData } = this.state;
 		if (match.path !== '/wardrobe/new') {
@@ -67,15 +76,9 @@ class ArticleForm extends Component {
 				}
 			}
 		}
-		this.setState({ formData });
 
 		const articles = await api.getAllArticles(user.token);
-		this.setState({ articles });
-	}
-
-	resetFormData() {
-		const { initialFormData } = this.state;
-		this.setState({ formData: {...initialFormData} });
+		this.setState({ articles, formData, isLoading: false });
 	}
 
 	handleChange = async (event) => {
@@ -127,6 +130,7 @@ class ArticleForm extends Component {
 	}
 
 	handleSubmit = async (event, routeToNewArticle) => {
+		this.setState({isLoading: true});
 		event.preventDefault();
 		const { match, user, history } = this.props;
 		const { formData, image } = this.state;
@@ -211,8 +215,13 @@ class ArticleForm extends Component {
 
 	render() {
 		const { match } = this.props;
-		const { articles, articleSearchOptions, formData, image, message } = this.state;
+		const { isLoading, articles, articleSearchOptions, formData, image, message } = this.state;
 		const { articleId } = match.params;
+
+
+		if (isLoading) {
+			return <Loader/>
+		}
 
 		let articleKindField;
 

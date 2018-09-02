@@ -7,7 +7,7 @@ import userStorage from './Modules/user-storage';
 import './App.css';
 
 class App extends Component {
-	componentWillMount() {
+	componentDidMount() {
 		const user = JSON.parse(localStorage.getItem('user'));
 		const lastRefresh = Number(localStorage.getItem('lastRefresh'));
 

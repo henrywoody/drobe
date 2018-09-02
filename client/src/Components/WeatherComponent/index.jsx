@@ -16,7 +16,7 @@ class WeatherComponent extends Component {
 		}
 	}
 
-	componentWillMount() {
+	componentDidMount() {
 		this.refreshWeather();
 	}
 

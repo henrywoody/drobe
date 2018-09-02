@@ -4,7 +4,7 @@ import userStorage from '../../Modules/user-storage';
 import './style.css';
 
 export default class Logout extends Component {
-	componentWillMount() {
+	componentDidMount() {
 		fetch('/users/logout');
 		userStorage.logUserOut();
 	}

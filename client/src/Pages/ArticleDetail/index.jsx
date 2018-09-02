@@ -1,23 +1,25 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
-import api from '../../Modules/api';
+import Loader from '../../Components/Loader';
 import AssociatedArticlesContainer from './AssociatedArticlesContainer.jsx';
+import api from '../../Modules/api';
 import './style.css';
 
 class ArticleDetail extends Component {
 	constructor() {
 		super();
 		this.state = {
+			isLoading: true,
 			articleData: {}
 		}
 	}
 
-	componentWillMount() {
+	componentDidMount() {
 		const { match, history } = this.props;
 		const { pluralArticleKind, articleId } = match.params;
 
-		this.setupData(pluralArticleKind, articleId);
+		this.fetchData(pluralArticleKind, articleId);
 
 		this.unlisten = history.listen((location, action) => {
 			if (location.pathname.match(/wardrobe\/\w*?\/\w*?$/)) {
@@ -31,10 +33,11 @@ class ArticleDetail extends Component {
 		this.unlisten();
 	}
 
-	async setupData(pluralArticleKind, articleId) {
+	async fetchData(pluralArticleKind, articleId) {
+		this.setState({isLoading: true});
 		const { user } = this.props;
 		const articleData = await api.getArticle(pluralArticleKind, articleId, user.token);
-		await this.setState({ articleData });
+		await this.setState({ articleData, isLoading: false });
 	}
 
 	handleDelete = async () => {
@@ -57,7 +60,15 @@ class ArticleDetail extends Component {
 	}
 
 	render() {
-		const { articleData } = this.state;
+		const { isLoading, articleData } = this.state;
+
+		if (isLoading) {
+			return (
+				<main className='article-detail'>
+					<Loader/>
+				</main>
+			)
+		}
 
 		return (
 			<main className='article-detail'>
