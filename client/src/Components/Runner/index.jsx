@@ -13,19 +13,28 @@ export default class Runner extends Component {
 			fadeCounter: 0,
 			fadeFrequency: 20
 		}
+		this.requestId = null;
 	}
 
 	componentDidMount() {
 		this.requestAnimationFrame()(this.update);
 	}
 
+	componentWillUnmount() {
+		this.cancelAnimationFrame();
+	}
+
 	requestAnimationFrame() {
 		return window.requestAnimationFrame		||
 			window.webkitRequestAnimationFrame	||
 			window.mozRequestAnimationFrame		||
-			function( callback ){
+			function(callback) {
 				window.setTimeout(callback, 1000 / 60);
 			};
+	}
+
+	cancelAnimationFrame() {
+		window.cancelAnimationFrame(this.requestId);
 	}
 
 	update = () => {
@@ -60,7 +69,7 @@ export default class Runner extends Component {
 			fadeCounter: (fadeCounter + 1) % fadeFrequency
 		})
 
-		this.requestAnimationFrame()(this.update);
+		this.requestId = this.requestAnimationFrame()(this.update);
 	}
 
 	render() {
