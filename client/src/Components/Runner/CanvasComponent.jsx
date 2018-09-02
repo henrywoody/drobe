@@ -9,15 +9,22 @@ export default class CanvasComponent extends Component {
 	}
 
 	componentDidMount() {
+		this.setupCanvas();
+	}
+
+	componentDidUpdate(prevProps) {
+		this.update();
+		if (prevProps.width !== this.props.width) {
+			this.setupCanvas();
+		}
+	}
+
+	setupCanvas() {
 		const { width, height, inverted } = this.props;
 		const { drobeBlue } = this.state;
 		const ctx = this.refs.canvas.getContext('2d');
 		ctx.fillStyle = inverted ? '#ffffff' : drobeBlue;
 		ctx.fillRect(0,0, width,height);
-	}
-
-	componentDidUpdate() {
-		this.update();
 	}
 
 	update() {

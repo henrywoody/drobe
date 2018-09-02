@@ -8,8 +8,21 @@ export default class Header extends Component {
 	constructor() {
 		super();
 		this.state = {
-			hideDrawer: true
+			hideDrawer: true,
+			runnerWidth: window.innerWidth
 		}
+	}
+
+	componentDidMount() {
+		window.addEventListener('resize', this.updateRunnerWidth);
+	}
+
+	componentWillUnmount() {
+		window.removeEventListener('resize', this.updateRunnerWidth);
+	}
+
+	updateRunnerWidth = () => {
+		this.setState({runnerWidth: window.innerWidth});
 	}
 
 	render() {
