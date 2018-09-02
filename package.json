@@ -40,7 +40,8 @@
     "redux": "^4.0.0",
     "request": "^2.87.0",
     "request-promise-native": "^1.0.5",
-    "sinon": "^6.1.4"
+    "sinon": "^6.1.4",
+    "url-parse": "^1.4.3"
   },
   "description": "Automated outfit picking.",
   "main": "app.js",
