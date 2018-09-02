@@ -20,7 +20,7 @@ router.post('/register', async (req, res) => {
 
 	const { username, password } = userData;
 	// for passport
-	req.body.username = username;
+	req.body.username = username.toLowerCase();
 	req.body.password = password;
 
 	try {
@@ -29,7 +29,7 @@ router.post('/register', async (req, res) => {
 		try {
 			const hash = await bcrypt.hash(password, salt);
 			userData.password = hash;
-			user = await createUser(userData);
+			user = await createUser({...userData, username: username.toLowerCase()});
 		} catch (err) {
 			return handleErrors(err, res);
 		}
@@ -113,7 +113,7 @@ router.post('/login', (req, res) => {
 	const { username, password } = userData;
 
 	// for passport
-	req.body.username = username;
+	req.body.username = username.toLowerCase();
 	req.body.password = password;
 
 	if (!(username && password)) {

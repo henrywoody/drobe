@@ -47,7 +47,12 @@ class UserForm extends Component {
 			if (formType === 'login') {
 				this.setState({message: 'Invalid username or password.'});
 			} else {
-				this.setState({message: 'Somethings wrong'})
+				const jsonResponse = await response.json()
+				if (jsonResponse.error === 'UserExistsError') {
+					this.setState({message: 'That username is already taken.'})
+				} else {
+					this.setState({message: 'Something went wrong :/'})
+				}
 			}
 		} else {
 			const jsonResponse = await response.json();
