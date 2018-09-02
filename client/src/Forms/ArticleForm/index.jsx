@@ -173,7 +173,8 @@ class ArticleForm extends Component {
 			const pluralArticleKind = pluralizeArticleKind(response.articleKind);
 			history.push(`/wardrobe/${pluralArticleKind}/${id}`);
 		} else {
-			this.resetFormData();
+			await this.resetFormData();
+			this.setState({isLoading: false});
 		}
 	}
 
