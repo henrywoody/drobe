@@ -1,0 +1,7 @@
+.logged-out-page p {
+	text-align: center;
+}
+
+.logged-out-page p:first-of-type {
+	margin-top: 3rem;
+}

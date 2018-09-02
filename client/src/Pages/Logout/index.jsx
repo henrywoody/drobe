@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { NavLink } from 'react-router-dom';
 import userStorage from '../../Modules/user-storage';
+import './style.css';
 
 export default class Logout extends Component {
 	componentWillMount() {
@@ -10,7 +11,7 @@ export default class Logout extends Component {
 
 	render() {
 		return (
-			<main>
+			<main className='logged-out-page'>
 				<h1>Logged Out</h1>
 
 				<p>
@@ -18,7 +19,7 @@ export default class Logout extends Component {
 				</p>
 
 				<p>
-					<NavLink exact to='/login'>Click to log back in</NavLink>
+					<NavLink exact to='/'>Click to go to the home page</NavLink>
 				</p>
 			</main>
 		)
