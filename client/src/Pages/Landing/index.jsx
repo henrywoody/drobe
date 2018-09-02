@@ -64,7 +64,11 @@ class Landing extends Component {
 						</h2>
 
 						<p>
-							Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+							Conserve your energy for the descisions that matter by delegating your wardrobe decisions to Drobe. Drobe considers the weather, your outfit history, and your preferences to create specially curated outfits for you each morning. Style and productivity have never been so compatible.
+						</p>
+
+						<p>
+							The future is now. The future is Drobe.
 						</p>
 					</div>
 				</section>
