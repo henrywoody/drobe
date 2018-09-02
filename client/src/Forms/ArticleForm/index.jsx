@@ -181,7 +181,8 @@ class ArticleForm extends Component {
 		this.setState({ message });
 	}
 
-	handleCancel = () => {
+	handleCancel = event => {
+		event.preventDefault();
 		const { match, history } = this.props;
 		const { pluralArticleKind, articleId } = match.params;
 
@@ -200,6 +201,20 @@ class ArticleForm extends Component {
 		this.setState({ articleSearchOptions });
 	}
 
+	filterAddedArticles(fieldName) {
+		const { articles, formData } = this.state;
+		return articles.filter(e => {
+			return e.articleKind === singularizeArticleKind(fieldName) && formData[fieldName].includes(e.id); // note: need both kind and id because ids are only unique within a kind
+		});
+	}
+
+	filterArticleSuggestions(fieldName) {
+		const { articles, articleSearchOptions, formData } = this.state;
+		return articles.filter(e => {
+			return e.articleKind === singularizeArticleKind(fieldName) && !formData[fieldName].includes(e.id) && e.name.match(new RegExp(`^${articleSearchOptions[fieldName]}`, 'i'));
+		});
+	}
+
 	addAssociatedArticle = (fieldName, id) => {
 		const { formData } = this.state;
 		formData[fieldName].push(id);
@@ -215,9 +230,7 @@ class ArticleForm extends Component {
 
 	render() {
 		const { match } = this.props;
-		const { isLoading, articles, articleSearchOptions, formData, image, message } = this.state;
-		const { articleId } = match.params;
-
+		const { isLoading, articleSearchOptions, formData, image, message } = this.state;
 
 		if (isLoading) {
 			return <Loader/>
@@ -257,7 +270,7 @@ class ArticleForm extends Component {
 			additionalFields.specificKind = (
 				<div className='input-container'>
 					<label htmlFor='specificKind'>Specific Kind</label>
-					<div className='radio-container'>
+					<div className='radio-container specific-kind-radio'>
 						<input type='radio' name='specificKind' id='sweater' value='sweater' checked={ formData.specificKind === 'sweater' } onChange={ this.handleChange }/>
 						<label htmlFor='sweater'>Sweater</label>
 						<input type='radio' name='specificKind' id='jacket' value='jacket' checked={ formData.specificKind === 'jacket' } onChange={ this.handleChange }/>
@@ -275,33 +288,16 @@ class ArticleForm extends Component {
 
 
 		// Added Articles
-		const addedShirts = articles.filter(e => {
-			return formData.shirts.includes(e.id) && e.articleKind === 'shirt';
-		});
-		const addedPants = articles.filter(e => {
-			return formData.pants.includes(e.id) && e.articleKind === 'pants';
-		});
-		const addedDresses = articles.filter(e => {
-			return formData.dresses.includes(e.id) && e.articleKind === 'dress';
-		});
-		const addedOuterwears = articles.filter(e => {
-			return formData.outerwears.includes(e.id) && e.articleKind === 'outerwear';
-		});
-
+		const addedShirts = this.filterAddedArticles('shirts');
+		const addedPants = this.filterAddedArticles('pants');
+		const addedDresses = this.filterAddedArticles('dresses');
+		const addedOuterwears = this.filterAddedArticles('outerwears');
 
 		// Suggested (not yet added) Articles
-		const shirtSuggestions = articles.filter(e => {
-			return e.articleKind === 'shirt' && !formData.shirts.includes(e.id) && e.name.match(new RegExp(`^${articleSearchOptions.shirts}`, 'i'));
-		});
-		const pantsSuggestions = articles.filter(e => {
-			return e.articleKind === 'pants' && !formData.pants.includes(e.id) && e.name.match(new RegExp(`^${articleSearchOptions.pants}`, 'i'));
-		});
-		const dressSuggestions = articles.filter(e => {
-			return e.articleKind === 'dress' && !formData.dresses.includes(e.id) && e.name.match(new RegExp(`^${articleSearchOptions.dresses}`, 'i'));
-		});
-		const outerwearSuggestions = articles.filter(e => {
-			return e.articleKind === 'outerwear' && !formData.outerwears.includes(e.id) && e.id !== Number(articleId) && e.name.match(new RegExp(`^${articleSearchOptions.outerwears}`, 'i'));
-		});
+		const shirtSuggestions = this.filterArticleSuggestions('shirts');
+		const pantsSuggestions = this.filterArticleSuggestions('pants');
+		const dressSuggestions = this.filterArticleSuggestions('dresses');
+		const outerwearSuggestions = this.filterArticleSuggestions('outerwears');
 
 		// Form Fields for Associat(ing/ed) Articles
 		let associatedArticleFields = [];
@@ -311,7 +307,7 @@ class ArticleForm extends Component {
 					fieldName='shirts'
 					label={ <label htmlFor='shirts'>Associated Shirts</label> }
 					addedArticles={ addedShirts }
-					searchInput={ <input name='shirts' type='search' placeholder='Search' value={ articleSearchOptions.shirts } onChange={ this.handleSearchChange }/> }
+					searchInput={ <input name='shirts' type='search' placeholder='Search' value={ articleSearchOptions.shirts || '' } onChange={ this.handleSearchChange }/> }
 					suggestedArticles={ shirtSuggestions }
 					addArticle={ this.addAssociatedArticle }
 					removeArticle={ this.removeAssociatedArticle }
@@ -324,7 +320,7 @@ class ArticleForm extends Component {
 					fieldName='pants'
 					label={ <label htmlFor='pants'>Associated Pants</label> }
 					addedArticles={ addedPants }
-					searchInput={ <input name='pants' type='search' placeholder='Search' value={ articleSearchOptions.pants } onChange={ this.handleSearchChange }/> }
+					searchInput={ <input name='pants' type='search' placeholder='Search' value={ articleSearchOptions.pants || '' } onChange={ this.handleSearchChange }/> }
 					suggestedArticles={ pantsSuggestions }
 					addArticle={ this.addAssociatedArticle }
 					removeArticle={ this.removeAssociatedArticle }
@@ -337,7 +333,7 @@ class ArticleForm extends Component {
 					fieldName='dresses'
 					label={ <label htmlFor='dresses'>Associated Dresses</label> }
 					addedArticles={ addedDresses }
-					searchInput={ <input name='dresses' type='search' placeholder='Search' value={ articleSearchOptions.dresses } onChange={ this.handleSearchChange }/> }
+					searchInput={ <input name='dresses' type='search' placeholder='Search' value={ articleSearchOptions.dresses || '' } onChange={ this.handleSearchChange }/> }
 					suggestedArticles={ dressSuggestions }
 					addArticle={ this.addAssociatedArticle }
 					removeArticle={ this.removeAssociatedArticle }
@@ -350,7 +346,7 @@ class ArticleForm extends Component {
 					fieldName='outerwears'
 					label={ <label htmlFor='outerwears'>Associated Outerwear</label> }
 					addedArticles={ addedOuterwears }
-					searchInput={ <input name='outerwears' type='search' placeholder='Search' value={ articleSearchOptions.outerwears } onChange={ this.handleSearchChange }/> }
+					searchInput={ <input name='outerwears' type='search' placeholder='Search' value={ articleSearchOptions.outerwears || '' } onChange={ this.handleSearchChange }/> }
 					suggestedArticles={ outerwearSuggestions }
 					addArticle={ this.addAssociatedArticle }
 					removeArticle={ this.removeAssociatedArticle }
@@ -365,7 +361,7 @@ class ArticleForm extends Component {
 			]
 		) : (
 			[
-				<button className='btn-primary' onClick={ e => this.handleSubmit(e, true)}>Update</button>
+				<button key='update' className='btn-primary' onClick={ e => this.handleSubmit(e, true)}>Update</button>
 			]
 		);
 
@@ -382,29 +378,29 @@ class ArticleForm extends Component {
 
 				<div className='input-container'>
 					<label htmlFor='name'>Name</label>
-					<input name='name' type='text' value={ formData.name } placeholder={ `My Great ${namePlaceholder}` } onChange={ this.handleChange }/>
+					<input name='name' type='text' value={ formData.name || '' } placeholder={ `My Great ${namePlaceholder}` } onChange={ this.handleChange }/>
 				</div>
 
 				<div className='input-container'>
 					<label htmlFor='description'>Description <span className='optional'>optional</span></label>
-					<textarea name='description' value={ formData.description } placeholder='Something descriptive' onChange={ this.handleChange }/>
+					<textarea name='description' value={ formData.description || '' } placeholder='Something descriptive' onChange={ this.handleChange }/>
 				</div>
 
 				<div className='input-container'>
 					<label htmlFor='image'>Image <span className='optional'>optional</span></label>
-					<input name='image' type='file' value={ image.path } onChange={ this.handleChange }/>
+					<input name='image' type='file' value={ image.path || '' } onChange={ this.handleChange }/>
 				</div>
 
 				<div className='input-container'>
 					<label htmlFor='rating'>Rating</label>
-					<input name='rating' type='range' min='1' max='5' value={ formData.rating } onChange={ this.handleChange }/>
+					<input name='rating' type='range' min='1' max='5' value={ formData.rating || '' } onChange={ this.handleChange }/>
 				</div>
 
 				<div className='input-container'>
 					<label>Temperature Range <span className='optional'>optional</span></label>
 					<div className='input-grouping always-row temp-inputs-container'>
-						<input name='minTemp' type='number' placeholder='Min Temp' value={ formData.minTemp } onChange={ this.handleChange }/>
-						<input name='maxTemp' type='number' placeholder='Max Temp' value={ formData.maxTemp } onChange={ this.handleChange }/>
+						<input name='minTemp' type='number' placeholder='Min Temp' value={ formData.minTemp || '' } onChange={ this.handleChange }/>
+						<input name='maxTemp' type='number' placeholder='Max Temp' value={ formData.maxTemp || '' } onChange={ this.handleChange }/>
 					</div>
 				</div>
 

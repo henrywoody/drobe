@@ -71,7 +71,7 @@ class ChangeLocationForm extends Component {
 				{ message }
 				<div className='input-container'>
 					<label htmlFor='location-name'>Location</label>
-					<input name='location-name' type='text' placeholder='Seattle, WA, USA' value={ locationName } onChange={ this.handleChange }/>
+					<input name='location-name' type='text' placeholder='Seattle, WA, USA' value={ locationName || '' } onChange={ this.handleChange }/>
 				</div>
 
 				<div className='buttons-container'>

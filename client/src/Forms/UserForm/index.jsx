@@ -69,18 +69,18 @@ class UserForm extends Component {
 				
 				<div className='input-container'>
 					<label htmlFor='username'>Username</label>
-					<input name='username' type='text' placeholder='username' value={ formOptions.username } onChange={ this.handleChange }/>
+					<input name='username' type='text' placeholder='username' value={ formOptions.username || '' } onChange={ this.handleChange }/>
 				</div>
 
 				<div className='input-container'>
 					<label htmlFor='password'>Password</label>
-					<input name='password' type='password' placeholder='password' value={ formOptions.password } onChange={ this.handleChange }/>
+					<input name='password' type='password' placeholder='password' value={ formOptions.password || '' } onChange={ this.handleChange }/>
 				</div>
 
 				{ formType === 'register' &&
 					<div className='input-container'>
 						<label htmlFor='passwordCheck'>Confirm Password</label>
-						<input name='passwordCheck' type='password' placeholder='password' value={ formOptions.passwordCheck } onChange={ this.handleChange }/>
+						<input name='passwordCheck' type='password' placeholder='password' value={ formOptions.passwordCheck || '' } onChange={ this.handleChange }/>
 					</div>
 				}
 
