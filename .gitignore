@@ -60,3 +60,9 @@ typings/
 
 # next.js build output
 .next
+
+
+#Google Cloud
+cloud_sql_proxy
+app.yaml
+*credentials.json

@@ -1,7 +1,7 @@
 const	request = require('request-promise-native');
 
 module.exports = async (address) => {
-	const response = await request(`https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${process.env.GOOGLE_API_KEY}`);
+	const response = await request(`https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${global.config.googleApiKey}`);
 	const jsonResponse = JSON.parse(response);
 
 	try {

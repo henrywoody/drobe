@@ -38,3 +38,38 @@ After that though, it'll be smooth sailing.
 Postgres is the DBMS, the back-end is built with Express and Node, and the front-end is written in React. The database used to be in Mongo, but this project has a lot of many-to-many relations and those aren't really great with Mongo, but perfect for Postgres.
 
 For weather data, this project uses the [Dark Sky API](https://darksky.net/dev). To get coordinates for users (for use in the Dark Sky API), this project uses the [Google Geocoding API](https://developers.google.com/maps/documentation/geocoding/intro).
+
+### Deployment
+
+Drobe is deployed on Google Cloud Platform [App Engine](https://cloud.google.com/appengine/) . The database is also hosted on GCP [Cloud SQL](https://cloud.google.com/sql/docs/postgres/). Images are stored on [AWS S3](https://aws.amazon.com/s3/).
+
+#### Config
+
+Environment variables are stored in `app.yaml`. For that reason `app.yaml` must be excluded from source control. The `template-app.yaml` shows how `app.yaml` should be formatted, but does not contain any values for the listed environment variables.
+
+#### Connecting to production DB on local
+
+[Using Cloud SQL for PostgreSQL](https://cloud.google.com/appengine/docs/standard/nodejs/using-cloud-sql-postgres) as a reference. See those docs for download of `cloud_sql_proxy`.
+
+To connect to the database on GCP, get the database instance connection name with:
+
+```shell
+gcloud sql instances describe [YOUR_INSTANCE_NAME] | grep connectionName
+```
+
+In my case, `YOUR_INSTANCE_NAME` is `drobe-db`.
+
+Then make sure postgres is not running (`brew services stop postgres`) and run:
+
+```shell
+./cloud_sql_proxy -instances="[YOUR_INSTANCE_CONNECTION_NAME]"=tcp:5432
+```
+
+#### Connecting in the Cloud Console
+
+Enter:
+
+```shell
+PGDATABASE=[database_name] gcloud sql connect sql_instance_name --user=database_user
+```
+
