@@ -76,6 +76,18 @@ describe('Clean Article Data module', () => {
 		assert.include(Object.keys(cleanOuterwearData), 'outerwears');
 	});
 
+	it('should replace empty strings with null', () => {
+		const data = {
+			'rating': ''
+		}
+
+		for (const table of ['shirt', 'pants', 'dress', 'outerwear']) {
+			const cleanData = cleanArticleData(table, data);
+			assert.include(Object.keys(cleanData), 'rating');
+			assert.isNull(cleanData.rating);
+		}
+	})
+
 	it('should remove invalid fields', () => {
 		const data = {
 			'otherField': 'somevalue'

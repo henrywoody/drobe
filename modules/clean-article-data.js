@@ -43,7 +43,11 @@ module.exports = (table, data) => {
 	const cleanData = {};
 	for (const key of fieldsForTable[table]) {
 		if (Object.keys(data).includes(camelCase(key))) {
-			cleanData[key] = data[camelCase(key)];
+			if (data[camelCase(key)] === '') {
+				cleanData[key] = null;
+			} else {
+				cleanData[key] = data[camelCase(key)];
+			}
 		} else if (['shirts', 'pants', 'dresses', 'outerwears'].includes(key)) {
 			cleanData[key] = [];
 		}
