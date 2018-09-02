@@ -24,6 +24,7 @@ header .bar {
 	justify-content: space-between;
 	box-sizing: border-box;
 	position: absolute;
+	overflow: hidden;
 	z-index: 100;
 }
 

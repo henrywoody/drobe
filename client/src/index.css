@@ -22,10 +22,6 @@
 	--body-font: Open Sans, sans-serif;
 }
 
-html {
-	height: 100%;
-}
-
 body {
 	font-family: var(--body-font);
 	color: var(--default-text-color);
