@@ -90,7 +90,7 @@ main.landing .runner-container {
 	}
 
 	h1.big-title {
-		margin: 0 0 2rem;
+		margin: 0 0 1rem;
 	}
 
 	h2.tagline {
@@ -104,9 +104,12 @@ main.landing .runner-container {
 
 	main.landing section {
 		width: 60%;
-		padding: 1.5rem;
 		display: inline-block;
 		box-sizing: border-box;
+	}
+
+	main.landing section:first-of-type {
+		padding-left: 1rem;
 	}
 
 	main.landing section > div {

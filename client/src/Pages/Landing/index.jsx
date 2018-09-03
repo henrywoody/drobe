@@ -2,14 +2,27 @@ import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import UserForm from '../../Forms/UserForm';
 import Runner from '../../Components/Runner';
-import './Landing.css';
+import './style.css';
 
 class Landing extends Component {
 	constructor() {
 		super();
 		this.state = {
-			displayedForm: null
+			displayedForm: null,
+			runnerWidth: window.innerWidth / 3
 		}
+	}
+
+	componentDidMount() {
+		window.addEventListener('resize', this.updateRunnerWidth);
+	}
+
+	componentWillUnmount() {
+		window.removeEventListener('resize', this.updateRunnerWidth);
+	}
+
+	updateRunnerWidth = () => {
+		this.setState({runnerWidth: window.innerWidth / 3});
 	}
 
 	getFormComponent() {
@@ -47,6 +60,8 @@ class Landing extends Component {
 	}
 
 	render() {
+		const { runnerWidth } = this.state;
+		
 		const formComponent = this.getFormComponent();
 
 		return (
@@ -56,7 +71,7 @@ class Landing extends Component {
 						<h1 className='title big-title'>Dr obe</h1>
 
 						<div className='runner-container'>
-							<Runner width={ window.innerWidth / 3 } height={ 2 } runSpeed={ 2 } inverted/>
+							<Runner width={ runnerWidth } height={ 2 } runSpeed={ 2 } inverted/>
 						</div>
 
 						<h2 className='tagline'>
