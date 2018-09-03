@@ -36,3 +36,16 @@
 input[type='search'] {
 	margin-bottom: .3rem;	
 }
+
+input[type='range'] {
+	display: none;
+}
+
+@media all and (min-width: 800px) {
+	input[type='range'] {
+		display: block;
+	}
+	input[type='range'] + input[type='number'] {
+		display: none;
+	}
+}

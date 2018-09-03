@@ -30,11 +30,13 @@
 }
 
 .content .weather-data .temperature {
-	width: 15rem;
+	max-width: 15rem;
 	margin: 0 auto .5rem;
 	display: flex;
-	flex-flow: row;
-	justify-content: space-between;
+	flex-flow: column;
+}
+.content .weather-data .temperature {
+	text-align: center;
 }
 .content .weather-data .temperature .main-temperature {
 	font-size: 3rem;
@@ -47,6 +49,13 @@
 	line-height: .9rem;
 	display: flex;
 	flex-flow: column;
+}
+
+@media all and (min-width: 700px) {
+	.content .weather-data .temperature {
+		flex-flow: row;
+		justify-content: space-between;
+	}
 }
 
 .content .weather-data .rain {
@@ -65,6 +74,7 @@
 }
 
 .content .weather-data .powered-by span {
+	text-align: center;
 	margin-top: 1rem;
-	float: right;
+	display: block;
 }

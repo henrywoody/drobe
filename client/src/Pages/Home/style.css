@@ -8,7 +8,7 @@ p.welcome-message {
 }
 
 .components .component {
-	width: 50%;
+	width: 90%;
 	padding: 1rem;
 	margin: 0 auto;
 	box-sizing: border-box;
@@ -21,6 +21,10 @@ p.welcome-message {
 @media all and (min-width: 800px) {
 	.components {
 		flex-flow: row;
+	}
+
+	.components .component {
+		width: 50%;
 	}
 
 	.components .component:nth-of-type(2) {

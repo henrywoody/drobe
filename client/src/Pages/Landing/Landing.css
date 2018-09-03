@@ -6,7 +6,6 @@ main.landing {
 	color: var(--nearly-white);
 	background-image: var(--drobe-blue-gradient);
 	min-height: 100vh;
-	padding: 1.5rem;
 	display: flex;
 	flex-flow: column;
 	box-sizing: border-box;
@@ -27,14 +26,27 @@ h2.tagline {
 	font-weight: 300;
 	color: var(--nearly-white);
 	width: 100%;
+	padding-left: 1rem;
+	padding-right: 1rem;
 	margin-bottom: .5rem;
 	display: inline-block;
 	text-align: center;
+	box-sizing: border-box;
 }
 
 main.landing section {
-	padding: 1.5rem;
+	margin-bottom: 1rem;
 }
+
+main.landing section:last-of-type {
+	margin-bottom: 5rem;
+}
+
+main.landing p {
+	width: 80%;
+	margin: 1rem auto;
+}
+
 
 main.landing .form-box {
 	color: var(--dark-gray);
@@ -72,6 +84,7 @@ main.landing .runner-container {
 
 @media all and (min-width: 850px) {
 	main.landing {
+		padding: 1.5rem;
 		flex-flow: row;
 		overflow: hidden;
 	}
@@ -91,6 +104,7 @@ main.landing .runner-container {
 
 	main.landing section {
 		width: 60%;
+		padding: 1.5rem;
 		display: inline-block;
 		box-sizing: border-box;
 	}
@@ -101,6 +115,11 @@ main.landing .runner-container {
 
 	main.landing section:nth-of-type(2) {
 		width: 40%;
+	}
+
+	main.landing p {
+		width: 80%;
+		margin: 1rem 0;
 	}
 
 	main.landing .form-box {

@@ -46,7 +46,7 @@ header canvas {
 header nav.nav-drawer {
 	--nav-drawer-width: 15rem;
 	--nav-drawer-hidden-offset: -16rem;
-	background-color: #fff;
+	background-color: var(--default-background-color);
 	width: var(--nav-drawer-width);
 	height: 100vh;
 	border-right: var(--drobe-blue);
@@ -65,6 +65,10 @@ header nav.nav-drawer {
 
 header nav.nav-drawer.hidden {
 	left: var(--nav-drawer-hidden-offset);
+}
+
+header nav.nav-drawer a {
+	margin-bottom: 2rem;
 }
 
 header nav.nav-bar {

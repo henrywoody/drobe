@@ -396,6 +396,7 @@ class ArticleForm extends Component {
 				<div className='input-container'>
 					<label htmlFor='rating'>Rating</label>
 					<input name='rating' type='range' min='1' max='5' value={ formData.rating || '' } onChange={ this.handleChange }/>
+					<input name='rating' type='number' min='1' max='5' value={ formData.rating || '' } onChange={ this.handleChange }/>
 				</div>
 
 				<div className='input-container'>

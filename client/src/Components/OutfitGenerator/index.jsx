@@ -23,7 +23,7 @@ class OutfitGenerator extends Component {
 		await this.setState({ isLoading: true, showMessage: false });
 
 		const outfit = await api.getOutfit(user.token);
-		const noArticles = !(outfit.shirt || outfit.pants || outfit.dress || (outfit.outerwear && !outfit.outerwear.length));
+		const noArticles = !(outfit.shirt || outfit.pants || outfit.dress || (outfit.outerwear && outfit.outerwear.length));
 		if ('error' in outfit || noArticles) {
 			this.setState({noArticles: true, isLoading: false});
 		} else {

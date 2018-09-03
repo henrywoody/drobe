@@ -34,10 +34,12 @@ export default class Header extends Component {
 					<div className='title-container'>
 						<NavLink to='/' className='title' onClick={ () => this.setState({hideDrawer: true})}>Dr obe</NavLink>
 					</div>
-					<HeaderNav hideDrawer={ hideDrawer } handleDrawerClick={ () => this.setState({hideDrawer: true}) }/>
+					<HeaderNav className='nav-bar' handleDrawerClick={ () => this.setState({hideDrawer: true}) }/>
 					<button className='button-toggle-nav-drawer btn-secondary' onClick={ () => this.setState({hideDrawer: !hideDrawer}) }>{ hideDrawer ? '+' : '-' }</button>
 					<Runner width={ window.innerWidth } height={ 2 }/>
 				</div>
+
+				<HeaderNav className='nav-drawer' hideDrawer={ hideDrawer } handleDrawerClick={ () => this.setState({hideDrawer: true}) }/>
 
 				<div className={ 'gray-screen' + (hideDrawer ? ' hidden' : '') } onClick={ () => this.setState({hideDrawer: !hideDrawer})}></div>
 			</header>
