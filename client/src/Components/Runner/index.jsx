@@ -17,7 +17,7 @@ export default class Runner extends Component {
 	}
 
 	componentDidMount() {
-		this.requestAnimationFrame()(this.update);
+		this.requestId = this.requestAnimationFrame()(this.update);
 	}
 
 	componentWillUnmount() {
