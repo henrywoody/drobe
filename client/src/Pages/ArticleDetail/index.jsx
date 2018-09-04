@@ -16,27 +16,21 @@ class ArticleDetail extends Component {
 	}
 
 	componentDidMount() {
-		const { match, history } = this.props;
-		const { pluralArticleKind, articleId } = match.params;
-
-		this.fetchData(pluralArticleKind, articleId);
-
-		this.unlisten = history.listen((location, action) => {
-			if (location.pathname.match(/wardrobe\/\w*?\/\w*?$/)) {
-				const [pluralArticleKind, id] = location.pathname.match(/wardrobe\/(\w*?)\/(\w*?)$/).slice(1);
-				this.setupData(pluralArticleKind, id);
-			}
-		})
+		this.fetchData();
 	}
 
-	componentWillUnmount() {
-		this.unlisten();
+	componentDidUpdate(prevProps) {
+		const { pluralArticleKind: prevPluralArticleKind, articleId: prevArticleId } = prevProps.match.params;
+		const { pluralArticleKind: currPluralArticleKind, articleId: currArticleId } = this.props.match.params;
+		if (prevPluralArticleKind !== currPluralArticleKind || prevArticleId !== currArticleId) {
+			this.fetchData();
+		}
 	}
 
-	async fetchData(pluralArticleKind, articleId) {
+	async fetchData() {
 		this.setState({isLoading: true});
-		const { user } = this.props;
-		const articleData = await api.getArticle(pluralArticleKind, articleId, user.token);
+		const { user, match } = this.props;
+		const articleData = await api.getArticle(match.params.pluralArticleKind, match.params.articleId, user.token);
 		await this.setState({ articleData, isLoading: false });
 	}
 
