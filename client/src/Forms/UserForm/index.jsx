@@ -6,7 +6,7 @@ class UserForm extends Component {
 	constructor() {
 		super();
 		this.state = {
-			formOptions: {
+			formData: {
 				username: '',
 				password: '',
 				passwordCheck: '',
@@ -18,21 +18,25 @@ class UserForm extends Component {
 
 	handleChange = (event) => {
 		const { name, value } = event.target;
-		const { formOptions } = this.state;
+		const { formData } = this.state;
 
-		formOptions[name] = value;
+		formData[name] = value;
 
-		this.setState({ formOptions });
+		this.setState({ formData });
 	}
 
 	handleSubmit = async (event) => {
 		event.preventDefault();
 		const { formType, history } = this.props;
-		const { formOptions } = this.state;
+		const { formData } = this.state;
 
 		if (formType === 'register') {
-			if (formOptions.password !== formOptions.passwordCheck)
+			if (formData.password !== formData.passwordCheck) {
 				return this.setState({message: 'Passwords do not match.'});
+			}
+			if (formData.username.includes(' ')) {
+				return this.setState({message: 'Username cannot contain spaces.'})
+			}
 		}
 
 		const response = await fetch(`/users/${formType}`, {
@@ -40,7 +44,7 @@ class UserForm extends Component {
 			headers: {
 				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify({user: formOptions})
+			body: JSON.stringify({user: formData})
 		})
 
 		if (response.status !== 200) {
@@ -64,7 +68,7 @@ class UserForm extends Component {
 
 	render() {
 		const { formType, handleCancel } = this.props;
-		const { formOptions, message } = this.state;
+		const { formData, message } = this.state;
 
 		return (
 			<form onSubmit={ this.handleSubmit }>
@@ -74,18 +78,18 @@ class UserForm extends Component {
 				
 				<div className='input-container'>
 					<label htmlFor='username'>Username</label>
-					<input name='username' type='text' placeholder='username' value={ formOptions.username || '' } onChange={ this.handleChange }/>
+					<input name='username' type='text' placeholder='username' value={ formData.username || '' } onChange={ this.handleChange }/>
 				</div>
 
 				<div className='input-container'>
 					<label htmlFor='password'>Password</label>
-					<input name='password' type='password' placeholder='password' value={ formOptions.password || '' } onChange={ this.handleChange }/>
+					<input name='password' type='password' placeholder='password' value={ formData.password || '' } onChange={ this.handleChange }/>
 				</div>
 
 				{ formType === 'register' &&
 					<div className='input-container'>
 						<label htmlFor='passwordCheck'>Confirm Password</label>
-						<input name='passwordCheck' type='password' placeholder='password' value={ formOptions.passwordCheck || '' } onChange={ this.handleChange }/>
+						<input name='passwordCheck' type='password' placeholder='password' value={ formData.passwordCheck || '' } onChange={ this.handleChange }/>
 					</div>
 				}
 

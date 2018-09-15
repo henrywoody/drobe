@@ -29,6 +29,7 @@ header .bar {
 }
 
 header .title {
+	word-spacing: -.4rem;
 	height: 2.75rem;
 	line-height: 2.75rem;
 	margin-top: .2rem;

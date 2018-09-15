@@ -79,7 +79,7 @@ class Landing extends Component {
 						</h2>
 
 						<p>
-							Conserve your energy for the descisions that matter by delegating your wardrobe decisions to Drobe. Drobe considers the weather, your outfit history, and your preferences to create specially curated outfits for you each morning. Style and productivity have never been so compatible.
+							Conserve your energy for the decisions that matter by delegating your wardrobe decisions to Drobe. Drobe considers the weather, your outfit history, and your preferences to create specially curated outfits for you each morning. Style and productivity have never been so compatible.
 						</p>
 
 						<p>

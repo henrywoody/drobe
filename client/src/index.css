@@ -44,7 +44,6 @@ main {
 	text-transform: uppercase;
 	text-decoration: none;
 	letter-spacing: .1rem;
-	word-spacing: -.5rem;
 	width: 11.5rem;
 	display: block;
 	flex-shrink: 0;
