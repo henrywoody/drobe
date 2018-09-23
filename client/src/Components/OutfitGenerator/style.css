@@ -2,18 +2,23 @@
 	font-size: 1.2rem;
 }
 
-.outfit-row {
+.outfit-generator h3 {
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
+.outfit-generator .outfit-row {
 	display: flex;
 	flex-flow: column;
 }
 
-.outfit-row .articles-container {
+.outfit-generator .outfit-row .articles-container {
 	display: flex;
 	flex-flow: row;
 	flex-wrap: wrap;
 	justify-content: space-around;
 }
 
-.message {
+.outfit-generator .message {
 	text-align: center;
 }
