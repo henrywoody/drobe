@@ -6,4 +6,4 @@ then
 fi
 
 npm run-script build --prefix ./client
-gcloud app deploy --quiet
+gcloud app deploy --version='current' --stop-previous-version --quiet
