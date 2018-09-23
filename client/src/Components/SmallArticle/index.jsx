@@ -14,7 +14,7 @@ export default props => {
 				</div>
 			)}
 			
-			<span>{ name }</span>
+			<span className='name'>{ name }</span>
 		</div>
 	)
 }
