@@ -21,29 +21,28 @@ class ArticleForm extends Component {
 				outerwears: ''
 			},
 			articles: [],
-			initialFormData: {
-				articleKind: '',
-				name: '',
-				description: '',
-				imageUrl: '',
-				rating: '1',
-				minTemp: '',
-				maxTemp: '',
-				rainOk: false,
-				snowOk: false,
-				specificKind: 'sweater',
-				innerLayer: false,
-				shirts: [],
-				pants: [],
-				dresses: [],
-				outerwears: []
-			},
 			formData: {},
 			image: {
 				path: '',
 				data: null
 			},
 			message: null
+		};
+		this.initialFormData = {
+			articleKind: '',
+			name: '',
+			description: '',
+			rating: '1',
+			minTemp: '',
+			maxTemp: '',
+			rainOk: false,
+			snowOk: false,
+			specificKind: 'sweater',
+			innerLayer: false,
+			shirts: [],
+			pants: [],
+			dresses: [],
+			outerwears: []
 		};
 	}
 
@@ -53,8 +52,7 @@ class ArticleForm extends Component {
 	}
 
 	resetFormData() {
-		const { initialFormData } = this.state;
-		this.setState({ formData: {...initialFormData} });
+		this.setState({ formData: JSON.parse(JSON.stringify(this.initialFormData)) });
 	}
 
 	async fetchData() {
@@ -81,7 +79,7 @@ class ArticleForm extends Component {
 		this.setState({ articles, formData, isLoading: false });
 	}
 
-	handleChange = async (event) => {
+	handleChange = async event => {
 		const { name, type, value, checked } = event.target;
 		const { formData, image, message } = this.state;
 		let newMessage = '';
@@ -143,6 +141,8 @@ class ArticleForm extends Component {
 			return this.setState({message: 'Minimum temperature cannot exceed maximum temperature.'})
 		}
 
+		const payload = { ...formData };
+
 		// Upload
 		// upload image first if there is one
 		if (image.data) {
@@ -150,18 +150,18 @@ class ArticleForm extends Component {
 			if (imageResponse.error) {
 				return this.setState({message: 'There was a problem with the image upload, please try again or select a different image.'});
 			}
-			formData.imageUrl = imageResponse.imageUrl;
+			payload.imageUrl = imageResponse.imageUrl;
 		}
 
 		let response;
 		if (match.path === '/wardrobe/new') {
-			const pluralArticleKind = pluralizeArticleKind(formData.articleKind);
-			const articleKind = formData.articleKind;
-			response = await api.postArticle(pluralArticleKind, {[articleKind]: formData}, user.token);
+			const pluralArticleKind = pluralizeArticleKind(payload.articleKind);
+			const articleKind = payload.articleKind;
+			response = await api.postArticle(pluralArticleKind, {[articleKind]: payload}, user.token);
 		} else {
 			const { pluralArticleKind, articleId } = match.params;
 			const articleKind = singularizeArticleKind(pluralArticleKind);
-			response = await api.putArticle(pluralArticleKind, articleId, {[articleKind]: formData}, user.token);
+			response = await api.putArticle(pluralArticleKind, articleId, {[articleKind]: payload}, user.token);
 		}
 
 		if ('error' in response) {
@@ -232,7 +232,7 @@ class ArticleForm extends Component {
 
 	render() {
 		const { match } = this.props;
-		const { isLoading, articleSearchOptions, formData, image, message } = this.state;
+		const { isLoading, articleSearchOptions, formData, message } = this.state;
 
 		if (isLoading) {
 			return <Loader/>
@@ -390,7 +390,7 @@ class ArticleForm extends Component {
 
 				<div className='input-container'>
 					<label htmlFor='image'>Image <span className='optional'>optional</span></label>
-					<input name='image' type='file' value={ image.path || '' } onChange={ this.handleChange }/>
+					<input name='image' type='file' onChange={ this.handleChange }/>
 				</div>
 
 				<div className='input-container'>
