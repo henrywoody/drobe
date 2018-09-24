@@ -47,7 +47,7 @@ class ArticleForm extends Component {
 
 	async componentDidMount() {
 		this.scrollToTop();
-		await this.resetFormData();
+		await this.resetState();
 		this.fetchData();
 	}
 
@@ -55,7 +55,7 @@ class ArticleForm extends Component {
 		window.scrollTo(0,0);
 	}
 
-	resetFormData() {
+	resetState() {
 		this.setState({ formData: JSON.parse(JSON.stringify(this.initialFormData)) });
 	}
 
@@ -115,8 +115,9 @@ class ArticleForm extends Component {
 		this.setState({ formData: newFormData });
 	}
 
-	handleSubmit = async (event, routeToNewArticle) => {
+	handleSubmit = async (event, shouldRouteToNewArticle) => {
 		this.setState({isLoading: true});
+		this.scrollToTop();
 		event.preventDefault();
 		const { match, user, history } = this.props;
 
@@ -143,12 +144,12 @@ class ArticleForm extends Component {
 			return this.handleError(response);
 		}
 
-		if (routeToNewArticle) {
+		if (shouldRouteToNewArticle) {
 			const { id } = response;
 			const pluralArticleKind = pluralizeArticleKind(response.articleKind);
 			history.push(`/wardrobe/${pluralArticleKind}/${id}`);
 		} else {
-			await this.resetFormData();
+			await this.resetState();
 			this.setState({isLoading: false});
 		}
 	}
@@ -191,7 +192,6 @@ class ArticleForm extends Component {
 
 	handleError(response) {
 		this.setState({message: response.message || response.error, isLoading: false});
-		this.scrollToTop();
 	}
 
 	handleCancel = event => {
