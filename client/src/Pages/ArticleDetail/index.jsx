@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import Loader from '../../Components/Loader';
+import DangerousButton from '../../Components/DangerousButton';
 import AssociatedArticlesContainer from './AssociatedArticlesContainer.jsx';
 import api from '../../Modules/api';
 import './style.css';
@@ -126,7 +127,7 @@ class ArticleDetail extends Component {
 					</div>
 
 					<div className='buttons-container'>
-						<button className='btn-danger' onClick={ this.handleDelete }>Delete</button>
+						<DangerousButton onClick={ this.handleDelete }>Delete</DangerousButton>
 						<button className='btn-secondary' onClick={ this.handleEditClick }>Edit</button>
 					</div>
 				</div>

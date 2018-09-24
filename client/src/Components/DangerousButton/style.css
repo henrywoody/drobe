@@ -1,0 +1,8 @@
+.confirmation-message {
+	margin-bottom: .25rem;
+	display: block;
+}
+
+.verify-buttons-container button:first-of-type {
+	margin-right: .5rem;
+}
