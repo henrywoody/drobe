@@ -2,10 +2,11 @@ import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import Loader from '../../Components/Loader';
+import TextareaAutosize from 'react-autosize-textarea';
+import ImageInput from '../Components/ImageInput';
 import JoinedArticlesInput from './JoinedArticlesInput.jsx';
 import pluralizeArticleKind from '../../Modules/pluralize-article-kind';
 import singularizeArticleKind from '../../Modules/singularize-article-kind';
-import ImageInput from '../Components/ImageInput';
 import api from '../../Modules/api';
 import './style.css';
 
@@ -395,7 +396,7 @@ class ArticleForm extends Component {
 
 				<div className='input-container'>
 					<label htmlFor='description'>Description <span className='optional'>optional</span></label>
-					<textarea name='description' value={ formData.description || '' } placeholder='Something descriptive' onChange={ this.handleChange }/>
+					<TextareaAutosize name='description' value={ formData.description || '' } placeholder='Something descriptive' onChange={ this.handleChange }/>
 				</div>
 
 				<ImageInput
