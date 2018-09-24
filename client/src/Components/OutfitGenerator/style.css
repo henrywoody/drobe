@@ -19,6 +19,13 @@
 	justify-content: space-around;
 }
 
+.outfit-generator .article-simple {
+	--mobile-width: 90%;
+	--tablet-width: 49%;
+	--desktop-width: 49%;
+	--large-desktop-width: 49%;
+}
+
 .outfit-generator .message {
 	text-align: center;
 }

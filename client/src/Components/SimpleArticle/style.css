@@ -1,4 +1,9 @@
 .article-simple {
+	--mobile-width: 90%;
+	--tablet-width: 49%;
+	--desktop-width: 32%;
+	--large-desktop-width: 24%;
+
 	background-color: #fff;
 	width: 90%;
 	min-height: 12rem;
@@ -25,7 +30,7 @@
 }
 
 .article-simple img {
-	width: 90%;
+	width: var(--mobile-width);
 	margin: 0 auto;
 }
 
@@ -36,19 +41,19 @@
 
 @media all and (min-width: 750px) {
 	.article-simple {
-		width: 49%;
+		width: var(--tablet-width);
 		margin: .5rem 0;
 	}
 }
 
 @media all and (min-width: 1000px) {
 	.article-simple {
-		width: 32%;
+		width: var(--desktop-width);
 	}
 }
 
 @media all and (min-width: 1200px) {
 	.article-simple {
-		width: 24%;
+		width: var(--large-desktop-width);
 	}
 }
