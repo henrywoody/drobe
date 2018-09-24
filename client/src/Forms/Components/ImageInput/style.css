@@ -1,0 +1,57 @@
+input[type='file'] {
+	width: 0.1px;
+	height: 0.1px;
+	border: 0;
+	opacity: 0;
+	overflow: hidden;
+	position: absolute;
+	z-index: -1;
+}
+
+.image-input {
+	--image-input-height: 13rem;
+	min-height: var(--image-input-height);
+	border: .1rem solid var(--light-gray);
+	padding: .5rem;
+	display: block;
+}
+
+.image-input:hover {
+	cursor: pointer;
+}
+
+.image-input * {
+	pointer-events: none;
+}
+
+.image-input .image-container {
+	width: 90%;
+	min-height: var(--image-input-height);
+	max-width: 15rem;
+	margin: 0 auto;
+	position: relative;
+}
+
+.image-input .image-container img {
+	width: 100%;
+}
+
+.image-input .icon-container-container {
+	width: 13rem;
+	height: 100%;
+	display: flex;
+	align-items: center;
+	position: absolute;
+	left: 50%;
+}
+
+.image-input .icon-container-container .icon-container {
+	position: relative;
+	left: -50%;
+}
+
+.image-input img.icon {
+	width: 80%;
+	margin: 0 auto;
+	display: block;
+}

@@ -2,7 +2,7 @@ export default async function uploadImage(image, token) {
 	const endpoint = '/api/v2/images/upload';
 
 	const formData = new FormData();
- 	formData.append('image', image.data);
+ 	formData.append('image', image);
 
 	const result = await fetch(endpoint, {
 		method: 'POST',

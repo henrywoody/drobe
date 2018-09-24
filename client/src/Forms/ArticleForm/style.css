@@ -8,6 +8,11 @@
 	}
 }
 
+.btn-clear-image {
+	margin: 0 auto;
+	display: block;
+}
+
 .temp-inputs-container input {
 	width: 48%;
 }

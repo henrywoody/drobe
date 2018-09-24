@@ -65,6 +65,7 @@ input {
 
 textarea {
 	height: var(--double-input-height);
+	resize: vertical;
 }
 
 ::placeholder {

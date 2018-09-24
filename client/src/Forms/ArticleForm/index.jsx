@@ -5,8 +5,8 @@ import Loader from '../../Components/Loader';
 import JoinedArticlesInput from './JoinedArticlesInput.jsx';
 import pluralizeArticleKind from '../../Modules/pluralize-article-kind';
 import singularizeArticleKind from '../../Modules/singularize-article-kind';
+import ImageInput from '../Components/ImageInput';
 import api from '../../Modules/api';
-import uploadImage from '../../Modules/upload-image';
 import './style.css';
 
 class ArticleForm extends Component {
@@ -22,16 +22,13 @@ class ArticleForm extends Component {
 			},
 			articles: [],
 			formData: {},
-			image: {
-				path: '',
-				data: null
-			},
 			message: null
 		};
 		this.initialFormData = {
 			articleKind: '',
 			name: '',
 			description: '',
+			imageUrl: '',
 			rating: '1',
 			minTemp: '',
 			maxTemp: '',
@@ -44,11 +41,17 @@ class ArticleForm extends Component {
 			dresses: [],
 			outerwears: []
 		};
+		this.isUploadingImage = false;
 	}
 
 	async componentDidMount() {
+		this.scrollToTop();
 		await this.resetFormData();
 		this.fetchData();
+	}
+
+	scrollToTop() {
+		window.scrollTo(0,0);
 	}
 
 	resetFormData() {
@@ -79,36 +82,20 @@ class ArticleForm extends Component {
 		this.setState({ articles, formData, isLoading: false });
 	}
 
+	clearErrorMessage = targetMessage => {
+		const { message } = this.state;
+		if (message === targetMessage) {
+			this.setState({message: null});
+		}
+	}
+
 	handleChange = async event => {
 		const { name, type, value, checked } = event.target;
-		const { formData, image, message } = this.state;
-		let newMessage = '';
+		const { formData } = this.state;
 
 		const newFormData = {...formData};
 
-		if (name === 'image') { // handling image upload
-			const imageTooLargeMessage = 'Image is too large, must be less than 16 MB.';
-			const file = event.target.files[0];
-
-			if (!file) {
-				image.path = '';
-				image.data = null;
-			} else if (file.size >= 16 * 1024 * 1024) { // max file size 16MB
-				image.data = '';
-				return this.setState({
-					message: imageTooLargeMessage,
-					formData: newFormData
-				});
-			} else {
-				if (message === imageTooLargeMessage)
-					newMessage = null;
-
-				image.path = value;
-				image.data = file;
-			}
-		} else {
-			newFormData[name] = type === 'checkbox' ? checked : value;
-		}
+		newFormData[name] = type === 'checkbox' ? checked : value;
 
 		// setting default values dynamically
 		if (name === 'specificKind') {
@@ -124,47 +111,34 @@ class ArticleForm extends Component {
 			}
 		}
 
-		this.setState({ formData: newFormData, image, message: newMessage });
+		this.setState({ formData: newFormData });
 	}
 
 	handleSubmit = async (event, routeToNewArticle) => {
 		this.setState({isLoading: true});
 		event.preventDefault();
 		const { match, user, history } = this.props;
-		const { formData, image } = this.state;
 
-		// Validation
-		if (!formData.name) {
-			return this.setState({message: 'Name cannot be blank.'})
-		}
-		if (formData.maxTemp !== '' && formData.minTemp !== '' && Number(formData.minTemp) > Number(formData.maxTemp)) {
-			return this.setState({message: 'Minimum temperature cannot exceed maximum temperature.'})
-		}
+		await this.waitForImageUpload();
+		const { formData } = this.state;
 
-		const payload = { ...formData };
-
-		// Upload
-		// upload image first if there is one
-		if (image.data) {
-			const imageResponse = await uploadImage(image, user.token);
-			if (imageResponse.error) {
-				return this.setState({message: 'There was a problem with the image upload, please try again or select a different image.'});
-			}
-			payload.imageUrl = imageResponse.imageUrl;
+		if (!this.checkFormDataValidityAndUpdateMessage()) {
+			return this.setState({isLoading: false});
 		}
 
 		let response;
 		if (match.path === '/wardrobe/new') {
-			const pluralArticleKind = pluralizeArticleKind(payload.articleKind);
-			const articleKind = payload.articleKind;
-			response = await api.postArticle(pluralArticleKind, {[articleKind]: payload}, user.token);
+			const pluralArticleKind = pluralizeArticleKind(formData.articleKind);
+			const articleKind = formData.articleKind;
+			response = await api.postArticle(pluralArticleKind, {[articleKind]: formData}, user.token);
 		} else {
 			const { pluralArticleKind, articleId } = match.params;
 			const articleKind = singularizeArticleKind(pluralArticleKind);
-			response = await api.putArticle(pluralArticleKind, articleId, {[articleKind]: payload}, user.token);
+			response = await api.putArticle(pluralArticleKind, articleId, {[articleKind]: formData}, user.token);
 		}
 
 		if ('error' in response) {
+			this.setState({isLoading: false});
 			return this.handleError(response);
 		}
 
@@ -178,9 +152,45 @@ class ArticleForm extends Component {
 		}
 	}
 
+	waitForImageUpload = async () => {
+		if (this.isUploadingImage) {
+			return new Promise(resolve => {
+				setTimeout(async () => {
+					await this.waitForImageUpload();
+					resolve();
+				}, 100);
+			});
+		}
+	}
+
+	clearImage = event => {
+		event.preventDefault();
+		const { formData } = this.state;
+		this.setState({
+			formData: {
+				...formData,
+				imageUrl: ''
+			}
+		});
+	}
+
+	checkFormDataValidityAndUpdateMessage() {
+		const { formData } = this.state;
+
+		if (!formData.name) {
+			this.setState({message: 'Name cannot be blank.'});
+			return false;
+		}
+		if (formData.maxTemp !== '' && formData.minTemp !== '' && Number(formData.minTemp) > Number(formData.maxTemp)) {
+			this.setState({message: 'Minimum temperature cannot exceed maximum temperature.'});
+			return false
+		}
+		return true;
+	}
+
 	handleError(response) {
 		this.setState({message: response.message || response.error, isLoading: false});
-		window.scrollTo(0,0);
+		this.scrollToTop();
 	}
 
 	handleCancel = event => {
@@ -388,10 +398,16 @@ class ArticleForm extends Component {
 					<textarea name='description' value={ formData.description || '' } placeholder='Something descriptive' onChange={ this.handleChange }/>
 				</div>
 
-				<div className='input-container'>
-					<label htmlFor='image'>Image <span className='optional'>optional</span></label>
-					<input name='image' type='file' onChange={ this.handleChange }/>
-				</div>
+				<ImageInput
+					ref='imageInput'
+					imageUrl={ formData.imageUrl }
+					handleChange={ imageUrl => this.setState({formData: {...formData, imageUrl}})}
+					clearErrorMessage={ this.clearErrorMessage }
+					handleError={ message => this.setState({ message })}
+					toggleUploadingStatus={ () =>  this.isUploadingImage = !this.isUploadingImage }
+				/>
+
+				{ formData.imageUrl && <button className='btn-secondary btn-clear-image' onClick={ this.clearImage }>Clear Image</button> }
 
 				<div className='input-container'>
 					<label htmlFor='rating'>Rating</label>
