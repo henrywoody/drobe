@@ -63,7 +63,7 @@ class ArticleForm extends Component {
 		this.setState({isLoading: true});
 		const { match, user } = this.props;
 		const { formData } = this.state;
-		if (match.path !== '/wardrobe/new') {
+		if (match.path === '/wardrobe/:pluralArticleKind/:articleId/edit') {
 			const { pluralArticleKind, articleId } = match.params;
 			const data = await api.getArticle(pluralArticleKind, articleId, user.token);
 
@@ -112,7 +112,7 @@ class ArticleForm extends Component {
 			}
 		}
 
-		this.setState({ formData: newFormData });
+		this.setState({formData: newFormData});
 	}
 
 	handleSubmit = async (event, shouldRouteToNewArticle) => {
@@ -120,6 +120,7 @@ class ArticleForm extends Component {
 		this.scrollToTop();
 		event.preventDefault();
 		const { match, user, history } = this.props;
+		const { articles } = this.state;
 
 		await this.waitForImageUpload();
 		const { formData } = this.state;
@@ -150,7 +151,7 @@ class ArticleForm extends Component {
 			history.push(`/wardrobe/${pluralArticleKind}/${id}`);
 		} else {
 			await this.resetState();
-			this.setState({isLoading: false});
+			this.setState({articles: [...articles, response], isLoading: false});
 		}
 	}
 
