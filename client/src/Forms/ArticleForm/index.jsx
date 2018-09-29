@@ -223,9 +223,14 @@ class ArticleForm extends Component {
 	}
 
 	filterArticleSuggestions(fieldName) {
+		const { match } = this.props;
 		const { articles, articleSearchOptions, formData } = this.state;
 		return articles.filter(e => {
-			return e.articleKind === singularizeArticleKind(fieldName) && !formData[fieldName].includes(e.id) && e.name.match(new RegExp(`^${articleSearchOptions[fieldName]}`, 'i'));
+			const notCurrentArticle = e.id !== Number(match.params.articleId);
+			const rightKind = e.articleKind === singularizeArticleKind(fieldName);
+			const notAlreadyIncluded = !formData[fieldName].includes(e.id);
+			const searchMatches = e.name.match(new RegExp(`^${articleSearchOptions[fieldName]}`, 'i'));
+			return notCurrentArticle && rightKind && notAlreadyIncluded && searchMatches;
 		});
 	}
 
