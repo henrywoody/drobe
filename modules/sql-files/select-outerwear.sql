@@ -6,7 +6,13 @@ FROM
 	FROM
 		outerwear
 	WHERE
-		outerwear.user_id = $1 AND (outerwear.min_temp <= $2 OR outerwear.min_temp IS NULL) AND (outerwear.max_temp >= $2 OR outerwear.max_temp IS NULL)
+		outerwear.user_id = $1
+	AND
+		(outerwear.specific_kind != 'raincoat' OR outerwear.specific_kind IS NULL)
+	AND
+		(outerwear.min_temp <= $2 OR outerwear.min_temp IS NULL)
+	AND
+		(outerwear.max_temp >= $2 OR outerwear.max_temp IS NULL)
 	) AS valid_outerwear
 INNER JOIN
 	(SELECT

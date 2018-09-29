@@ -13,4 +13,10 @@ INNER JOIN
 ON
 	outerwear.id = ANY(ARRAY[joined_outerwear.a_outerwear_id, joined_outerwear.b_outerwear_id])
 WHERE
-	outerwear.id != $1 AND (outerwear.min_temp <= $2 OR outerwear.min_temp IS NULL) AND (outerwear.max_temp >= $2 OR outerwear.max_temp IS NULL)
+	outerwear.id != $1
+AND
+	(outerwear.specific_kind != 'raincoat' OR outerwear.specific_kind IS NULL)
+AND
+	(outerwear.min_temp <= $2 OR outerwear.min_temp IS NULL)
+AND
+	(outerwear.max_temp >= $2 OR outerwear.max_temp IS NULL)
