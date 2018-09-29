@@ -44,10 +44,10 @@ class WeatherComponent extends Component {
 		}
 
 		const weather = await api.getWeather(coordinates, user.token);
-		this.setState({ isLoading: false, weather });
+		this.setState({ weather, isLoading: false, showLocationForm: false });
 	}
 
-	didSubmitLocation = (wasChanged) => {
+	didSubmitLocation = wasChanged => {
 		if (wasChanged) {
 			this.setState({showLocationForm: false, isLoading: true});
 		} else {
@@ -113,10 +113,7 @@ class WeatherComponent extends Component {
 		} else {
 			content = (
 				<div className='content'>
-					<ChangeLocationForm didSubmit={ this.didSubmitLocation }/>
-					<div className='buttons-container'>
-						<button className='btn-secondary' onClick={ () => this.setState({showLocationForm: false}) }>Cancel</button>
-					</div>
+					<ChangeLocationForm didSubmit={ this.didSubmitLocation } handleCancel={ e => {e.preventDefault(); this.setState({showLocationForm: false})} }/>
 				</div>
 			)
 		}
