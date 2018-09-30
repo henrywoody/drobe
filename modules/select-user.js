@@ -3,9 +3,9 @@ const	query = require('./query'),
 
 async function byId(id, {includePassword=false}={}) {
 	const queryText = includePassword ? (
-		"SELECT id, username, password, location_name, longitude, latitude FROM app_user WHERE id = $1"
+		"SELECT id, email, password, location_name, longitude, latitude FROM app_user WHERE id = $1"
 	) : ( 
-		"SELECT id, username, location_name, longitude, latitude FROM app_user WHERE id = $1"
+		"SELECT id, email, location_name, longitude, latitude FROM app_user WHERE id = $1"
 	);
 	const queryValues = [id];
 	const { rows } = await query(queryText, queryValues);
@@ -16,13 +16,13 @@ async function byId(id, {includePassword=false}={}) {
 	return camelCaseKeys(rows[0]);
 }
 
-async function byUsername(username, {includePassword=false}={}) {
+async function byEmail(email, {includePassword=false}={}) {
 	const queryText = includePassword ? (
-		"SELECT id, username, password, location_name, longitude, latitude FROM app_user WHERE username = $1"
+		"SELECT id, email, password, location_name, longitude, latitude FROM app_user WHERE email = $1"
 	) : ( 
-		"SELECT id, username, location_name, longitude, latitude FROM app_user WHERE username = $1"
+		"SELECT id, email, location_name, longitude, latitude FROM app_user WHERE email = $1"
 	);
-	const queryValues = [username];
+	const queryValues = [email];
 	const { rows } = await query(queryText, queryValues);
 
 	if (!rows.length)
@@ -40,5 +40,5 @@ function throwUserNotFoundError() {
 
 module.exports = {
 	byId: byId,
-	byUsername: byUsername
+	byEmail: byEmail
 }

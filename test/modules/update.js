@@ -14,8 +14,8 @@ describe('Update module', () => {
 	let goodDress, badDress1, badDress2;
 	
 	before(async () => {
-		goodUser = await createUser({username: 'goodUser', password: 'goodpassword123'});
-		badUser = await createUser({username: 'badUser', password: 'badpassword123'});
+		goodUser = await createUser({email: 'goodUser@example.com', password: 'goodpassword123'});
+		badUser = await createUser({email: 'badUser@example.com', password: 'badpassword123'});
 	});
 
 	beforeEach(async () => {
@@ -27,7 +27,7 @@ describe('Update module', () => {
 	describe('tableByIdWithValues method', () => {
 		it('should throw a ForbiddenError and perform no further actions if table is not allowed', async () => {
 			try {
-				await update.tableByIdWithValues('app_user', badUser.id, {username: 'worstUser', password: 'worstpassword123'});
+				await update.tableByIdWithValues('app_user', badUser.id, {email: 'worstUser@example.com', password: 'worstpassword123'});
 				assert.fail(0, 1, 'Error not thrown');
 			} catch (err) {
 				if (err.name === 'AssertionError')
@@ -36,7 +36,7 @@ describe('Update module', () => {
 			}
 
 			const updatedBadUser = await selectUser.byId(badUser.id);
-			assert.strictEqual(updatedBadUser.username, badUser.username);
+			assert.strictEqual(updatedBadUser.email, badUser.email);
 		});
 
 		it('should throw a ValidationError if the given name to update clashes with another article of the same type for the same user', async () => {

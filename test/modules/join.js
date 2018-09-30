@@ -11,8 +11,8 @@ describe ('Join module', () => {
 	let shirt, pants, jacket, sweater, dress, badPants;
 
 	before(async () => {
-		goodUser = await createUser({username: 'goodUser', password: 'password'});
-		badUser = await createUser({username: 'badUser', password: 'password'});
+		goodUser = await createUser({email: 'goodUser@example.com', password: 'password'});
+		badUser = await createUser({email: 'badUser@example.com', password: 'password'});
 	});
 
 	beforeEach(async () => {

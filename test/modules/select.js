@@ -14,8 +14,8 @@ describe('Select module', () => {
 
 	before(async () => {
 		// set up users
-		goodUser = await createUser({username: 'good_username', password: 'goodpassword123'});
-		badUser = await createUser({username: 'bad_username', password: 'badpassword123'});
+		goodUser = await createUser({email: 'goodUser@example.com', password: 'goodpassword123'});
+		badUser = await createUser({email: 'badUser@example.com', password: 'badpassword123'});
 	});
 
 	beforeEach(async () => {

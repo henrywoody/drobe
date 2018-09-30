@@ -17,6 +17,7 @@
     "cors": "^2.8.4",
     "debug": "~2.6.9",
     "decamelize": "^2.0.0",
+    "email-validator": "^2.0.4",
     "express": "~4.16.0",
     "express-session": "^1.15.6",
     "fast-deep-equal": "^2.0.1",

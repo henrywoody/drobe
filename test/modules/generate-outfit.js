@@ -16,7 +16,7 @@ describe('Generate Outfit module', () => {
 	let raincoat;
 
 	before(async () => {
-		user = await createUser({username: 'user', password: 'password', longitude: -122.0, latitude: 47.0});
+		user = await createUser({email: 'user@example.com', password: 'password', longitude: -122.0, latitude: 47.0});
 	});
 
 	beforeEach(async () => {
@@ -52,7 +52,7 @@ describe('Generate Outfit module', () => {
 				rainProb: 0.5
 			});
 			
-			const newUser = await createUser({username: 'newUser', password: 'password'})
+			const newUser = await createUser({email: 'newUser@example.com', password: 'password'})
 			await generateOutfit.forUser(newUser);
 		});
 

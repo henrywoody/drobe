@@ -12,14 +12,14 @@ describe('Insert module', () => {
 	let goodUser, badUser;
 
 	before(async () => {
-		goodUser = await createUser({username: 'gooduser', password: 'goodpass123'});
-		badUser = await createUser({username: 'baduser', password: 'badpass123'});
+		goodUser = await createUser({email: 'gooduser@example.com', password: 'goodpass123'});
+		badUser = await createUser({email: 'baduser@example.com', password: 'badpass123'});
 	});
 
 	describe('intoTableValues method', () => {
 		it('should throw a ForbiddenError if the given table is not valid', async () => {
 			try {
-				await insert.intoTableValues('app_user', {username: 'fakeuser', password: 'fakepass'});
+				await insert.intoTableValues('app_user', {email: 'fakeuser@example.com', password: 'fakepass'});
 				assert.fail(0, 1, 'Error not thrown');
 			} catch (err) {
 				if (err.name === 'AssertionError')

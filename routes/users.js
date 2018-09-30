@@ -18,9 +18,9 @@ router.post('/register', async (req, res) => {
 		return handleErrors(err, res);
 	}
 
-	const { username, password } = userData;
+	const { email, password } = userData;
 	// for passport
-	req.body.username = username.toLowerCase();
+	req.body.email = email.toLowerCase();
 	req.body.password = password;
 
 	try {
@@ -29,7 +29,7 @@ router.post('/register', async (req, res) => {
 		try {
 			const hash = await bcrypt.hash(password, salt);
 			userData.password = hash;
-			user = await createUser({...userData, username: username.toLowerCase()});
+			user = await createUser({...userData, email: email.toLowerCase()});
 		} catch (err) {
 			return handleErrors(err, res);
 		}
@@ -110,13 +110,13 @@ router.post('/login', (req, res) => {
 		err.name = 'FormatError';
 		return handleErrors(err, res);
 	}
-	const { username, password } = userData;
+	const { email, password } = userData;
 
 	// for passport
-	req.body.username = username.toLowerCase();
+	req.body.email = email.toLowerCase();
 	req.body.password = password;
 
-	if (!(username && password)) {
+	if (!(email && password)) {
 		const err = new Error;
 		err.name = 'MissingCredentialsError';
 		return handleErrors(err, res);

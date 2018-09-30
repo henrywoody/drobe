@@ -7,7 +7,7 @@ class UserForm extends Component {
 		super();
 		this.state = {
 			formData: {
-				username: '',
+				email: '',
 				password: '',
 				passwordCheck: '',
 				location: {}
@@ -16,7 +16,7 @@ class UserForm extends Component {
 		}
 	}
 
-	handleChange = (event) => {
+	handleChange = event => {
 		const { name, value } = event.target;
 		const { formData } = this.state;
 
@@ -25,7 +25,7 @@ class UserForm extends Component {
 		this.setState({ formData });
 	}
 
-	handleSubmit = async (event) => {
+	handleSubmit = async event => {
 		event.preventDefault();
 		const { formType, history } = this.props;
 		const { formData } = this.state;
@@ -34,7 +34,7 @@ class UserForm extends Component {
 			if (formData.password !== formData.passwordCheck) {
 				return this.setState({message: 'Passwords do not match.'});
 			}
-			if (formData.username.includes(' ')) {
+			if (formData.email.includes(' ')) {
 				return this.setState({message: 'Username cannot contain spaces.'})
 			}
 		}
@@ -49,13 +49,15 @@ class UserForm extends Component {
 
 		if (response.status !== 200) {
 			if (formType === 'login') {
-				this.setState({message: 'Invalid username or password.'});
+				this.setState({message: 'Invalid email or password.'});
 			} else {
 				const jsonResponse = await response.json()
 				if (jsonResponse.error === 'UserExistsError') {
-					this.setState({message: 'That username is already taken.'})
+					this.setState({message: 'That email is already taken.'});
+				} else if (jsonResponse.error === 'InvalidEmailError') {
+					this.setState({message: 'Please provide a valid email address.'});
 				} else {
-					this.setState({message: 'Something went wrong :/'})
+					this.setState({message: 'Something went wrong :/'});
 				}
 			}
 		} else {
@@ -77,8 +79,8 @@ class UserForm extends Component {
 				</div>
 				
 				<div className='input-container'>
-					<label htmlFor='username'>Username</label>
-					<input name='username' type='text' placeholder='username' value={ formData.username || '' } onChange={ this.handleChange }/>
+					<label htmlFor='email'>Email</label>
+					<input name='email' type='text' placeholder='email' value={ formData.email || '' } onChange={ this.handleChange }/>
 				</div>
 
 				<div className='input-container'>

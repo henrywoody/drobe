@@ -13,7 +13,7 @@ module.exports = async (data) => {
 	const { rows } = insertResult;
 	if (!rows) {
 		const { name, constraint } = insertResult;
-		if (name === 'error' && constraint === 'app_user_username_key') {
+		if (name === 'error' && constraint === 'app_user_email_key') {
 			const err = new Error;
 			err.name = 'UserExistsError';
 			throw err;

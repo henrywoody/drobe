@@ -15,7 +15,7 @@ describe('Delete module', () => {
 	let coat;
 
 	before(async () => {
-		user = await createUser({username: 'user', password: 'password'});
+		user = await createUser({email: 'user@example.com', password: 'password'});
 	});
 
 	beforeEach(async () => {

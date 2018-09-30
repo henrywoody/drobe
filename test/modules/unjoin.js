@@ -12,7 +12,7 @@ describe('Unjoin module', () => {
 	let shirt, pants, dress, jacket, sweater;
 
 	before(async () => {
-		user = await createUser({username: 'user', password: 'pass'});
+		user = await createUser({email: 'user@example.com', password: 'pass'});
 	});
 
 	beforeEach(async () => {

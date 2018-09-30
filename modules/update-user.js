@@ -20,7 +20,7 @@ module.exports = async (id, data, {includePassword=false}={}) => {
 	const { rows } = updateResult;
 	if (!rows) {
 		const { name, constraint } = updateResult;
-		if (name === 'error' && constraint === 'app_user_username_key') {
+		if (name === 'error' && constraint === 'app_user_email_key') {
 			const err = new Error;
 			err.name = 'UserExistsError';
 			throw err;

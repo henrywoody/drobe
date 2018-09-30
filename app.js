@@ -46,9 +46,9 @@ const selectUser = require('./modules/select-user');
 app.use(passport.initialize());
 app.use(passport.session());
 
-passport.use(new localStrategy(async (username, password, cb) => {
+passport.use(new localStrategy({usernameField: 'email'}, async (email, password, cb) => {
 	try {
-		const user = await selectUser.byUsername(username, {includePassword: true});
+		const user = await selectUser.byEmail(email, {includePassword: true});
 		if (user) {
 			try {
 				const cryptResult = await bcrypt.compare(password, user.password);
@@ -84,7 +84,7 @@ passport.use(new localStrategy(async (username, password, cb) => {
 				cb(err);
 			}
 		} else {
-			const err = new Error('Incorrect username.');
+			const err = new Error('Incorrect email.');
 			err.name = 'IncorrectEmailError';
 			cb(err);
 		}

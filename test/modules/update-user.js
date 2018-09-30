@@ -7,15 +7,15 @@ const	chai = require('chai'),
 describe('Update User module', () => {
 	let user, userId
 	beforeEach(async () => {
-		user = await createUser({username: 'test@example.com', password: 'test', locationName: 'Seattle, WA, USA', longitude: 100, latitude: 50});
+		user = await createUser({email: 'test@example.com', password: 'test', locationName: 'Seattle, WA, USA', longitude: 100, latitude: 50});
 		userId = user.id;
 	});
 
 	it('should return a new user with given data', async () => {
-		const userData = {username: 'somethingelse@example.com', password: 'newpass', locationName: 'Los Angeles, CA, USA', latitude: 34.0, longitude: -118.0};
+		const userData = {email: 'somethingelse@example.com', password: 'newpass', locationName: 'Los Angeles, CA, USA', latitude: 34.0, longitude: -118.0};
 		updatedUser = await updateUser(userId, userData, {includePassword: true});
 		
-		assert.strictEqual(updatedUser.username, userData.username);
+		assert.strictEqual(updatedUser.email, userData.email);
 		assert.strictEqual(updatedUser.locationName, userData.locationName);
 		assert.strictEqual(updatedUser.password, userData.password);
 		assert.equal(updatedUser.latitude, userData.latitude);
@@ -23,12 +23,12 @@ describe('Update User module', () => {
 	});
 
 	it('should update a new user with given data if includePassword is true', async () => {
-		const userData = {username: 'somethingelse@example.com', password: 'newpass', locationName: 'Los Angeles, CA, USA', latitude: 34.0, longitude: -118.0};
+		const userData = {email: 'somethingelse@example.com', password: 'newpass', locationName: 'Los Angeles, CA, USA', latitude: 34.0, longitude: -118.0};
 		await updateUser(userId, userData, {includePassword: true});
 		const { rows } = await query("SELECT * FROM app_user");
 		const updatedUser = rows[0];
 		
-		assert.strictEqual(updatedUser.username, userData.username);
+		assert.strictEqual(updatedUser.email, userData.email);
 		assert.strictEqual(updatedUser.location_name, userData.locationName);
 		assert.equal(updatedUser.latitude, userData.latitude);
 		assert.equal(updatedUser.longitude, userData.longitude);
@@ -38,12 +38,12 @@ describe('Update User module', () => {
 
 	it('should update a user without updating the password if includePassword is false', async () => {
 		const oldPassword = user.password;
-		const userData = {username: 'somethingelse@example.com', password: 'newpass', locationName: 'Los Angeles, CA, USA', latitude: 34.0, longitude: -118.0};
+		const userData = {email: 'somethingelse@example.com', password: 'newpass', locationName: 'Los Angeles, CA, USA', latitude: 34.0, longitude: -118.0};
 		await updateUser(userId, userData, {includePassword: false});
 		const { rows } = await query("SELECT * FROM app_user");
 		const updatedUser = rows[0];
 
-		assert.strictEqual(updatedUser.username, userData.username);
+		assert.strictEqual(updatedUser.email, userData.email);
 		assert.strictEqual(updatedUser.location_name, userData.locationName);
 		assert.equal(updatedUser.latitude, userData.latitude);
 		assert.equal(updatedUser.longitude, userData.longitude);
@@ -51,10 +51,10 @@ describe('Update User module', () => {
 		assert.strictEqual(updatedUser.password, oldPassword);
 	});
 
-	it('should throw an error if a user with the same username already exists', async () => {
-		await createUser({username: 'other@example.com', password: 'test'});
+	it('should throw an error if a user with the same email already exists', async () => {
+		await createUser({email: 'other@example.com', password: 'test'});
 		try {
-			await updateUser(userId, {username: 'other@example.com', password: 'test'});
+			await updateUser(userId, {email: 'other@example.com', password: 'test'});
 			assert.fail(0, 1, 'Error not thrown'); // should not get here
 		} catch (err) {
 			if (err.name === 'AssertionError')
