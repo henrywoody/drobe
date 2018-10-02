@@ -8,7 +8,7 @@ const	chai = require('chai'),
 describe('Select User module', () => {
 	let user;
 	before(async () => {
-		user = await createUser({email: 'user@example.com', password: 'password'});
+		user = await createUser({email: 'user@example.com', password: 'password', facebookId: 'fb12345', googleId: 'google12345'});
 	});
 
 	describe('byId method', () => {
@@ -17,8 +17,9 @@ describe('Select User module', () => {
 				await selectUser.byId(user.id + 1);
 				assert.fail(0, 1, 'No error was raised');
 			} catch (err) {
-				if (err.name === 'AssertionError')
+				if (err.name === 'AssertionError') {
 					throw err;
+				}
 				assert.strictEqual(err.name, 'UserNotFoundError');
 			}
 		});
@@ -57,8 +58,9 @@ describe('Select User module', () => {
 				await selectUser.byEmail('someothername@example.com');
 				assert.fail(0, 1, 'No error was raised');
 			} catch (err) {
-				if (err.name === 'AssertionError')
+				if (err.name === 'AssertionError') {
 					throw err;
+				}
 				assert.strictEqual(err.name, 'UserNotFoundError');
 			}
 		});
@@ -85,6 +87,72 @@ describe('Select User module', () => {
 
 		it('should camelCase the keys of the returned user', async () => {
 			const existingUser = await selectUser.byEmail(user.email);
+
+			assert.include(Object.keys(existingUser), 'locationName');
+			assert.notInclude(Object.keys(existingUser), 'location_name');
+		});
+	});
+
+	describe('byFacebookId method', () => {
+		it('should throw a UserNotFoundError if no user with the given facebookId is found', async () => {
+			try {
+				await selectUser.byFacebookId('notcorrect');
+				assert.fail(0, 1), 'No error was raised';
+			} catch (err) {
+				if (err.name === 'AssertionError') {
+					throw err;
+				}
+				assert.strictEqual(err.name, 'UserNotFoundError');
+			}
+		});
+
+		it('should return the requested user if it exists', async () => {
+			const existingUser = await selectUser.byFacebookId(user.facebookId);
+
+			assert.isNotNull(existingUser);
+			assert.strictEqual(existingUser.facebookId, user.facebookId);
+		});
+
+		it('should not return the password of the requested user', async () => {
+			const existingUser = await selectUser.byFacebookId(user.facebookId);
+			assert.notInclude(Object.keys(existingUser), 'password');
+		});
+
+		it('should camelCase the keys of the returned user', async () => {
+			const existingUser = await selectUser.byFacebookId(user.facebookId);
+
+			assert.include(Object.keys(existingUser), 'locationName');
+			assert.notInclude(Object.keys(existingUser), 'location_name');
+		});
+	});
+
+	describe('byGoogleId method', () => {
+		it('should throw a UserNotFoundError if no user with the given googleId is found', async () => {
+			try {
+				await selectUser.byGoogleId('notcorrect');
+				assert.fail(0, 1), 'No error was raised';
+			} catch (err) {
+				if (err.name === 'AssertionError') {
+					throw err;
+				}
+				assert.strictEqual(err.name, 'UserNotFoundError');
+			}
+		});
+
+		it('should return the requested user if it exists', async () => {
+			const existingUser = await selectUser.byGoogleId(user.googleId);
+
+			assert.isNotNull(existingUser);
+			assert.strictEqual(existingUser.googleId, user.googleId);
+		});
+
+		it('should not return the password of the requested user', async () => {
+			const existingUser = await selectUser.byGoogleId(user.googleId);
+			assert.notInclude(Object.keys(existingUser), 'password');
+		});
+
+		it('should camelCase the keys of the returned user', async () => {
+			const existingUser = await selectUser.byGoogleId(user.googleId);
 
 			assert.include(Object.keys(existingUser), 'locationName');
 			assert.notInclude(Object.keys(existingUser), 'location_name');

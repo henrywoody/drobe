@@ -8,6 +8,8 @@ describe('Clean User Data module', () => {
 	it('should keep all the data for valid keys', () => {
 		const data = {
 			email: 'test@example.com',
+			facebookId: 'fb12345',
+			googleId: 'google12345',
 			password: 'goodpassword1',
 			locationName: 'Good Town, USA',
 			longitude: -115.5,
@@ -25,6 +27,8 @@ describe('Clean User Data module', () => {
 		const data = {};
 		const missingFields = [
 			'email',
+			'facebookId',
+			'googleId',
 			'password',
 			'locationName',
 			'longitude',

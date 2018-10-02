@@ -3,6 +3,8 @@ const	camelCase = require('camelcase'),
 
 const fields = [
 	'email',
+	'facebook_id',
+	'google_id',
 	'password',
 	'location_name',
 	'longitude',
