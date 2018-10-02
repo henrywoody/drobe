@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import UserForm from '../../Forms/UserForm';
 import Runner from '../../Components/Runner';
+import SocialAuthButtons from '../../Components/SocialAuthButtons';
 import './style.css';
 
 class Landing extends Component {
@@ -28,6 +29,13 @@ class Landing extends Component {
 	getFormComponent() {
 		const { displayedForm } = this.state;
 
+		const socialAuthButtons = (
+			<div className='social-auth-div'>
+				<span>or</span>
+				<SocialAuthButtons/>
+			</div>
+		)
+
 		switch (displayedForm) {
 		case 'register':
 			return (
@@ -35,6 +43,8 @@ class Landing extends Component {
 					<h3>Register</h3>
 
 					<UserForm formType='register' handleCancel={ () => this.setState({ displayedForm: null }) }/>	
+
+					{ socialAuthButtons }
 				</div>
 			)
 		case 'login':
@@ -43,6 +53,8 @@ class Landing extends Component {
 					<h3>Login</h3>
 
 					<UserForm formType='login' handleCancel={ () => this.setState({ displayedForm: null }) }/>	
+
+					{ socialAuthButtons }
 				</div>
 			)
 		default:
@@ -54,6 +66,8 @@ class Landing extends Component {
 						<button className='btn-primary' onClick={ () => this.setState({ displayedForm: 'register' }) }>Create an Account</button>
 						<button className='btn-secondary' onClick={ () => this.setState({ displayedForm: 'login' }) }>Login</button>
 					</div>
+
+					{ socialAuthButtons }
 				</div>
 			)
 		}
@@ -79,7 +93,9 @@ class Landing extends Component {
 						</h2>
 
 						<p>
-							Conserve your energy for the decisions that matter by delegating your wardrobe decisions to Drobe. Drobe considers the weather, your outfit history, and your preferences to create specially curated outfits for you each morning. Style and productivity have never been so compatible.
+							Conserve your energy for the decisions that matter by delegating your wardrobe decisions to Drobe.
+							Drobe considers the weather, your outfit history, and your preferences to create specially curated outfits for you each morning.
+							Style and productivity have never been so compatible.
 						</p>
 
 						<p>

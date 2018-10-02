@@ -1,0 +1,93 @@
+.social-auth-buttons-container {
+	margin: 1rem auto;
+	display: flex;
+	flex-flow: column;
+}
+
+.social-auth-buttons-container > * {
+	width: 75%;
+	min-width: 15rem;
+	margin: .25rem auto 0;
+	display: inline-block;
+	position: relative;
+}
+
+.social-auth-buttons-container > *:hover {
+	cursor: pointer;
+}
+
+.social-auth-buttons-container > * span.button-text {
+	line-height: 42px;
+	text-align: center;
+	display: block;
+
+	vertical-align: middle;
+}
+
+.social-auth-buttons-container > * span.icon {
+	display: inline-block;
+	vertical-align: middle;
+	position: absolute;
+	left: 0;
+	top: 0;
+}
+
+
+/* Facebook Style sources:
+	- https://developers.facebook.com/docs/facebook-login/web/login-button/
+*/
+.social-auth-buttons-container .btn-facebook {
+	background-color: #4267b2;
+	color: #fff;
+	font-family: Helvetica, Arial, sans-serif;
+	font-weight: 500;
+	letter-spacing: .05rem;
+	font-size: 13.5px;
+	border-radius: 4px;
+
+	margin-bottom: .5rem;
+}
+
+
+.social-auth-buttons-container .btn-facebook span.icon {
+	width: 24px;
+	margin-top: 9px;
+	margin-left: 9px;
+}
+
+/* Google Style sources:
+	- https://developers.google.com/identity/sign-in/web/sign-in#before_you_begin
+	- https://developers.google.com/identity/sign-in/web/build-button
+*/
+.social-auth-buttons-container .btn-google {
+	background: #fff;
+	height: 42px;
+	border-radius: 1px;
+	box-shadow: 0 2px 4px 0 rgba(0,0,0,.25);
+	white-space: nowrap;
+
+	transition: background-color .218s,border-color .218s,box-shadow .218s;
+}
+.social-auth-buttons-container .btn-google:hover {
+	box-shadow: 0 0 3px 3px rgba(66,133,244,.3);
+}
+.social-auth-buttons-container .btn-google:active {
+	background-color: #eee;
+    color: #6d6d6d;
+}
+.social-auth-buttons-container .btn-google span.label {
+	font-family: serif;
+	font-weight: normal;
+}
+.social-auth-buttons-container .btn-google span.icon {
+	background: url('https://google-developers.appspot.com/identity/sign-in/g-normal.png') transparent 5px 50% no-repeat;
+	width: 42px;
+	height: 42px;
+}
+.social-auth-buttons-container .btn-google span.button-text {
+	color: #757575;
+	font-family: 'Roboto', sans-serif;
+	font-size: 14px;
+	letter-spacing: .21px;
+	font-weight: 500;
+}

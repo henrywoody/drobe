@@ -31,11 +31,14 @@ class UserForm extends Component {
 		const { formData } = this.state;
 
 		if (formType === 'register') {
+			if (!formData.email) {
+				return this.setState({message: 'Email cannot be blank.'});
+			}
 			if (formData.password !== formData.passwordCheck) {
 				return this.setState({message: 'Passwords do not match.'});
 			}
 			if (formData.email.includes(' ')) {
-				return this.setState({message: 'Username cannot contain spaces.'})
+				return this.setState({message: 'Email cannot contain spaces.'});
 			}
 		}
 

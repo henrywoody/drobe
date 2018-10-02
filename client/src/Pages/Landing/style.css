@@ -55,7 +55,7 @@ main.landing .form-box {
 	min-height: 3rem;
 	width: 60%;
 	border-radius: .25rem;
-	padding: 1rem;
+	padding: 2rem 1rem;
 	margin: 0 auto;
 	box-shadow: .5rem .5rem 1rem var(--dark-drobe-blue-shadow);
 	display: flex;
@@ -64,7 +64,7 @@ main.landing .form-box {
 }
 
 main.landing .form-box h3 {
-	margin: 1rem auto .5rem;
+	margin: 0 auto .5rem;
 }
 
 main.landing .form-box > .buttons-container {
@@ -73,7 +73,12 @@ main.landing .form-box > .buttons-container {
 	justify-content: space-around;
 	width: 15rem;
 	height: 2rem;
-	margin: 1.5rem auto;
+	margin: 1rem auto;
+}
+
+main.landing .form-box .social-auth-div > span {
+	text-align: center;
+	display: block;
 }
 
 main.landing .runner-container {
@@ -127,7 +132,7 @@ main.landing .runner-container {
 
 	main.landing .form-box {
 		width: 80%;
-		padding: 1rem 1.25rem;
+		padding: 2rem 1.25rem;
 		margin-top: 10rem;
 	}
 }
