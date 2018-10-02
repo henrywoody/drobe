@@ -42,6 +42,7 @@ app.use(cors());
 // Authentication
 // ==============
 const selectUser = require('./modules/select-user');
+const createUser = require('./modules/create-user');
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -64,8 +65,9 @@ passport.use(new localStrategy({usernameField: 'email'}, async (email, password,
 
 					const data = {};
 					for (const key in user) {
-						if (key !== 'password')
+						if (key !== 'password') {
 							data[key] = user[key];
+						}
 					}
 
 					const info = {

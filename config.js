@@ -13,7 +13,13 @@ config.dev = {
 	googleApiKey: process.env.GOOGLE_API_KEY,
 	imagesBucket: process.env.DEV_IMAGES_BUCKET,
 	awsAccessKeyId: process.env.AWS_ACCESS_KEY_ID,
-	awsSecretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+	awsSecretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+	facebookAppId: process.env.FACEBOOK_APP_ID,
+	facebookAppSecret: process.env.FACEBOOK_APP_SECRET,
+	facebookCallbackURL: process.env.FACEBOOK_CALLBACK_URL,
+	googleAppId: process.env.GOOGLE_APP_ID,
+	googleAppSecret: process.env.GOOGLE_APP_SECRET,
+	googleCallbackURL: process.env.GOOGE_CALLBACK_URL
 };
 
 // Test
@@ -29,7 +35,13 @@ config.test = {
 	googleApiKey: process.env.GOOGLE_API_KEY,
 	imagesBucket: process.env.TEST_IMAGES_BUCKET,
 	awsAccessKeyId: process.env.AWS_ACCESS_KEY_ID,
-	awsSecretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+	awsSecretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+	facebookAppId: process.env.FACEBOOK_APP_ID,
+	facebookAppSecret: process.env.FACEBOOK_APP_SECRET,
+	facebookCallbackURL: process.env.FACEBOOK_CALLBACK_URL,
+	googleAppId: process.env.GOOGLE_APP_ID,
+	googleAppSecret: process.env.GOOGLE_APP_SECRET,
+	googleCallbackURL: process.env.GOOGE_CALLBACK_URL
 };
 
 // Production
@@ -45,7 +57,13 @@ config.production = {
 	googleApiKey: process.env.GOOGLE_API_KEY,
 	imagesBucket: process.env.PROD_IMAGES_BUCKET,
 	awsAccessKeyId: process.env.AWS_ACCESS_KEY_ID,
-	awsSecretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+	awsSecretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+	facebookAppId: process.env.FACEBOOK_APP_ID,
+	facebookAppSecret: process.env.FACEBOOK_APP_SECRET,
+	facebookCallbackURL: process.env.FACEBOOK_CALLBACK_URL,
+	googleAppId: process.env.GOOGLE_APP_ID,
+	googleAppSecret: process.env.GOOGLE_APP_SECRET,
+	googleCallbackURL: process.env.GOOGE_CALLBACK_URL
 }
 
 
