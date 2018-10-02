@@ -15,7 +15,7 @@ module.exports = (userData) => {
 	const cleanData = {};
 	for (const key of fields) {
 		if (Object.keys(userData).includes(camelCase(key))) {
-			if (key === 'email' && !emailValidator.validate(userData[camelCase(key)])) {
+			if (key === 'email' && userData[camelCase(key)] && !emailValidator.validate(userData[camelCase(key)])) {
 				const err = new Error;
 				err.name = 'InvalidEmailError'
 				throw err;

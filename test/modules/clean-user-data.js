@@ -51,4 +51,41 @@ describe('Clean User Data module', () => {
 		assert.notInclude(Object.keys(cleanData), 'otherField');
 		assert.notInclude(Object.keys(cleanData), decamelize('otherField'));
 	});
+
+	it('should raise an InvalidEmailError if the given email is invalid', () => {
+		const data = {
+			email: 'notanemail',
+			facebookId: 'fb12345',
+			googleId: 'google12345',
+			password: 'goodpassword1',
+			locationName: 'Good Town, USA',
+			longitude: -115.5,
+			latitude: 35.0
+		};
+
+		try {
+			cleanUserData(data);
+			assert.fail(0,1,'No error was thrown');
+		} catch (err) {
+			if (err.name === 'AssertionError') {
+				throw err;
+			}
+			assert.strictEqual(err.name, 'InvalidEmailError');
+		}
+	});
+
+	it('should not raise an InvalidEmailError if no email is given', () => {
+		cleanUserData({
+			locationName: 'Good Town, USA',
+			longitude: -115.5,
+			latitude: 35.0
+		});
+
+		cleanUserData({
+			email: '',
+			locationName: 'Good Town, USA',
+			longitude: -115.5,
+			latitude: 35.0
+		});
+	});
 });
