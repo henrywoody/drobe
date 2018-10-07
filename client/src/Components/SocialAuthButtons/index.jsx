@@ -66,8 +66,8 @@ const GoogleAuthButtonWithRouter = withRouter(GoogleAuthButton);
 export default props => {
 	return (
 		<div className='social-auth-buttons-container'>
-			<FacebookAuthButtonWithRouter/>
 			<GoogleAuthButtonWithRouter/>
+			<FacebookAuthButtonWithRouter/>
 		</div>
 	)
 }

@@ -32,6 +32,10 @@
 	top: 0;
 }
 
+.social-auth-buttons-container > :not(:last-child) {
+	margin-bottom: .5rem;
+}
+
 
 /* Facebook Style sources:
 	- https://developers.facebook.com/docs/facebook-login/web/login-button/
@@ -44,8 +48,6 @@
 	letter-spacing: .05rem;
 	font-size: 13.5px;
 	border-radius: 4px;
-
-	margin-bottom: .5rem;
 }
 
 
