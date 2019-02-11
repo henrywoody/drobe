@@ -4,7 +4,6 @@ const	createError		= require('http-errors'),
 		cookieParser	= require('cookie-parser'),
 		logger			= require('morgan'),
 		passport		= require('passport'),
-		localStrategy	= require('passport-local'),
 		jwt				= require('jsonwebtoken'),
 		cors			= require('cors'),
 		handleErrors	= require('./modules/handle-db-errors'),
@@ -47,53 +46,8 @@ const createUser = require('./modules/create-user');
 app.use(passport.initialize());
 app.use(passport.session());
 
-passport.use(new localStrategy({usernameField: 'email'}, async (email, password, cb) => {
-	try {
-		const user = await selectUser.byEmail(email, {includePassword: true});
-		if (user) {
-			try {
-				const cryptResult = await bcrypt.compare(password, user.password);
-
-				if (cryptResult) { // passwords match
-					const success = true;
-
-					const payload = {
-						sub: user.id
-					};
-
-					const token = jwt.sign(payload, global.config.appSecret);
-
-					const data = {};
-					for (const key in user) {
-						if (key !== 'password') {
-							data[key] = user[key];
-						}
-					}
-
-					const info = {
-						message: 'Login Successful',
-						token,
-						userData: data
-					};
-
-					cb(null, success, info);
-				} else {
-					const err = new Error('Incorrect password.')
-					err.name = 'IncorrectPasswordError';
-					cb(err);
-				}
-			} catch (err) {
-				cb(err);
-			}
-		} else {
-			const err = new Error('Incorrect email.');
-			err.name = 'IncorrectEmailError';
-			cb(err);
-		}
-	} catch (err) {
-		cb(err);
-	}
-}));
+const authStrategy = require('./modules/auth-strategy');
+passport.use(authStrategy);
 
 passport.serializeUser((user, cb) => {
 	cb(null, user.id);
@@ -106,7 +60,6 @@ passport.deserializeUser(async (id, cb) => {
 		console.log(err);
 	}
 });
-// ==============
 
 
 app.use('/users', usersRouter);
