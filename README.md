@@ -41,35 +41,31 @@ For weather data, this project uses the [Dark Sky API](https://darksky.net/dev).
 
 ### Deployment
 
-Drobe is deployed on Google Cloud Platform [App Engine](https://cloud.google.com/appengine/) . The database is also hosted on GCP [Cloud SQL](https://cloud.google.com/sql/docs/postgres/). Images are stored on [AWS S3](https://aws.amazon.com/s3/).
+~~Drobe is deployed on Google Cloud Platform [App Engine](https://cloud.google.com/appengine/) . The database is also hosted on GCP [Cloud SQL](https://cloud.google.com/sql/docs/postgres/).~~ I'm not rich, so now Drobe is hosted on my Raspberry Pi at home. Images are stored on [AWS S3](https://aws.amazon.com/s3/).
 
-#### Config
+### Deployment Steps
 
-Environment variables are stored in `app.yaml`. For that reason `app.yaml` must be excluded from source control. The `template-app.yaml` shows how `app.yaml` should be formatted, but does not contain any values for the listed environment variables.
+These are probably not interesting for anyone reading this, but this is for my records.
 
-#### Connecting to production DB on local
-
-[Using Cloud SQL for PostgreSQL](https://cloud.google.com/appengine/docs/standard/nodejs/using-cloud-sql-postgres) as a reference. See those docs for download of `cloud_sql_proxy`.
-
-To connect to the database on GCP, get the database instance connection name with:
+First pull updates from git on the Pi
 
 ```shell
-gcloud sql instances describe [YOUR_INSTANCE_NAME] | grep connectionName
+git pull origin master
 ```
 
-In my case, `YOUR_INSTANCE_NAME` is `drobe-db`.
-
-Then make sure postgres is not running (`brew services stop postgres`) and run:
+Create a new build of the client and copy it over to the pi (from dev machine)
 
 ```shell
-./cloud_sql_proxy -instances="[YOUR_INSTANCE_CONNECTION_NAME]"=tcp:5432
+cd client
+npm run build
+zip -r build.zip build
+scp build.zip pi@192.168.0.139:/home/pi/projects/drobe/client
 ```
 
-#### Connecting in the Cloud Console
-
-Enter:
+On the Pi, unzip the new build
 
 ```shell
-PGDATABASE=[database_name] gcloud sql connect sql_instance_name --user=database_user
+cd client
+unzip build.zip
 ```
 
