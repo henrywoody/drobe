@@ -1,10 +1,10 @@
-export default async function uploadImage(image, token) {
+export default async function uploadImage(image, token, uploadId) {
 	const endpoint = '/api/v2/images/upload';
 
 	const formData = new FormData();
  	formData.append('image', image);
 
-	const result = await fetch(endpoint, {
+	const response = await fetch(endpoint, {
 		method: 'POST',
 		headers: {
 			'Authorization': `Bearer ${token}`,
@@ -12,5 +12,16 @@ export default async function uploadImage(image, token) {
 		body: formData
 	});
 
-	return result.json();
+	let responseData;
+	try {
+		responseData = await response.json()
+	} catch (e) {
+		responseData = {};
+	}
+
+	return {
+		responseData,
+		responseStatus: response.status,
+		uploadId,
+	}
 }

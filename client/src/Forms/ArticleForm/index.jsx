@@ -166,17 +166,6 @@ class ArticleForm extends Component {
 		}
 	}
 
-	clearImage = event => {
-		event.preventDefault();
-		const { formData } = this.state;
-		this.setState({
-			formData: {
-				...formData,
-				imageUrl: ''
-			}
-		});
-	}
-
 	checkFormDataValidityAndUpdateMessage() {
 		const { formData } = this.state;
 
@@ -250,6 +239,7 @@ class ArticleForm extends Component {
 	render() {
 		const { match } = this.props;
 		const { isLoading, articleSearchOptions, formData, message } = this.state;
+		console.log(formData)
 
 		if (isLoading) {
 			return <Loader/>
@@ -407,14 +397,12 @@ class ArticleForm extends Component {
 
 				<ImageInput
 					ref='imageInput'
-					imageUrl={ formData.imageUrl }
-					handleChange={ imageUrl => this.setState({formData: {...formData, imageUrl}})}
+					imageUrl = { formData.imageUrl }
+					handleChange={ imageUrl => this.setState(prevState => ({formData: {...prevState.formData, imageUrl}}))}
 					clearErrorMessage={ this.clearErrorMessage }
 					handleError={ message => this.setState({ message })}
 					toggleUploadingStatus={ () =>  this.isUploadingImage = !this.isUploadingImage }
 				/>
-
-				{ formData.imageUrl && <button className='btn-secondary btn-clear-image' onClick={ this.clearImage }>Clear Image</button> }
 
 				<div className='input-container'>
 					<label htmlFor='rating'>Rating</label>
