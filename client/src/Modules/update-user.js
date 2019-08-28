@@ -9,6 +9,13 @@ export default async function updateUser(id, token, body) {
 		},
 		body: JSON.stringify(body)
 	};
-	const result = await fetch(fullUrl, additionalInfo);
-	return result.json();
+
+	const response = await fetch(fullUrl, additionalInfo);
+	const data = await response.json();
+
+	if (response.ok) {
+		return { ok: true, data, error: "" };
+	} else {
+		return { ok: false, data: {}, error: data.error };
+	}
 }

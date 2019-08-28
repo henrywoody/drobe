@@ -239,7 +239,6 @@ class ArticleForm extends Component {
 	render() {
 		const { match } = this.props;
 		const { isLoading, articleSearchOptions, formData, message } = this.state;
-		console.log(formData)
 
 		if (isLoading) {
 			return <Loader/>

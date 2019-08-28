@@ -19,7 +19,10 @@ class UserStorage {
 	}
 
 	updateUser = async (user) => {
-		const updatedUser = await updateUser(user.id, user.token, { user });
+		const { ok, data: updatedUser } = await updateUser(user.id, user.token, { user });
+		if (!ok) {
+			return;
+		}
 		this.storeUserInfo({...updatedUser, token: user.token});
 		store.dispatch(logUserIn({...updatedUser, token: user.token}));
 	}
