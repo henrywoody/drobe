@@ -26,7 +26,7 @@
     "http-errors": "~1.6.2",
     "jsonwebtoken": "^8.4.0",
     "local-storage": "^1.4.2",
-    "mongoose": "^5.3.13",
+    "mongoose": "^5.7.5",
     "morgan": "^1.9.1",
     "multer": "^1.4.1",
     "multer-s3": "^2.9.0",
