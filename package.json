@@ -10,7 +10,7 @@
     "test-modules": "NODE_ENV=test mocha test/modules"
   },
   "dependencies": {
-    "aws-sdk": "^2.361.0",
+    "aws-sdk": "^2.814.0",
     "bcrypt": "^3.0.2",
     "camelcase": "^5.0.0",
     "cookie-parser": "~1.4.3",
