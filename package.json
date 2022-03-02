@@ -38,7 +38,7 @@
     "request": "^2.88.0",
     "request-promise-native": "^1.0.5",
     "sinon": "^6.3.5",
-    "url-parse": "^1.4.4"
+    "url-parse": "^1.5.9"
   },
   "description": "Automated outfit picking.",
   "main": "app.js",
